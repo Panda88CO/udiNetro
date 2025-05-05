@@ -1,13 +1,24 @@
 <editors> 
-  <editor id="IRRSTATE" > 
-     <range  uom="25" subset="0,1,2,3,4,5,6,99"  nls='IRRSTATE'/>
+  <editor id="IrrState" > 
+     <range  uom="25" subset="0,1,2,3,4,5,6,99"  nls='IrrState'/>
   </editor>
-    <editor id="TESTCON" > 
-     <range  uom="25" subset="0,1,2"  nls='TEST'/>
+    <editor id="Enabled" > 
+     <range  uom="25" subset="0,1,99"  nls='Enabled'/>
   </editor>
   
-  <editor id="API" > 
-     <range  uom="25" subset="0,1" nls="API" />
+  <editor id="Nbr_Zones" > 
+     <range  uom="72" min="0" max="16" />
+  </editor>
+
+  <editor id="Sch_Source" > 
+     <range  uom="25" subset="0,1,2,99" nls="Sch_Source" />
+  </editor>
+  <editor id="Sch_Status" > 
+     <range  uom="25" subset="0,1,2,99" nls="Sch_Status" />
+  </editor>
+
+   <editor id="StartStop" > 
+     <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>
 
   <editor id="DURATIONH" > 

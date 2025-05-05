@@ -2,10 +2,12 @@
    <nodeDef id="controller" nls="nls_ctrl">
       <editors />
       <sts>
-         <st id="ST" editor="ENABLED" />
-         <st id="GV0" editor="IRRSTATE" />
-         <st id="GV1" editor="NBR_ZONES" />
-         <st id="GV18" editor="LAST_TIME" />
+         <st id="ST" editor="Enabled" />
+         <st id="GV0" editor="IrrState" />
+         <st id="GV1" editor="Nbr_Zones" />
+         <st id="GV10" editor="Sch_Source" />
+          <st id="GV11" editor="Sch_Status" />
+         <st id="GV18" editor="LastTime" />
          <st id="GV19" editor="unixtime" />
       <cmds>
          <sends>
@@ -16,8 +18,8 @@
             <cmd id="Update" />
             <cmd id="Water" >   
                <p id="StartStop" editor="StartStop" />
-               <p id="Duration" editor="Duration" />
-               <p id="Delay" editor="Delay" />                
+               <p id="Duration" editor="Minutes" />
+               <p id="Delay" editor="Minutes" />                
             </cmd >
             <cmd id="SKIP_DAYS" >   
                <p id="" editor="NBR_Days" /> 
