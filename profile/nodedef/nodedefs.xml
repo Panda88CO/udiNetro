@@ -3,23 +3,27 @@
       <editors />
       <sts>
          <st id="ST" editor="ENABLED" />
-         <st id="ST" editor="IRRSTATE" />
-         <st id="GV1" editor="LAST_TIME" />
-         <st id="GV2" editor="LAST_API" />
+         <st id="GV0" editor="IRRSTATE" />
+         <st id="GV1" editor="NBR_ZONES" />
+         <st id="GV18" editor="LAST_TIME" />
+         <st id="GV19" editor="unixtime" />
       <cmds>
          <sends>
             <cmd id="DON" /> 
             <cmd id="DOF" />          
          </sends>
          <accepts>
-            <!--<cmd id="UPDATE" /> 
-            <cmd id="WAKEUP" />-->
-            <cmd id="UPDATE" />
-            <cmd id="WATER" >   
-               <p id="" editor="ONOFF" /> 
+            <cmd id="Update" />
+            <cmd id="Water" >   
+               <p id="StartStop" editor="StartStop" />
+               <p id="Duration" editor="Duration" />
+               <p id="Delay" editor="Delay" />                
             </cmd >
-           <cmd id="ENABLE" >   
-               <p id="" editor="ONOFF" /> 
+            <cmd id="SKIP_DAYS" >   
+               <p id="" editor="NBR_Days" /> 
+            </cmd >         
+           <cmd id="Enable" >   
+               <p id="" editor="OnOff" /> 
             </cmd >
          </accepts>
       </cmds>
@@ -65,28 +69,23 @@
       </sts>
       <cmds>
          <sends>
+            <cmd id="DON" /> 
+            <cmd id="DOF" />          
          </sends>
-         <accepts>         
-            <cmd id="UPDATE" /> 
-            <cmd id="BACKUP_PCT" > 
-               <p id="" editor="PERCENT" init="GV21" /> 
-            </cmd> 
-            <cmd id="OP_MODE" > 
-               <p id="" editor="setOP_MODE" init="GV24" /> 
-            </cmd> 
-            <cmd id="STORM_MODE" > 
-               <p id="" editor="setTOGGLE" init="GV25" /> 
-            </cmd> 
-            <!--<cmd id="TOU_MODE" > 
-               <p id="" editor="setTOU_MODE" init="GV4" /> 
-            </cmd> -->
-            <cmd id="GRID_MODE" > 
-               <p id="import" editor="setGRID_IMP_MODE" init="GV26" /> 
-               <p id="export" editor="setGRID_EXP_MODE" init="GV27" /> 
-            </cmd> 
-            <cmd id="EV_CHRG_MODE" > 
-               <p id="" editor="PERCENT" init="GV28" /> 
-            </cmd> 
+         <accepts>
+            <!--<cmd id="UPDATE" /> 
+            <cmd id="WAKEUP" />-->
+            <cmd id="Water" >   
+               <p id="StartStop" editor="StartStop" />
+               <p id="Duration" editor="Duration" />
+               <p id="Delay" editor="Delay" />                
+            </cmd >
+            <cmd id="SKIP_DAYS" >   
+               <p id="" editor="NBR_Days" /> 
+            </cmd >         
+           <cmd id="Enable" >   
+               <p id="" editor="OnOff" /> 
+            </cmd >
          </accepts>
       </cmds>
    </nodeDef> 
@@ -115,29 +114,7 @@
          <sends>
          </sends>
          <accepts>
-            <cmd id="SUNROOF" > 
-                  <p id="" editor="SUNROOFCTRL" init="0" /> 
-            </cmd>
-            <cmd id="WINDOWS" > 
-                  <p id="" editor="WINDOWCTRL" init="0" /> 
-            </cmd >            
-            <cmd id="AUTOCON"> 
-                  <p id="" editor="AUTOCONCTRL" init="GV10" /> 
-            </cmd >            
-            <cmd id="CABINTEMP" >
-                  <p id="driver" editor="CABINTEMP" init="GV3" />
-                  <p id="passenger" editor="CABINTEMP" init="GV4" /> 
-            </cmd>            
-            <cmd id="DEFROST" > 
-                  <p id="" editor="DEFROST" init="GV1" /> 
-            </cmd >    
-            <cmd id="SEAT" > 
-                  <p id="seat" editor="SEATSEL" init="0" /> 
-                  <p id="heatlvl" editor="HEAT" init="GV5" /> 
-            </cmd > 
-            <cmd id="STEERINGW" > 
-                  <p id="" editor="HEAT" init="GV1" /> 
-            </cmd >
+            <cmd id="UPDATE" /> 
          </accepts>
       </cmds>
    </nodeDef> 

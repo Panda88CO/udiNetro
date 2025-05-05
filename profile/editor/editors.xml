@@ -1,6 +1,6 @@
 <editors> 
-  <editor id="NODE_ST" > 
-     <range  uom="25" subset="0,1,2,3,4"  nls='STATUS'/>
+  <editor id="IRRSTATE" > 
+     <range  uom="25" subset="0,1,2,3,4,5,6,99"  nls='IRRSTATE'/>
   </editor>
     <editor id="TESTCON" > 
      <range  uom="25" subset="0,1,2"  nls='TEST'/>

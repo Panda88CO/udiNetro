@@ -1,24 +1,27 @@
 ND-controller-NAME=Netro Irrigation Controller
-ND-controller-ICON=EnergyMonitor
-CMD-nlscontroller-UPDATE-NAME=Update System Data
-ST-nlscontroller-ST-NAME=Controller Connected
-STATUS-0=Disonnected
-STATUS-1=Connected
-STATUS-2=Failed
-ST-nlscontroller-GV0-NAME=Connected to Tesla Cloud
-API-0=Disonnected
-API-1=Connected
-
-ST-nlscontroller-GV1-NAME=Number of EVs
-ST-nlscontroller-GV2-NAME=Distance Unit
-D_UNIT-0=Km
-D_UNIT-1=Miles
-D_UNIT-99=Unknown
-ST-nlscontroller-GV3-NAME=Temperature Unit
-T_UNIT-0=Celsius
-T_UNIT-1=Farenheit
-T_UNIT-99=Unknown
-
+ND-controller-ICON=Irrigation
+CMD-nls_ctrl-UPDATE-NAME=Update System Data
+ST-nls_ctrl-ST-NAME=Controller Enabled
+ENABLED-0=Disabled
+ENABLED-1=Enabled
+ENABLED-99=Unknown
+ST-nls_ctrl-GV0-NAME=Controller State
+IRRSTATE-0=Standby
+IRRSTATE-1=Setup
+IRRSTATE-2=Online
+IRRSTATE-3=Watering
+IRRSTATE-4=Offline
+IRRSTATE-5=Sleeping
+IRRSTATE-6=Power Off
+IRRSTATE-99=Unknown
+ST-nls_ctrl-GV1-NAME=Number Active Zones
+ST-nls_ctrl-GV18-NAME=Last Activity
+ST-nls_ctrl-GV19-NAME=Last Update
+CMD-nls_ctrl-UPDATE-NAME=Update Data
+CMD-nls_ctrl-WATER-NAME=Water All Zones
+STARTSTOP-0=Stop
+STARTSTOP-1=Start
+CMD-nls_ctrl-SKIP_DAYS-NAME=Days to Skip Watering 
 
 ND-evstatus-NAME=EV Status
 ND-evstatus-ICON=EnergyMonitor
