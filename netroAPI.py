@@ -33,6 +33,7 @@ class netroAccess(object):
             logging.debug(f'get info {self.serialID}')
             status, res = self._callApi('GET', '/info.json')
             if status == 'ok':
+                logging.debug(f'res = {res}')                
                 self.netro_info = res #NOT CORRECT
                 
                 return(res)
@@ -45,21 +46,138 @@ class netroAccess(object):
 
     def get_moisture(self, zone_list=None ) -> dict:
         try:
-            logging.debug(f'get info {self.serialID}')
+            logging.debug(f'get_moisture {self.serialID}')
             params = {}
             params['zones'] = zone_list 
             status, res = self._callApi('GET', '/moistures.json', params)
             if status == 'ok':
+                logging.debug(f'res = {res}')                
                 return(res)
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception get_info {self.serialID} {e} ')
+            logging.debug(f'Exception get_moisture {self.serialID} {e} ')
             return(None)
         
 
-
+    def get_schedules(self, zone_list=None ) -> dict:
+        try:
+            logging.debug(f'get_schedules {self.serialID}')
+            params = {}
+            if zone_list is not None:
+                params['zones'] = zone_list 
+                status, res = self._callApi('GET', '/schedules.json', params)
+                logging.debug(f'res = {res}')if status == 'ok'
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception get_schedules {self.serialID} {e} ')
+            return(None)
+        
+    def get_events(self, zone_list=None ) -> dict:
+        try:
+            logging.debug(f'get_events {self.serialID}')
+            params = {}
+            if zone_list is not None:
+                params['zones'] = zone_list 
+            status, res = self._callApi('GET', '/events.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception get_events {self.serialID} {e} ')
+            return(None)
+        
     
+    def set_status(self, status=None):
+        try:
+            logging.debug(f'set_status {self.serialID}')
+            params = {'key':str(self.serialID)}
+            if status is not None:
+
+                params['status'] = int(status) 
+                status, res = self._callApi('POST', '/set_status.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception set_status {self.serialID} {e} ')
+            return(None)
+        
+    def set_watering(self, duration=1, delay=0, zone_list = None):
+        try:
+            logging.debug(f'set_watering {self.serialID} {duration} {delay} {zone_list}')
+            params = {'key':str(self.serialID),
+                      'duration':int(duration)}
+            if delay != 0:
+                params['delay']=int(delay)
+            if zone_list is not None and type(zone_list) is list:
+                params['zones'] = int(zone_list) 
+            status, res = self._callApi('POST', '/water.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception set_status {self.serialID} {e} ')
+            return(None)
+
+    def stop_watering(self):
+        try:
+            logging.debug(f'stop_watering {self.serialID} ')
+            params = {'key':str(self.serialID)}
+            status, res = self._callApi('POST', '/stop_water.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception stop_watering {self.serialID} {e} ')
+            return(None)
+        
+    def set_no_water_days(self, skip_days=1):
+        try:
+            logging.debug(f'set_no_water_days {self.serialID}')
+            params = {'key':str(self.serialID),
+                      'days':int(skip_days)}
+            if status is not None:
+
+                params['status'] = int(status) 
+                status, res = self._callApi('POST', '/no_water.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception set_no_water_days {self.serialID} {e} ')
+            return(None)        
+    ####################
+
+    def get_sensor_data(self, zone_list=None ) -> dict:
+        try:
+            logging.debug(f'get_sensor_data {self.serialID}')
+            params = {}
+            if zone_list is not None:
+                params['zones'] = zone_list 
+            status, res = self._callApi('GET', '/sensor_data.json', params)
+            if status == 'ok':
+                logging.debug(f'res = {res}')
+                return(res)
+            else:
+                return(None)
+        except Exception as e:
+            logging.debug(f'Exception get_evget_sensor_dataents {self.serialID} {e} ')
+            return(None)
+
+
     def _callApi(self, method='GET', url=None, body=None):
         # When calling an API, get the access token (it will be refreshed if necessary)
         #self.apiLock.acquire()
