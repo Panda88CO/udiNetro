@@ -8,7 +8,7 @@ import requests
 import time
 import json
 from netroAPI import netroAccess
-from datetime import timedelta, datetime
+#from datetime import timedelta, datetime
 from tzlocal import get_localzone
 
 try:
@@ -23,7 +23,7 @@ serial1 = 'd48afce15210'
 serial2 = 'c82e18810de8'
 netro1 = netroAccess(serial1)
 netro2 = netroAccess(serial2)
-status, test1 = netro1._callApi('GET', '/info.json')
+test1 = netro1.get_info()
 print(test1)
 print()
 test2 = netro2._callApi('GET', '/info.json')
