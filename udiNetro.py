@@ -16,14 +16,15 @@ import time
 from netroAPI import netroAccess
 from datetime import timedelta, datetime
 from tzlocal import get_localzone
-
+from netroController import netroController
+from netroSensor import netroSensor
 VERSION = '0.0.1'
 
-class NetroController(udi_interface.Node):
+class netroStart(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, code2ISY, wait_for_node_done,tempUnitAdjust, display2ISY, sentry2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, EV_setDriver, openClose2ISY
 
     def __init__(self, polyglot, primary, address, name ):
-        super(NetroController, self).__init__(polyglot, primary, address, name)
+        super(netroStart, self).__init__(polyglot, primary, address, name)
         logging.info(f'_init_ Netro Controller {VERSION}')
         logging.setLevel(10)
         logging.debug('Init Message system')
@@ -66,12 +67,8 @@ class NetroController(udi_interface.Node):
         self.customParam_done = False
         self.config_done = False
 
-        self.serialID_list = [] 
-        #self.poly.setLogLevel('debug')
-        #self.poly.addNode(self, conn_status = None, rename = False)
-        #self.poly.addNode(self)
-        #self.wait_for_node_done()
-        #self.node = self.poly.getNode(self.address)
+        self.serialID_list = []
+        self.nodelist = []
 
         logging.info('Controller init DONE')
         logging.debug(f'drivers ; {self.drivers}')
@@ -106,7 +103,6 @@ class NetroController(udi_interface.Node):
     def handleNotices(self, level):
         logging.info('handleNotices:')
        
-
     def customParamsHandler(self, userParams):
         self.customParameters.load(userParams)
         logging.debug(f'customParamsHandler called {userParams}')
@@ -127,16 +123,12 @@ class NetroController(udi_interface.Node):
                 self.customParameters['SERIALID'] = 'Input list of serial numbers (space separated)'
                 self.poly.Notices['SERIALID'] = 'SerialID(s) not specified'
     
-
-
             if 'TEMP_UNIT' in userParams:
                 if self.customParameters['TEMP_UNIT'] != 'C or F':
                     self.temp_unit = str(self.customParameters['TEMP_UNIT'])
                     if self.temp_unit[0].upper() not in ['C', 'F']:
                         logging.error(f'Unsupported temperatue unit {self.temp_unit}')
                         self.poly.Notices['temp'] = 'Unknown distance Unit specified'
-
-
             else:
                 logging.warning('No TEMP_UNIT')
                 self.customParameters['TEMP_UNIT'] = 'C or F'
@@ -169,7 +161,15 @@ class NetroController(udi_interface.Node):
             self.poly.Notices['No serial IDs input in configuration folder - exiting']
             time.sleep(10)
             sys.exit()
-        
+        for indx, device in enumerate (self.serialID_list):
+            logging.debug(f'Instanciating nodes for {device}')
+            api = netroAccess(device)
+            if api.device_type == 'controller':
+                self.node_list[device] = netroController(self.poly, device, device, 'controller', api )
+            elif api.device_type == 'sensor':
+                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor', api )
+       
+       
         nodeName = self.poly.getValidName(EVname)
         self.node.rename(nodeName)
         assigned_addresses.append(self.address)
@@ -314,82 +314,10 @@ class NetroController(udi_interface.Node):
             logging.info(f'Not all nodes ready:')
 
 
-    def createSubNodes(self):
-        logging.debug(f'Creating sub nodes for {self.EVid}')
-        nodeAdr = 'climate'+str(self.EVid)[-9:]
-        nodeName = self.poly.getValidName('Climate Info')
-        nodeAdr = self.poly.getValidAddress(nodeAdr)
-        #if not self.poly.getNode(nodeAdr):
-        logging.info(f'Creating ClimateNode: {nodeAdr} - {self.primary} {nodeAdr} {nodeName} {self.EVid}')
-        self.climateNode = teslaEV_ClimateNode(self.poly, self.primary, nodeAdr, nodeName, self.EVid, self.TEVcloud )
-        time.sleep(2)
-        self.node_addresses.append(nodeAdr)
-        nodeAdr = 'charge'+str(self.EVid)[-10:]
-        nodeName = self.poly.getValidName('Charging Info')
-        nodeAdr = self.poly.getValidAddress(nodeAdr)
-        self.node_addresses.append(nodeAdr)
-        #if not self.poly.getNode(nodeAdr):
-        logging.info(f'Creating ChargingNode: {nodeAdr} - {self.primary} {nodeAdr} {nodeName} {self.EVid}')
-        self.chargeNode = teslaEV_ChargeNode(self.poly, self.primary, nodeAdr, nodeName, self.EVid, self.TEVcloud )
-        time.sleep(2)
-        logging.debug(f'Nbr Wall Cons create: {self.nbr_wall_conn}')
-        if self.nbr_wall_conn != 0: 
-            nodeAdr = 'pwrshare'+str(self.EVid)[-8:]
-            nodeName = self.poly.getValidName('Powershare Info')
-            nodeAdr = self.poly.getValidAddress(nodeAdr)
-            logging.info(f'Creating pwrshare: {nodeAdr} - {self.primary} {nodeAdr} {nodeName} {self.PW_siteid}')
-            self.power_share_node = teslaEV_PwrShareNode(self.poly, self.primary, nodeAdr, nodeName, self.EVid, self.PW_siteid, self.TEVcloud, self.TPWcloud )
-            self.node_addresses.append(nodeAdr)
-        logging.debug(f'climate drivers0 {self.climateNode.drivers}')
-        time.sleep(2)
-
-    def subnodesReady(self):
-        if self.power_share_node is None:
-            return(self.climateNode.nodeReady and self.chargeNode.nodeReady)
-        else:
-            return(self.climateNode.nodeReady and self.chargeNode.nodeReady and self.power_share_node.nodeReady)
-
-    def ready(self):
-        if self.power_share_node is None:
-            return(self.climateNode.nodeReady and self.chargeNode.nodeReady)
-        else:
-            return(self.climateNode.nodeReady and self.chargeNode.nodeReady and self.power_share_node.nodeReady)
-
-    def update_time(self):
-        logging.debug('update_time')
-        try:
-            temp = self.TEVcloud.teslaEV_GetTimestamp(self.EVid)
-            self.EV_setDriver('GV19', temp , 151)
-        except ValueError:
-            self.EV_setDriver('GV19', None, 25)
+   
 
 
-    '''
-    def poll (self, type ):    
-        logging.info(f'Status Node Poll for {self.EVid} - poll type: {type}')        
-        #pass
-        
-        try:
-            if type in ['short']:
-               #code, state  = self.TEVcloud.teslaEV_UpdateCloudInfoAwake(self.EVid)
-            elif type in ['long']:
-                #code, state =  self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-            else:
-                return
-            logging.debug(f'Poll data code {code} , {state}')
-            self.update_all_drivers()
-            self.display_update()
-
-            #if state in[ 'online', 'offline', 'asleep', 'overload', 'error', 'on-link']:
-            #    self.EV_setDriver('ST', self.state2ISY(state), 25)
-                #logging.info('Car appears off-line/sleeping or overload  - not updating data')
-
-            #else:
-            #    self.EV_setDriver('ST', 99, 25)
-
-        except Exception as e:
-                logging.error(f'Status Poll exception : {e}')
-    '''    
+  
 
     def update_all_drivers(self):
         try:
@@ -831,26 +759,8 @@ if __name__ == "__main__":
         polyglot.start(VERSION)
         #polyglot.updateProfile()
         polyglot.setCustomParamsDoc()
-
-        TeslaApi = teslaApiAccess(polyglot,'energy_device_data energy_cmds vehicle_device_data vehicle_cmds vehicle_charging_cmds open_id offline_access')
-        #TEV_cloud = teslaEVAccess(polyglot, 'energy_device_data energy_cmds open_id offline_access')
-        #TEV_cloud = teslaEVAccess(polyglot, 'open_id vehicle_device_data vehicle_cmds  vehicle_charging_cmds offline_access')
-        logging.debug(f'TeslaAPI {TeslaApi}')
-
-        TEV =TeslaEVController(polyglot, 'controller', 'controller', 'Tesla EV Status', TeslaApi)
-        logging.debug('before subscribe')
-        #polyglot.subscribe(polyglot.STOP, TEV.stop)
-        #polyglot.subscribe(polyglot.CUSTOMPARAMS, TEV.customParamsHandler)
-        #polyglot.subscribe(polyglot.CONFIGDONE, TEV.configDoneHandler)
-        #polyglot.subscribe(polyglot.ADDNODEDONE, TEV.node_queue)        
-        #polyglot.subscribe(polyglot.LOGLEVEL, TEV.handleLevelChange)
-        ##polyglot.subscribe(polyglot.NOTICES, TEV.handleNotices)
-        #polyglot.subscribe(polyglot.POLL, TEV.systemPoll)        
-        #polyglot.subscribe(polyglot.WEBHOOK, TEV.webhook)
-        #logging.debug('Calling start')
-        #polyglot.subscribe(polyglot.START, TEV.start, 'controller')
-        #polyglot.subscribe(polyglot.CUSTOMNS, TEV.customNSHandler)
-        #polyglot.subscribe(polyglot.OAUTH, TEV.oauthHandler)
+        TEV =netroStart(polyglot, 'controller', 'controller', 'Tesla EV Status')
+    
         
         logging.debug('after subscribe')
         polyglot.ready()

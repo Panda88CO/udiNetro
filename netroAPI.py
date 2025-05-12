@@ -23,7 +23,7 @@ class netroAccess(object):
         self.serialID = serial_nbr
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
-
+        self.device_type = ''
         self.tz = get_localzone()
 
     def get_device_type(self) -> str:
@@ -33,13 +33,26 @@ class netroAccess(object):
         except Exception:
             return(None)
 
+    def get_device_name(self):
+        try:
+            logging.debuf('get_device_name')
+            if self.netro['type'] == 'controller':
+                return(self.netro['info']['name'])
+            elif self.netro['type'] == 'sensor':
+               return('sensor'+str(self.serialID))
+            else:
+                return('Unknown')
+        except KeyError as e:
+            logging.error(f'Error: get_device_name {e}')
+            return(None)
+        
 
     def get_info(self) -> str:
         try:
             logging.debug(f'get info {self.serialID}')
             status, res = self._callApi('GET', '/info.json')
             if status == 'ok':
-                logging.debug(f'res = {res['data']}')                
+                logging.debug('res = {}'.format(res['data']))                
                 #self.netro_info['info'] = res['data'] #NOT CORRECT
                 date_time_str = res['meta']['last_active']#+'GMT-00:00'
                 date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
@@ -47,15 +60,15 @@ class netroAccess(object):
                 unix_time = int(date_time_obj.timestamp())
                 self.netro['last_api_time'] = unix_time  
                 if 'device' in res['data']: # controller
-                    self.netro['type'] = 'controller'
+                    self.device_type = 'controller'
                     self.netro['info'] = res['data'] 
                     self.netro['active_zone_list'] = []
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
                         if zone['enabled']:
                             self.netro['active_zone_list'].append(zone)
                 elif 'sensor_data' in res['data']: #sensor
-                    self.netro['type'] = 'sensor'
-                    self.netro['info'] = res['data'] 
+                    self.device_type ='sensor'
+                    self.netro['info'] = res['data']
                 return(status)
             else:
                 return(None)
@@ -122,11 +135,12 @@ class netroAccess(object):
 
                 params['status'] = int(status) 
                 status, res = self._callApi('POST', '/set_status.json', params)
-            if status == 'ok':
-                logging.debug(f'res = {res}')
-                return(res)
-            else:
-                return(None)
+                if status == 'ok':
+                    logging.debug(f'res = {res}')
+                    return(res)
+                else:
+                    return(None)
+            return(None)
         except Exception as e:
             logging.debug(f'Exception set_status {self.serialID} {e} ')
             return(None)
@@ -169,10 +183,7 @@ class netroAccess(object):
             logging.debug(f'set_no_water_days {self.serialID}')
             params = {'key':str(self.serialID),
                       'days':int(skip_days)}
-            if status is not None:
-
-                params['status'] = int(status) 
-                status, res = self._callApi('POST', '/no_water.json', params)
+            status, res = self._callApi('POST', '/no_water.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
                 return(res)
