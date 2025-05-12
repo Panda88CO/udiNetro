@@ -28,23 +28,8 @@ class NetroController(udi_interface.Node):
         logging.info(f'_init_ Netro Controller {VERSION}')
         logging.setLevel(10)
         logging.debug('Init Message system')
-        self.messageQueue = Queue()
-        self.background_thread = threading.Thread(target=self.process_message)
-        self.background_thread.daemon = True  # Daemonize thread
-        self.background_thread.start()
-
         self.poly = polyglot
         self.node = None
-        self.portalID = None
-        self.portalSecret = None
-        self.n_queue = []
-        self.vehicleList = []
-        self.vin_list = [] # needed for streaming server
-        #self.stream_cert = {}
-        self.power_share_node = None
-        
-        
-        self.ISYforced = False
         self.CELCIUS = 0
         self.FARENHEIT = 1 
 
