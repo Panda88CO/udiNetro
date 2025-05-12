@@ -3,7 +3,8 @@ import requests
 import time
 import json
 from threading import Lock
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
+from tzlocal import get_localzone
 
 try:
     #import udi_interface
@@ -15,28 +16,47 @@ except ImportError:
     logging.basicConfig(level=30)
 
 class netroAccess(object):
-    #yourApiEndpoint = 'https://fleet-api.prd.na.vn.cloud.tesla.com'
-    #yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     def __init__(self,  serial_nbr):
         #super().__init__(polyglot)
         logging.info(f'Netro API initializing')
         #self.poly = polyglot
         self.serialID = serial_nbr
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
-        self.netro_info = {}
-        self.netro_info = {}
+        self.netro= {}
+
+        self.tz = get_localzone()
+
+    def get_device_type(self) -> str:
+        try:
+            return(self.netro['type'])
         
+        except Exception:
+            return(None)
 
 
-    def get_info(self) -> dict:
+    def get_info(self) -> str:
         try:
             logging.debug(f'get info {self.serialID}')
             status, res = self._callApi('GET', '/info.json')
             if status == 'ok':
-                logging.debug(f'res = {res}')                
-                self.netro_info = res #NOT CORRECT
-                
-                return(res)
+                logging.debug(f'res = {res['data']}')                
+                #self.netro_info['info'] = res['data'] #NOT CORRECT
+                date_time_str = res['meta']['last_active']#+'GMT-00:00'
+                date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
+                date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
+                unix_time = int(date_time_obj.timestamp())
+                self.netro['last_api_time'] = unix_time  
+                if 'device' in res['data']: # controller
+                    self.netro['type'] = 'controller'
+                    self.netro['info'] = res['data'] 
+                    self.netro['active_zone_list'] = []
+                    for indx, zone in enumerate( self.netro['info']['device']['zones']):
+                        if zone['enabled']:
+                            self.netro['active_zone_list'].append(zone)
+                elif 'sensor_data' in res['data']: #sensor
+                    self.netro['type'] = 'sensor'
+                    self.netro['info'] = res['data'] 
+                return(status)
             else:
                 return(None)
         except Exception as e:
@@ -52,6 +72,8 @@ class netroAccess(object):
             status, res = self._callApi('GET', '/moistures.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')                
+                if zone_list is None: # all zones are updated
+                    logging.debug('all zones')
                 return(res)
             else:
                 return(None)
@@ -67,7 +89,7 @@ class netroAccess(object):
             if zone_list is not None:
                 params['zones'] = zone_list 
                 status, res = self._callApi('GET', '/schedules.json', params)
-                logging.debug(f'res = {res}')if status == 'ok'
+                logging.debug(f'status = {status}  res = {res} ')
                 return(res)
             else:
                 return(None)
