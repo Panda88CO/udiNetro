@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-import time 
-from threading import Thread, Event, Lock
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -12,8 +10,9 @@ except ImportError:
     logging.basicConfig(level=20)
 import threading
 import json
-
+import re
 import time
+
 from netroAPI import netroAccess
 from datetime import timedelta, datetime
 from tzlocal import get_localzone
@@ -53,20 +52,21 @@ class NetroController(udi_interface.Node):
         #polyglot.subscribe(polyglot.WEBHOOK, self.webhook)
         logging.debug('Calling start')
         polyglot.subscribe(polyglot.START, self.start, 'controller')
-        polyglot.subscribe(polyglot.CUSTOMNS, self.customNSHandler)
+        #polyglot.subscribe(polyglot.CUSTOMNS, self.customNSHandler)
         #polyglot.subscribe(polyglot.OAUTH, self.oauthHandler)
         #polyglot.subscribe(polyglot.ADDNODEDONE, self.node_queue)
         self.hb = 0
         self.connected = False
         self.nodeDefineDone = False
-        self.customNsDone = False
-        self.portalReady = False
+
         self.poly.updateProfile()
         self.poly.ready()
         self.tempUnit = 0 # C
         self.distUnit = 0 # KM
         self.customParam_done = False
         self.config_done = False
+
+        self.serialID_list = [] 
         #self.poly.setLogLevel('debug')
         #self.poly.addNode(self, conn_status = None, rename = False)
         #self.poly.addNode(self)
@@ -101,261 +101,75 @@ class NetroController(udi_interface.Node):
         self.configDoneHandler()
 
     def handleLevelChange(self, level):
-        logging.info('New log level: {level}')
+        logging.info(f'New log level: {level}')
 
     def handleNotices(self, level):
         logging.info('handleNotices:')
-
-
-    def customNSHandler(self, key, data):        
-        self.portalData.load(data)
-        #stream_cert = {}
-        logging.debug(f'customNSHandler : key:{key}  data:{data}')
-        if key == 'nsdata':
-
-            if 'portalID' in data:
-                self.portalID = data['portalID']
-
-            if 'PortalSecret' in data:
-                self.portalSecret = data['PortalSecret']
-            self.portalReady = True
-
-            logging.debug(f'Custom Data portal: {self.portalID} {self.portalSecret}')
-
-        self.tesla_api.customNsHandler(key, data)
-        self.customNsDone =self.tesla_api.customNsDone()
-    #def customDataHandler(self, Data):
-    #    logging.debug('customDataHandler')
-    #    self.customData.load(Data)
-    #    #logging.debug('handleData load - {}'.format(self.customData))
-         
+       
 
     def customParamsHandler(self, userParams):
         self.customParameters.load(userParams)
         logging.debug(f'customParamsHandler called {userParams}')
-
-        oauthSettingsUpdate = {}
-        #oauthSettingsUpdate['parameters'] = {}
-        oauthSettingsUpdate['token_parameters'] = {}
-        # Example for a boolean field
-
-        if 'REGION' in userParams:
-            if self.customParameters['REGION'] != 'Input region NA, EU, CN':
-                region = str(self.customParameters['REGION'])
-                if region.upper() not in ['NA', 'EU', 'CN']:
-                    logging.error(f'Unsupported region {region}')
-                    self.poly.Notices['REGION'] = 'Unknown Region specified (NA = North America + Asia (-China), EU = Europe. middle East, Africa, CN = China)'
-                else:
-                    self.tesla_api.cloud_set_region(region)
-        else:
-            logging.warning('No region found')
-            self.customParameters['REGION'] = 'Input region NA, EU, CN'
-            region = None
-            self.poly.Notices['region'] = 'Region not specified (NA = Nort America + Asia (-China), EU = Europe. middle East, Africa, CN = China)'
-   
-        if 'DIST_UNIT' in userParams:
-            if self.customParameters['DIST_UNIT'] != 'Km or Miless':
-                dist_unit = str(self.customParameters['DIST_UNIT'])
-
-                if dist_unit[0].upper() not in ['K', 'M']:
-                    logging.error(f'Unsupported distance unit {dist_unit}')
-                    self.poly.Notices['dist'] = 'Unknown distance Unit specified'
-                else:
-                    if dist_unit[0].upper() == 'K':
-                        
-                        self.TEVcloud.teslaEV_SetDistUnit(0)
-                    else:
-                        self.TEVcloud.teslaEV_SetDistUnit(1)
-                        
-        else:
-            logging.warning('No DIST_UNIT')
-            self.customParameters['DIST_UNIT'] = 'Km or Miles'
-
-        if 'TEMP_UNIT' in userParams:
-            if self.customParameters['TEMP_UNIT'] != 'C or F':
-                temp_unit = str(self.customParameters['TEMP_UNIT'])
-                if temp_unit[0].upper() not in ['C', 'F']:
-                    logging.error(f'Unsupported temperatue unit {temp_unit}')
-                    self.poly.Notices['temp'] = 'Unknown distance Unit specified'
-                else:
-                    if temp_unit[0].upper() == 'C':
-                        self.TEVcloud.teslaEV_SetTempUnit(0)
-                    else:
-                        self.TEVcloud.teslaEV_SetTempUnit(1)
-
-        else:
-            logging.warning('No TEMP_UNIT')
-            self.customParameters['TEMP_UNIT'] = 'C or F'
-
-
-        if 'VIN' in userParams:
-            if self.customParameters['VIN'] != 'EV VIN':
-                self.EVid = str(self.customParameters['VIN'])
-        else:
-            logging.warning('No VIN')
-            self.customParameters['VIN'] = 'EV VIN'
-            self.EVid = None
-
-
-        
-        if 'LOCATION_EN' in userParams:
-            if self.customParameters['LOCATION_EN'] != 'True or False':
-                self.locationEn = str(self.customParameters['LOCATION_EN'])
-                if self.locationEn.upper() not in ['TRUE', 'FALSE']:
-                    logging.error(f'Unsupported Location Setting {self.locationEn}')
-                    self.poly.Notices['location'] = 'Unknown Location setting '
-                else:
-                    self.tesla_api.teslaEV_set_location_enabled(self.locationEn)
-                    if self.locationEn.upper() == 'TRUE':
-                        self.tesla_api.append_scope('vehicle_location')
-                    
-        else:
-            logging.warning('No LOCATION')
-            self.customParameters['LOCATION_EN'] = 'True or False'   
-        self.customParam_done = True
-
-        logging.debug('customParamsHandler finish ')
-        
-    def process_message(self):
-        logging.debug('Stating proccess_mnessage thread')
-        while True:
-            try:
-      
-                data = self.messageQueue.get(timeout = 10) 
-                logging.debug('Received message - Q size={}'.format(self.messageQueue.qsize()))
-
-                evID = self.TEVcloud.teslaEV_stream_get_id(data)
-                logging.debug(f'EVid in data = {evID}')
-                if evID == self.EVid:
-                    self.TEVcloud.teslaEV_stream_process_data(data)
-                    if self.subnodesReady():            
-                        self.update_all_drivers()
-                        self.EV_setDriver('ST', 1, 25) # Car must be online to stream data 
-                time.sleep(1)
-
-            except Exception as e:
-                logging.debug('message processing timeout - no new commands')
-                pass
-
-        #@measure_time
-    def insert_message(self, msg):
-        logging.debug('insert_message: {}'.format(msg))
-        self.messageQueue.put(msg)
-        qsize = self.messageQueue.qsize()
-        logging.debug('Message received and put in queue (size : {})'.format(qsize))
-        #logging.debug('Creating threads to handle the received messages')
-        #threads = []
-        ##for idx in range(0, qsize):
-        #    threads.append(Thread(target = self.process_message ))
-        #[t.start() for t in threads]
-        #logging.debug('{} on_message threads starting'.format(qsize))
-
-    def init_webhook(self, EVid):
-        EV = str(EVid)
-        init_w ={}
-        init_w['name'] = 'Tesla'
-        init_w['assets'] = []
-        tmp = {}
-        tmp['id'] = str(EVid)
-        init_w['assets'].append(tmp)
-        init_w = {"assets":[{"id":EV}], "name":"Tesla"}
-        logging.debug(f'EVid {type(EVid)} {type(str(EVid))}')
-        logging.debug(f'webhook_init {init_w}')        
-        self.poly.webhookStart(init_w)
-        time.sleep(2)
-        #self.test()
-
-
-    def webhook(self, data): 
-        try:
-            logging.info(f"Webhook received: { data }")  
-            if 'body' in data:
-                logging.info(f'webhook test received')
-                eventInfo = json.loads(data['body'])
-
-                if  eventInfo['event'] == 'webhook-test':
-                    self.activate()
+        IDerror = False
+        try: 
+            if 'SERIALID' in userParams:
+                if self.customParameters['SERIAL'] != 'Input list of serial id(s) (space separated)':
+                    temp_list = str(self.customParameters['SERIALID']).split()
+                    for indx, serial in enumerate(temp_list):
+                        if not bool(re.match(r'^([0-9A-Fa-f]',serial)):
+                            self.poly.Notices['IDERROR'] = f'Illegal serial number detected {serial}'
+                            IDerror = True
+                    if not IDerror:
+                        self.serialID_list = temp_list
+               
             else:
-                self.data_flowing = True
-                self.insert_message(data)
-                qsize = self.messageQueue.qsize()
-                while qsize != 0:
-                    time.sleep(1)
-                #if self.subnodesReady():            
-                #    self.update_all_drivers()
-                '''
-                evID = self.TEVcloud.teslaEV_stream_get_id(data)
-                logging.debug(f'EVid in data = {evID}')
-                #if evID in self.EVid:
-                self.TEVcloud.teslaEV_stream_process_data(data)
-                if self.subnodesReady():            
-                    self.update_all_drivers()
-                '''
+                logging.warning('No serialID found')
+                self.customParameters['SERIALID'] = 'Input list of serial numbers (space separated)'
+                self.poly.Notices['SERIALID'] = 'SerialID(s) not specified'
+    
+
+
+            if 'TEMP_UNIT' in userParams:
+                if self.customParameters['TEMP_UNIT'] != 'C or F':
+                    self.temp_unit = str(self.customParameters['TEMP_UNIT'])
+                    if self.temp_unit[0].upper() not in ['C', 'F']:
+                        logging.error(f'Unsupported temperatue unit {self.temp_unit}')
+                        self.poly.Notices['temp'] = 'Unknown distance Unit specified'
+
+
+            else:
+                logging.warning('No TEMP_UNIT')
+                self.customParameters['TEMP_UNIT'] = 'C or F'
+
+
+            self.customParam_done = True
+
+            logging.debug('customParamsHandler finish ')
         except Exception as e:
-            logging.error(f'Exception webhook {e}')
+            logging.error(f'Error detected during custome Param parsing {e}')
+        
+   
 
     def start(self):
         logging.info('start main node')
         self.poly.Notices.clear()
-        EVname = None
-        #self.Parameters.load(customParams)
         self.poly.updateProfile()
 
         #self.poly.setCustomParamsDoc()
 
-        while not self.customParam_done or not self.customNsDone or not self.config_done or not self.portalReady:
+        while not self.customParam_done  or not self.config_done :
         #while not self.config_done and not self.portalReady :
-            logging.info(f'Waiting for node to initialize {self.customParam_done} {self.customNsDone} {self.config_done} {self.portalReady}')
+            logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
             #logging.debug(f' 1 2 3: {} {} {} {}'.format(self.customParam_done, , self.config_done))
             time.sleep(1)
-        self.tesla_api.initializePortal(self.portalID, self.portalSecret)
-        logging.debug(f'Portal Credentials: {self.portalID} {self.portalSecret}')
-        #self.tesla_api.initializePortal(self.portalID, self.portalSecret)
-        while not self.tesla_api.portal_ready():
-            time.sleep(5)
-            logging.debug('Waiting for portal connection')
-        while not self.tesla_api.authenticated():
-            logging.info('Waiting to authenticate to complete - press authenticate button')
-            self.poly.Notices['auth'] = 'Please initiate authentication'
-            time.sleep(5)
+        
+        logging.debug(f'Detected devices : {self.serialID_list}')
 
-        assigned_addresses =[self.id]
-        self.node_addresses = [self.id]
-        self.poly.Notices['products'] = 'Acquiring supported products'
-        self.PW_siteid, self.nbr_wall_conn = self.TPWcloud.tesla_get_energy_products()
-        logging.debug(f'Nbr Wall Cons main {self.nbr_wall_conn}')
-        self.tesla_api.teslaEV_set_power_share_enabled(self.nbr_wall_conn > 0)
-               
-        code, vehicles = self.TEVcloud.teslaEV_get_vehicles()
-        if code in ['ok']:
-            self.vehicleList = self.TEVcloud.teslaEV_get_vehicle_list()
-            logging.debug(f'vehicleList: {code} - {self.vehicleList}')
-        else:
-            self.poly.Notices['REG']=f"Cannot get data from EV - make sure it is authenticated"
-            #self.EV_setDriver('GV0', 0, 25)   
+        if len(self.serialID_list) == 0:
+            self.poly.Notices['No serial IDs input in configuration folder - exiting']
+            time.sleep(10)
             sys.exit()
-
-        if len(self.vehicleList) > 1 and self.EVid is None:
-            self.poly.Notices['VIN']=f"Please enter one of the following VINs in configuration: {self.vehicleList}"
-            self.poly.Notices['VIN2']="Then restart"
-            #self.EV_setDriver('GV0', 0, 25)   
-            sys.exit()
-        elif len(self.vehicleList) == 0:
-            self.poly.Notices['VIN2']="Then restart"
-
-        if self.EVid is None or self.EVid == '':
-            self.EVid = str(self.vehicleList[0])
-            self.customParameters['VIN'] = self.EVid
-        logging.debug(f'EVid {self.EVid}')
-        EVname = self.TEVcloud.teslaEV_GetName(self.EVid)
-
-        logging.debug(f'EVname {EVname}') 
-        self.init_webhook(self.EVid)       
-        #self.EV_setDriver('GV0', self.bool2ISY(self.EVid is not None), 25)            
-        if EVname == None or EVname == '':
-            # should not happen but just in case or user has not given name to EV
-            EVname = 'ev'+str(self.EVid)
-            EVname = str(EVname)
+        
         nodeName = self.poly.getValidName(EVname)
         self.node.rename(nodeName)
         assigned_addresses.append(self.address)
