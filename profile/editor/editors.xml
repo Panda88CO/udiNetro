@@ -11,6 +11,10 @@
   <editor id="Nbr_Zones" > 
      <range  uom="72" min="0" max="16" />
   </editor>
+  <editor id="count" > 
+     <range  uom="72" min="0" max="2000" />
+  </editor>
+
     <editor id="setEnable" > 
      <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>

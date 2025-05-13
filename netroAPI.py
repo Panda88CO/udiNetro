@@ -58,6 +58,7 @@ class netroAccess(object):
         try:
             logging.debug(f'get info {self.serialID}')
             status, res = self._callApi('GET', '/info.json')
+
             if status == 'ok':
                 logging.debug('res = {}'.format(res['data']))                
                 #self.netro_info['info'] = res['data'] #NOT CORRECT
@@ -217,6 +218,19 @@ class netroAccess(object):
             logging.debug(f'Exception get_evget_sensor_dataents {self.serialID} {e} ')
             return(None)
 
+    def callNetroApi(self, method='GET',url=None, body=None):
+        try:
+            logging.debug(f'callNetroApi {url} {body}')
+            status, res = self._callApi(method, url, body)
+            response = res
+            if status == 'ok':
+                if 'errors' in res and len(res['errors']>0):
+                    status = 'error'
+                    response = res['errors']
+                self.netro['meta']=res['meta']
+            return(status, response)
+        except KeyError as e:
+            return ('error', e)
 
     def _callApi(self, method='GET', url=None, body=None):
         # When calling an API, get the access token (it will be refreshed if necessary)

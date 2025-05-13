@@ -33,11 +33,11 @@ class netroController(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.nodeReady = True
-        logging.info('_init_ Tesla ClimateNode Status Node COMPLETE')
+        logging.info('_init_ Netro Irrigation Controller Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
-        logging.debug('Start TeslaEV Climate Node')  
+        logging.debug('Start Netro Irrigation Node')  
         #self.CO_setDriver('ST', 1)
         self.nodeReady = True
         #self.updateISYdrivers()
@@ -166,12 +166,13 @@ class netroController(udi_interface.Node):
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25},  #Irrigation state
             #{'driver': 'GV0', 'value': 0, 'uom': 25},  #Irrigation state
-            {'driver': 'GV1', 'value': 0, 'uom': 0},  #Nmber of enabled zones
+            {'driver': 'GV1', 'value': 0, 'uom': 72},  #Nmber of enabled zones
             {'driver': 'GV2', 'value': 0, 'uom': 151},  #Next Start Time
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Previous Start Time
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
             {'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
             {'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
+            {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
             {'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last update
 

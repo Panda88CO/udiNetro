@@ -34,6 +34,7 @@ Sch_Status-0=Valid Schedule
 Sch_Status-1=Schedule Ececuting
 Sch_Status-2=Schedule Executed
 Sch_Status-99=Unknown
+ST-nls_irr_ctrl-GV18-NAME=Remaing API calls
 ST-nls_irr_ctrl-GV18-NAME=Last Activity
 ST-nls_irr_ctrl-GV19-NAME=Last Update
 CMD-nls_irr_ctrl-Update-NAME=Update Data
