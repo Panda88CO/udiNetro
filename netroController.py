@@ -15,7 +15,7 @@ class netroController(udi_interface.Node):
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroController, self).__init__(polyglot, primary, address, name)
-        logging.info('_init_ Tesla ClimateNode Status Node')
+        logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
         self.ISYforced = False
         self.netro_api = api
