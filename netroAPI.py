@@ -17,6 +17,7 @@ except ImportError:
 
 
 from .constants import(STATUS_CODE)
+
 class netroAccess(object):
     def __init__(self,  serial_nbr):
         #super().__init__(polyglot)
@@ -39,9 +40,10 @@ class netroAccess(object):
     def get_status(self):
         logging.debug('get_status')
         try:
-            return(self.netro['info']['status'])
+            return(STATUS_CODE[self.netro['info']['status']])
         except KeyError as e:
             logging.error('ERROR - no key found {e}')
+            return(None)
     
     
     def get_zone_list(self):
