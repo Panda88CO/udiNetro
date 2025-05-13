@@ -27,9 +27,18 @@ class netroAccess(object):
         self.tz = get_localzone()
         self.get_info()
 
+
+        self.status_2_isy= []
+
     def get_device_type(self) -> str:
         return(self.device_type)
 
+    def get_status(self):
+        logging.debug('get_status')
+        try:
+            return(self.netro['info']['status'])
+        except KeyError as e:
+            logging.error('ERROR - no key found {e}')
 
     def get_device_name(self):
         try:

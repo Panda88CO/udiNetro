@@ -5,7 +5,9 @@
     <editor id="Enabled" > 
      <range  uom="25" subset="0,1,99"  nls='Enabled'/>
   </editor>
-  
+      <editor id="Status" > 
+     <range  uom="25" subset="0,1,99"  nls='Status'/>
+  </editor>
   <editor id="Nbr_Zones" > 
      <range  uom="72" min="0" max="16" />
   </editor>

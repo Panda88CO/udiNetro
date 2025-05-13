@@ -164,8 +164,8 @@ class netroController(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},  #Status /enabled
-            {'driver': 'GV0', 'value': 0, 'uom': 25},  #Irrigation state
+            {'driver': 'ST', 'value': 0, 'uom': 25},  #Irrigation state
+            #{'driver': 'GV0', 'value': 0, 'uom': 25},  #Irrigation state
             {'driver': 'GV1', 'value': 0, 'uom': 0},  #Nmber of enabled zones
             {'driver': 'GV2', 'value': 0, 'uom': 151},  #Next Start Time
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Previous Start Time
