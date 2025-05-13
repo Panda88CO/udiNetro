@@ -146,7 +146,7 @@ class netroStart(udi_interface.Node):
         logging.info('start main node')
         self.poly.Notices.clear()
         self.poly.updateProfile()
-
+        assigned_primary_addresses = ['controller']
         #self.poly.setCustomParamsDoc()
 
         while not self.customParam_done  or not self.config_done :
@@ -165,69 +165,31 @@ class netroStart(udi_interface.Node):
             logging.debug(f'Instanciating nodes for {device}')
             api = netroAccess(device)
             if api.device_type == 'controller':
-                self.node_list[device] = netroController(self.poly, device, device, 'controller', api )
+                name = api.get_device_name()
+                self.node_list[device] = netroController(self.poly, device, device, name, api )
+                assigned_primary_addresses.append(device)
             elif api.device_type == 'sensor':
-                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor', api )
+                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+                assigned_primary_addresses.append(device)
        
-       
-        nodeName = self.poly.getValidName(EVname)
-        self.node.rename(nodeName)
-        assigned_addresses.append(self.address)
-        self.poly.Notices['subnotes'] = 'Creating sub-notes - 2 or 3 depending on powershare support'
-        time.sleep(1)
-        self.poly.Notices.delete('products')
-        self.createSubNodes()
-        logging.debug(f'climate drivers1 {self.climateNode.drivers}')
-        while not (self.subnodesReady()):
-            logging.debug(f'Subnodes {self.subnodesReady()} ')
-            logging.debug('waiting for nodes to be created')
-            time.sleep(5)
-        logging.debug(f'climate drivers2 {self.climateNode.drivers}')
-
-        # force creation of new config - assume this will enable retransmit of all data 
-        self.poly.Notices['subscribe1'] = 'Subscribing to datastream from EV'
-        if not self.tesla_api.teslaEV_streaming_check_certificate_update(self.EVid, True ): #We need to update streaming server credentials
-            logging.info('')
-            self.poly.Notices['SYNC']=f'{EVname} ERROR failed to connect to streaming server - EV may be too old'
-            #self.stop()
-            sys.exit()
-        logging.debug(f'climate drivers3 {self.climateNode.drivers}')
-            
-        code, state = self.TEVcloud._teslaEV_wake_ev(self.EVid)
-        logging.debug(f'Wake EV {code} {state}')
-        if state not in ['online']:
-            self.poly.Notices['NOTONLINE']=f'{EVname} appears offline - cannot continue with EV being online'
-            #self.stop()
-            #sys.exit()
-        #sync_status = False
-        logging.debug(f'climate drivers4 {self.climateNode.drivers}')
-        while not self.tesla_api.teslaEV_streaming_synched(self.EVid):
-            self.poly.Notices['subscribe2'] = 'Waiting for EV to synchronize datastream - this may take some time '
-            time.sleep(3)
-
-        self.EV_setDriver('ST', 1, 25)  # EV is synched so online 
-        logging.debug(f'climate drivers5 {self.climateNode.drivers}')                    
-        logging.debug(f'Scanning db for extra nodes : {assigned_addresses} - {self.node_addresses}')
+           
+        logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
         for indx, node  in enumerate(self.nodes_in_db):
             #node = self.nodes_in_db[nde]
             logging.debug(f'Scanning db for node : {node}')
-            if node['primaryNode'] not in assigned_addresses:
+            if node['primaryNode'] not in assigned_primary_addresses:
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
                 self.poly.delNode(node['address'])
-            if node['address'] not in self.node_addresses:
-                logging.debug('Removing node : {} {}'.format(node['name'], node))
-                self.poly.delNode(node['address'])
-        
-        logging.debug(f'climate drivers6 {self.climateNode.drivers}')
-              
+            
+
         self.update_all_drivers()
 
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
-        logging.debug(f'climate drivers7 {self.climateNode.drivers}')
+
 
     def validate_params(self):
         logging.debug('validate_params: {}'.format(self.Parameters.dump()))
@@ -238,20 +200,12 @@ class netroStart(udi_interface.Node):
         self.Notices.clear()
         #self.background_thread.stop()
         #if self.TEV:
-        self.tesla_api.teslaEV_streaming_delete_config(self.EVid)
         self.EV_setDriver('ST', 0, 25 )
         logging.debug('stop - Cleaning up')
         #self.scheduler.shutdown()
         self.poly.stop()
         sys.exit() # kill running threads
 
-
-
-    def portal_initialize(self, portalId, portalSecret):
-        logging.debug(f'portal_initialize {portalId} {portalSecret}')
-        #portalId = None
-        #portalSecret = None
-        self.tesla_api.initializePortal(portalId, portalSecret)
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
@@ -603,96 +557,17 @@ class netroStart(udi_interface.Node):
     #        self.longPoll()
 
 
-    def webhookTimeout(self):
-        if self.getDriver('GV30') == 1: # Test in progress
-            logging.error(f"Webhook test message timed out after { self.webhookTestTimeoutSeconds } seconds.")
-            self.setDriver('GV30', 3, True, True) # 3=Timeout
-
-    def activate(self):
-        if self.getDriver('GV30') == 1: # Test in progress
-            logging.info('Webhook test message received successfully.')
-            self.webhookTimer.cancel()
-            self.setDriver('GV30', 2, True, True) # 2=Success
-
-    def test(self, param=None):
-        try:
-            self.setDriver('GV30', 1, True, True) # 1=Test in progress
-            time.sleep(1)
-            # Our webhook handler will route this to our activate() function
-            body = {
-               'event': 'webhook-test',
-               'data': {'type':'test',
-                        'description' : 'weebhhok test'
-               }
-            }
-
-            self.TEVcloud.testWebhook(body)
-            logging.info('Webhook test message sent successfully.')
-
-            self.webhookTimer = threading.Timer(self.webhookTestTimeoutSeconds, self.webhookTimeout)
-            self.webhookTimer.start()
-
-        except Exception as error:
-            logging.error(f"Test Webhook API call failed: { error }")
-            self.setDriver('GV30', 4, True, True) # 4=failure
-
+    
     
     id = 'controller'
 
 
-    commands = { #'UPDATE': ISYupdate, 
-                 #'WAKEUP' : evWakeUp,
-                 'HONKHORN' : evHonkHorn,
-                 'FLASHLIGHT' : evFlashLights,
-                 'SENTRYMODE' : evSentryMode,
-                 'DOORS' : evControlDoors,
-                 'SUNROOF' : evControlSunroof,
-                 'TRUNK' : evOpenTrunk,
-                 'FRUNK' : evOpenFrunk,
-                 'HOMELINK' : evHomelink,
-                 'PLAYSOUND' : evPlaySound,
-                 'TESTCON'  : test,
-                }
+    commands = {  }
 
 
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},   #car State            
-            {'driver': 'GV1', 'value': 99, 'uom': 25},  #center_display_state
-            {'driver': 'GV2', 'value': 99, 'uom': 25},  # Homelink Nearby
-            {'driver': 'GV0', 'value': 99, 'uom': 25},  # nbr homelink devices
-            {'driver': 'GV3', 'value': 99, 'uom': 25},  #locked
-            {'driver': 'GV4', 'value': 0, 'uom': 116},  #odometer
-  
-            {'driver': 'GV5', 'value': 0, 'uom': 25},  # Sentury Mode
-            {'driver': 'GV6', 'value': 99, 'uom': 25},  #fd_window
-            {'driver': 'GV7', 'value': 99, 'uom': 25},  #fp_window
-            {'driver': 'GV8', 'value': 99, 'uom': 25},  #rd_window
-            {'driver': 'GV9', 'value': 99, 'uom': 25},  #rp_window
-
-            {'driver': 'GV11', 'value': 0, 'uom': 25}, #trunk
-            {'driver': 'GV12', 'value': 0, 'uom': 25}, #frunk
-
-            #{'driver': 'GV13', 'value': 0, 'uom': 25}, #door
-            #{'driver': 'GV14', 'value': 0, 'uom': 25}, #door
-            #{'driver': 'GV15', 'value': 0, 'uom': 25}, #door
-            #{'driver': 'GV16', 'value': 0, 'uom': 25}, #door            
-
-            {'driver': 'GV17', 'value': 99, 'uom': 56}, #longitude
-            {'driver': 'GV18', 'value': 99, 'uom': 56}, #latitude
-
-
-
-            {'driver': 'GV23', 'value': 0, 'uom': 138}, # tire pressure
-            {'driver': 'GV24', 'value': 0, 'uom': 138}, # tire pressure
-            {'driver': 'GV25', 'value': 0, 'uom': 138}, # tire pressure
-            {'driver': 'GV26', 'value': 0, 'uom': 138}, # tire pressure            
-
-
-            {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last combined update Hours
-            {'driver': 'GV21', 'value': 99, 'uom': 25}, #Last Command status
-            {'driver': 'GV29', 'value': 99, 'uom': 25}, #Synchronized
-            {'driver': 'GV30', 'value': 0, 'uom': 25}, # Test isy API conection result
-         
+           
             ]
 
     
@@ -700,73 +575,17 @@ class netroStart(udi_interface.Node):
             # GV0 Access to TeslaApi
             # GV1 Number of EVs
 
-    '''
-        <nodeDef id="controller" nls="nlsevstatus">
-        <editors />
-        <sts>
-         <!--<st id="ST" editor="NODEST" />-->
-         <st id="ST" editor="CARSTATE" />
-         <st id="GV1" editor="CONSOLE" />
-         <st id="GV2" editor="BOOLSTATE" />
-         <st id="GV0" editor="NUMBER" />
-         <st id="GV3" editor="LOCKUNLOCK" />
-         <st id="GV4" editor="ODOMETER" />
-         <!--<st id="GV5" editor="BOOLSTATE" />-->
-         <st id="GV6" editor="WINDOW" />
-         <st id="GV7" editor="WINDOW" />
-         <st id="GV8" editor="WINDOW" />
-         <st id="GV9" editor="WINDOW" />
-         <!--<st id="GV10" editor="PERCENT" />-->
-         <st id="GV11" editor="OPENCLOSE" />
-         <st id="GV12" editor="OPENCLOSE" />
-         <!-- <st id="GV13" editor="CARSTATE" /> -->
-         <!-- <st id="GV16" editor="IDEADIST" /> !-->
-         <st id="GV17" editor="LONGITUDE" />         
-         <st id="GV18" editor="LATITUDE" />  
-         <st id="GV19" editor="unixtime" />         
-         <!--<st id="GV20" editor="MINU" />    -->
-         <st id="GV21" editor="LASTCMD" />   
-        </sts>
-        <cmds>
-         <sends>
-            <cmd id="DON" /> 
-            <cmd id="DOF" />          
-         </sends>
-         <accepts>
-            <cmd id="UPDATE" /> 
-            <cmd id="WAKEUP" />
-            <cmd id="HONKHORN" />
-            <cmd id="FLASHLIGHT" />   
-            <cmd id="DOORS" > 
-               <p id="" editor="LOCKUNLOCK" init="GV3" /> 
-            </cmd>
-            <cmd id="SUNROOF" > 
-               <p id="" editor="SUNROOFCTRL" init="0" /> 
-            </cmd >
-            <cmd id="TRUNK" /> 
-            <cmd id="FRUNK" /> 
-            <cmd id="HOMELINK" /> 
-            <cmd id="PLAYSOUND" > 
-               <p id="" editor="SOUNDS" init="0" /> 
-    '''
 
 if __name__ == "__main__":
     try:
-        logging.info('Starting TeslaEV Controller')
-        polyglot = udi_interface.Interface([],{ "enableWebhook": True })
-
-        #TeslaEVController(polyglot, 'controller', 'controller', 'Tesla EVs')
+        logging.info('Starting Netro Nodes')
+        polyglot = udi_interface.Interface([])
         polyglot.start(VERSION)
-        #polyglot.updateProfile()
-        polyglot.setCustomParamsDoc()
-        TEV =netroStart(polyglot, 'controller', 'controller', 'Tesla EV Status')
-    
-        
-        logging.debug('after subscribe')
+        #polyglot.setCustomParamsDoc()
+        Netro =netroStart(polyglot, 'controller', 'controller', 'Tesla EV Status')
+
         polyglot.ready()
         polyglot.runForever()
 
-        polyglot.setCustomParamsDoc()
-        polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
         sys.exit(0)

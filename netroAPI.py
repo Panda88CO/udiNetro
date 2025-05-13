@@ -25,20 +25,18 @@ class netroAccess(object):
         self.netro= {}
         self.device_type = ''
         self.tz = get_localzone()
+        self.get_info()
 
     def get_device_type(self) -> str:
-        try:
-            return(self.netro['type'])
-        
-        except Exception:
-            return(None)
+        return(self.device_type)
+
 
     def get_device_name(self):
         try:
             logging.debuf('get_device_name')
-            if self.netro['type'] == 'controller':
+            if self.device_type == 'controller':
                 return(self.netro['info']['name'])
-            elif self.netro['type'] == 'sensor':
+            elif self.device_type == 'sensor':
                return('sensor'+str(self.serialID))
             else:
                 return('Unknown')
