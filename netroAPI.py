@@ -15,6 +15,8 @@ except ImportError:
     import logging
     logging.basicConfig(level=30)
 
+
+from .constants import(STATUS_CODE)
 class netroAccess(object):
     def __init__(self,  serial_nbr):
         #super().__init__(polyglot)
@@ -28,13 +30,7 @@ class netroAccess(object):
         self.get_info()
 
 
-        self.status_2_isy= {'STANDBY':0,
-                            'SETUP':1,
-                            'ONLINE':2,
-                            'WATERING':3,
-                            'OFFLINE':4,
-                            'SLEEPING':5,
-                            'POWEROFF':6}
+
 
 
     def get_device_type(self) -> str:
