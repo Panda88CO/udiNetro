@@ -8,7 +8,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 import time
-        
+from netroZone import netroZone
                
 class netroController(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
@@ -39,6 +39,7 @@ class netroController(udi_interface.Node):
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
         #self.CO_setDriver('ST', 1)
+
         self.nodeReady = True
         #self.updateISYdrivers()
         #self.update_time()

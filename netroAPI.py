@@ -28,7 +28,14 @@ class netroAccess(object):
         self.get_info()
 
 
-        self.status_2_isy= []
+        self.status_2_isy= {'STANDBY':0,
+                            'SETUP':1,
+                            'ONLINE':2,
+                            'WATERING':3,
+                            'OFFLINE':4,
+                            'SLEEPING':5,
+                            'POWEROFF':6}
+
 
     def get_device_type(self) -> str:
         return(self.device_type)
@@ -39,6 +46,23 @@ class netroAccess(object):
             return(self.netro['info']['status'])
         except KeyError as e:
             logging.error('ERROR - no key found {e}')
+    
+    
+    def get_zone_list(self):
+        logging.debug('get_zone_list')
+        return(self.netro['active_zone_list'])
+
+    def get_zone_info(self, zone_nbr=None):
+        try:
+            logging.debuf('get_device_name')
+
+            if self.device_type == 'controller':
+                return(self.netro['active_zone_list'][zone_nbr])
+                                            
+        except KeyError as e:
+            logging.error(f'Error: get_zone_info {e}')
+            return(None)
+        
 
     def get_device_name(self):
         try:
@@ -47,6 +71,7 @@ class netroAccess(object):
                 return(self.netro['info']['name'])
             elif self.device_type == 'sensor':
                return('sensor'+str(self.serialID))
+            
             else:
                 return('Unknown')
         except KeyError as e:
