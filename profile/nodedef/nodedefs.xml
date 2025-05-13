@@ -1,5 +1,22 @@
 <nodeDefs> 
+
    <nodeDef id="controller" nls="nls_ctrl">
+      <editors />
+      <sts>
+         <st id="ST" editor="Enabled" />
+        
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON" /> 
+            <cmd id="DOF" />          
+         </sends>
+         <accepts>
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+   <nodeDef id="irr_ctrl" nls="nls_irr_ctrl">
       <editors />
       <sts>
          <st id="ST" editor="Enabled" />

@@ -10,11 +10,11 @@ except ImportError:
 import time
         
                
-class netroController(udi_interface.Node):
+class netroZone(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot,  primary, address, name, api):
-        super(netroController, self).__init__(polyglot, primary, address, name)
+        super(netroZone, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
         self.ISYforced = False
@@ -33,11 +33,11 @@ class netroController(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.nodeReady = True
-        logging.info('_init_ Tesla ClimateNode Status Node COMPLETE')
+        logging.info('_init_ Netro Irrigation Controlle Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
-        logging.debug('Start TeslaEV Climate Node')  
+        logging.debug('Start Netro Irrigation Controller Node')  
         #self.CO_setDriver('ST', 1)
         self.nodeReady = True
         #self.updateISYdrivers()
@@ -98,7 +98,7 @@ class netroController(udi_interface.Node):
             self.CO_setDriver('GV18',0)
             self.CO_setDriver('GV19', 0)
         except Exception as e:
-            logging.error(f'updateISYdrivers climate node  failed: Nodes may not be 100% ready {e}')
+            logging.error(f'updateISYdrivers Netro Irrigation Controller  failed: Nodes may not be 100% ready {e}')
 
 
     #def ISYupdate (self, command):
@@ -155,7 +155,7 @@ class netroController(udi_interface.Node):
 
 
 
-    id = 'irr_ctrl'
+    id = 'zone'
     commands = { 
                  'Update' : update,
                  'Water' : water_control,

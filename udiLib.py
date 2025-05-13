@@ -323,8 +323,8 @@ def period2ISY(self, period):
     else:
         return(99)
 
-def EV_setDriver(self, key, value, Unit=None):
-    logging.debug(f'EV_setDriver : {key} {value} {Unit}')
+def CO_setDriver(self, key, value, Unit=None):
+    logging.debug(f'CO_setDriver : {key} {value} {Unit}')
     try:
         if value is None:
             #logging.debug('None value passed = seting 99, UOM 25')
