@@ -21,6 +21,7 @@ except:
 
 serial1 = 'd48afce15210'
 serial2 = 'c82e18810de8'
+serial3 = 'c82e1881d038'
 netro1 = netroAccess(serial1)
 netro2 = netroAccess(serial2)
 test1 = netro1.get_info()
