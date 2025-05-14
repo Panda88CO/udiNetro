@@ -73,6 +73,54 @@ class netroStart(udi_interface.Node):
         logging.info('Controller init DONE')
         logging.debug(f'drivers ; {self.drivers}')
 
+        self.poly.Notices.clear()
+        self.poly.updateProfile()
+        assigned_primary_addresses = ['controller']
+        #self.poly.setCustomParamsDoc()
+
+        while not self.customParam_done  or not self.config_done :
+        #while not self.config_done and not self.portalReady :
+            logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
+            #logging.debug(f' 1 2 3: {} {} {} {}'.format(self.customParam_done, , self.config_done))
+            time.sleep(1)
+        
+        logging.debug(f'Detected devices : {self.serialID_list}')
+
+        if len(self.serialID_list) == 0:
+            self.poly.Notices['No serial IDs input in configuration folder - exiting']
+            time.sleep(10)
+            sys.exit()
+        for indx, device in enumerate (self.serialID_list):
+            logging.debug(f'Instanciating nodes for {device}')
+            api = netroAccess(device)
+            if api.device_type == 'controller':
+                name = api.get_device_name()
+                self.node_list[device] = netroController(self.poly, device, device, name, api )
+                assigned_primary_addresses.append(device)
+            elif api.device_type == 'sensor':
+                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+                assigned_primary_addresses.append(device)
+       
+           
+        logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
+
+        for indx, node  in enumerate(self.nodes_in_db):
+            #node = self.nodes_in_db[nde]
+            logging.debug(f'Scanning db for node : {node}')
+            if node['primaryNode'] not in assigned_primary_addresses:
+                logging.debug('Removing node : {} {}'.format(node['name'], node))
+                self.poly.delNode(node['address'])
+            
+
+        self.update_all_drivers()
+
+        self.poly.Notices['done'] = 'Initialization process completed'
+        self.initialized = True
+        time.sleep(2)
+        self.poly.Notices.clear()
+
+
+
     def check_config(self):
         self.nodes_in_db = self.poly.getNodesFromDb()
         #self.config_done= True
