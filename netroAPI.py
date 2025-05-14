@@ -64,7 +64,7 @@ class netroAccess(object):
 
     def get_device_name(self):
         try:
-            logging.debuf('get_device_name')
+            logging.debug('get_device_name')
             if self.device_type == 'controller':
                 return(self.netro['info']['name'])
             elif self.device_type == 'sensor':
