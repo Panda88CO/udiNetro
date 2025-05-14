@@ -16,7 +16,7 @@ except ImportError:
     logging.basicConfig(level=30)
 
 
-from .constants import STATUS_CODE
+from  constants import STATUS_CODE
 
 class netroAccess(object):
     def __init__(self,  serial_nbr):

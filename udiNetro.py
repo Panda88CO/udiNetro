@@ -97,8 +97,6 @@ class netroStart(udi_interface.Node):
         # Then proceed with device discovery
         self.configDoneHandler()
 
-    def handleLevelChange(self, level):
-        logging.info(f'New log level: {level}')
 
     def handleNotices(self, level):
         logging.info('handleNotices:')
