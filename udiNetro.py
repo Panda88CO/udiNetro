@@ -68,7 +68,7 @@ class netroStart(udi_interface.Node):
         self.config_done = False
 
         self.serialID_list = []
-        self.node_list = []
+        self.node_dict = {}
 
         logging.info('Controller init DONE')
         logging.debug(f'drivers ; {self.drivers}')
@@ -95,10 +95,10 @@ class netroStart(udi_interface.Node):
             api = netroAccess(device)
             if api.device_type == 'controller':
                 name = api.get_device_name()
-                self.node_list[device] = netroController(self.poly, device, device, name, api )
+                self.node_dict[device] = netroController(self.poly, device, device, name, api )
                 assigned_primary_addresses.append(device)
             elif api.device_type == 'sensor':
-                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+                self.node_dict[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
                 assigned_primary_addresses.append(device)
        
            
@@ -202,10 +202,10 @@ class netroStart(udi_interface.Node):
             api = netroAccess(device)
             if api.device_type == 'controller':
                 name = api.get_device_name()
-                self.node_list[device] = netroController(self.poly, device, device, name, api )
+                self.node_dict[device] = netroController(self.poly, device, device, name, api )
                 assigned_primary_addresses.append(device)
             elif api.device_type == 'sensor':
-                self.node_list[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+                self.node_dict[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
                 assigned_primary_addresses.append(device)
        
            
