@@ -148,7 +148,7 @@ class netroStart(udi_interface.Node):
                 if self.customParameters['SERIAL'] != 'Input list of serial id(s) (space separated)':
                     temp_list = str(self.customParameters['SERIALID']).split()
                     for indx, serial in enumerate(temp_list):
-                        if not bool(re.match(r'^([0-9A-Fa-f]',serial)):
+                        if not bool(re.match(r'^([0-9A-Fa-f])',serial)):
                             self.poly.Notices['IDERROR'] = f'Illegal serial number detected {serial}'
                             IDerror = True
                     if not IDerror:
