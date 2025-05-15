@@ -48,7 +48,7 @@ def daytimestr2epocTime(self, time_str) -> int:
     return(epoch_time)
 
 def daystr2epocTime(self, time_str) -> int:
-    dt = datetime.strptime(time_str, "%Y-%m-%d)
+    dt = datetime.strptime(time_str, "%Y-%m-%d")
     epoch_time = int(dt.timestamp())
     return(epoch_time)
 

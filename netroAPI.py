@@ -30,7 +30,15 @@ class netroAccess(object):
         #self.tz = get_localzone()
         self.get_info()
 
+    def daytimestr2epocTime(self, time_str) -> int:
+        dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
+        epoch_time = int(dt.timestamp())
+        return(epoch_time)
 
+    def daystr2epocTime(self, time_str) -> int:
+        dt = datetime.strptime(time_str, "%Y-%m-%d")
+        epoch_time = int(dt.timestamp())
+        return(epoch_time)
 
 
 
@@ -75,7 +83,17 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'Error: get_device_name {e}')
             return(None)
-        
+
+    def updatelastAPItime(self, date_time_str) -> int:
+        try:
+            logging.debug(f'updatelastAPItime {date_time_str}')
+            date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
+            date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
+            unix_time = int(date_time_obj.timestamp())
+            self.netro['last_api_time'] = unix_time        
+            return(unix_time)
+        except Exception as e:
+            logging.error(f'ERROR updatelastAPItime: {e} ')
 
     def get_info(self) -> str:
         try:
@@ -84,12 +102,8 @@ class netroAccess(object):
 
             if status == 'ok':
                 logging.debug('res = {}'.format(res['data']))                
-                #self.netro_info['info'] = res['data'] #NOT CORRECT
-                date_time_str = res['meta']['last_active']#+'GMT-00:00'
-                date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
-                date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
-                unix_time = int(date_time_obj.timestamp())
-                self.netro['last_api_time'] = unix_time  
+                self.updatelastAPItime( res['meta']['last_active'])#+'GMT-00:00'
+
                 if 'device' in res['data']: # controller
                     self.device_type = 'controller'
                     self.netro['info'] = res['data'] 
@@ -158,18 +172,20 @@ class netroAccess(object):
             return(None)
         
     
-    
-    def set_status(self, status=None):
-        try:
-            logging.debug(f'set_status {self.serialID}')
-            params = {'key':str(self.serialID)}
-            if status is not None:
 
-                params['status'] = int(status) 
+    def set_status(self, statusEN=None):
+        try:
+            #logging.debug(f'set_status {self.serialID}')
+            #params = {'key':str(self.serialID)}
+            if statusEN is not None:
+                params = {}
+                params['status'] = int(statusEN) 
                 status, res = self._callApi('POST', '/set_status.json', params)
                 if status == 'ok':
                     logging.debug(f'res = {res}')
-                    return(res)
+                    self.netro['status'] = statusEN
+    
+                    return(res['status'])
                 else:
                     return(None)
             return(None)
@@ -180,8 +196,7 @@ class netroAccess(object):
     def set_watering(self, duration=1, delay=0, zone_list = None):
         try:
             logging.debug(f'set_watering {self.serialID} {duration} {delay} {zone_list}')
-            params = {'key':str(self.serialID),
-                      'duration':int(duration)}
+            params = {'duration':int(duration)}
             if delay != 0:
                 params['delay']=int(delay)
             if zone_list is not None and type(zone_list) is list:

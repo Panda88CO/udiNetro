@@ -29,6 +29,9 @@ print(test1)
 print()
 schedules = netro1.get_schedules()
 
+testEN = netro1.set_status(0)
+time.sleep(1)
+testEN = netro1.set_status(1)
 
 
 test2 = netro2._callApi('GET', '/info.json')
