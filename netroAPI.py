@@ -133,11 +133,10 @@ class netroAccess(object):
             params = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
-                status, res = self._callApi('GET', '/schedules.json', params)
-                logging.debug(f'status = {status}  res = {res} ')
-                return(res)
-            else:
-                return(None)
+            status, res = self._callApi('GET', '/schedules.json', params)
+            logging.debug(f'status = {status}  res = {res} ')
+            return(res)
+
         except Exception as e:
             logging.debug(f'Exception get_schedules {self.serialID} {e} ')
             return(None)
@@ -158,6 +157,7 @@ class netroAccess(object):
             logging.debug(f'Exception get_events {self.serialID} {e} ')
             return(None)
         
+    
     
     def set_status(self, status=None):
         try:

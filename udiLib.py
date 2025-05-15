@@ -18,6 +18,7 @@ from os import truncate
 import time
 import math
 import numbers 
+import datetime
 
 def node_queue(self, data):
     self.n_queue.append(data['address'])
@@ -39,6 +40,18 @@ def daysToMask (self, dayList):
             daysValue = daysValue + pow(2,i)
         i = i+1
     return(daysValue)
+
+
+def daytimestr2epocTime(self, time_str) -> int:
+    dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
+    epoch_time = int(dt.timestamp())
+    return(epoch_time)
+
+def daystr2epocTime(self, time_str) -> int:
+    dt = datetime.strptime(time_str, "%Y-%m-%d)
+    epoch_time = int(dt.timestamp())
+    return(epoch_time)
+
 
 def maskToDays(self, daysValue):
     daysList = []

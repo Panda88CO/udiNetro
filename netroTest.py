@@ -27,6 +27,10 @@ netro2 = netroAccess(serial2)
 test1 = netro1.get_info()
 print(test1)
 print()
+schedules = netro1.get_schedules()
+
+
+
 test2 = netro2._callApi('GET', '/info.json')
 print(test2)
 
