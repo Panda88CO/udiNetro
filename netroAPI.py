@@ -4,7 +4,7 @@ import time
 import json
 from threading import Lock
 from datetime import timedelta, datetime, timezone
-from tzlocal import get_localzone
+#from tzlocal import get_localzone
 
 try:
     #import udi_interface
@@ -27,7 +27,7 @@ class netroAccess(object):
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
         self.device_type = ''
-        self.tz = get_localzone()
+        #self.tz = get_localzone()
         self.get_info()
 
 
