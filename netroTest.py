@@ -27,15 +27,14 @@ netro2 = netroAccess(serial2)
 test1 = netro1.get_info()
 print(test1)
 print()
-schedules = netro1.get_schedules()
+#chedules = netro1.get_schedules()
 
 testEN = netro1.set_status(0)
-time.sleep(1)
+#time.sleep(1)
 testEN = netro1.set_status(1)
+test3 = netro1.set_watering(1,0,1)
 
 
-test2 = netro2._callApi('GET', '/info.json')
-print(test2)
 
 payload = {}
 #payload['event']=3

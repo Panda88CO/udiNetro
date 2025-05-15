@@ -84,30 +84,32 @@ class netroAccess(object):
             logging.error(f'Error: get_device_name {e}')
             return(None)
 
-    def updatelastAPItime(self, date_time_str) -> int:
+    def updateAPIinfo(self, res) -> int:
         try:
-            logging.debug(f'updatelastAPItime {date_time_str}')
+            date_time_str = res['meta']['last_active']
+            logging.debug('updateAPIinfo {}'.format(res['meta']))
             date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
             date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
             unix_time = int(date_time_obj.timestamp())
-            self.netro['last_api_time'] = unix_time        
-            return(unix_time)
+            self.netro['last_api_time'] = unix_time     
+            self.netro['calls_remaining'] = res['meta']['token_remaining']   
+            return('ok')
         except Exception as e:
-            logging.error(f'ERROR updatelastAPItime: {e} ')
+            logging.error(f'ERROR updateAPIinfo: {e} ')
+            return(None)
 
     def get_info(self) -> str:
         try:
-            logging.debug(f'get info {self.serialID}')
-            status, res = self._callApi('GET', '/info.json')
+            logging.debug(f'get info ')
+            status, res = self.callNetroApi('GET', '/info.json')
 
             if status == 'ok':
+                self.updateAPIinfo(res)
                 logging.debug('res = {}'.format(res['data']))                
-                self.updatelastAPItime( res['meta']['last_active'])#+'GMT-00:00'
-
                 if 'device' in res['data']: # controller
                     self.device_type = 'controller'
                     self.netro['info'] = res['data'] 
-                    self.netro['active_zone_list'] = []
+                    self.netro['active_zone_list'] = []                  
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
                         if zone['enabled']:
                             self.netro['active_zone_list'].append(zone)
@@ -119,20 +121,24 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception get_info {self.serialID} {e} ')
+            logging.debug(f'Exception get_info {e} ')
             return(None)
         
 
     def get_moisture(self, zone_list=None ) -> dict:
         try:
-            logging.debug(f'get_moisture {self.serialID}')
+            logging.debug(f'get_moisture')
             params = {}
-            params['zones'] = zone_list 
-            status, res = self._callApi('GET', '/moistures.json', params)
+            if isinstance(zone_list, list):
+                params['zones'] = zone_list 
+            status, res = self.callNetroApi('GET', '/moistures.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')                
                 if zone_list is None: # all zones are updated
                     logging.debug('all zones')
+
+
+                self.updateAPIinfo(res)
                 return(res)
             else:
                 return(None)
@@ -143,27 +149,29 @@ class netroAccess(object):
 
     def get_schedules(self, zone_list=None ) -> dict:
         try:
-            logging.debug(f'get_schedules {self.serialID}')
+            logging.debug(f'get_schedules ')
             params = {}
-            if zone_list is not None:
+            if isinstance(zone_list, list):
                 params['zones'] = zone_list 
-            status, res = self._callApi('GET', '/schedules.json', params)
+            status, res = self.callNetroApi('GET', '/schedules.json', params)
             logging.debug(f'status = {status}  res = {res} ')
+            self.updateAPIinfo(res)
             return(res)
 
         except Exception as e:
-            logging.debug(f'Exception get_schedules {self.serialID} {e} ')
+            logging.debug(f'Exception get_schedules {e} ')
             return(None)
         
     def get_events(self, zone_list=None ) -> dict:
         try:
             logging.debug(f'get_events {self.serialID}')
             params = {}
-            if zone_list is not None:
+            if isinstance(zone_list, list):
                 params['zones'] = zone_list 
-            status, res = self._callApi('GET', '/events.json', params)
+            status, res = self.callNetroApi('GET', '/events.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
+                self.updateAPIinfo(res)
                 return(res)
             else:
                 return(None)
@@ -173,19 +181,19 @@ class netroAccess(object):
         
     
 
-    def set_status(self, statusEN=None):
+    def set_status(self, statusEN=None)-> str:
         try:
             #logging.debug(f'set_status {self.serialID}')
-            #params = {'key':str(self.serialID)}
-            if statusEN is not None:
-                params = {}
-                params['status'] = int(statusEN) 
-                status, res = self._callApi('POST', '/set_status.json', params)
+            #params = {'key':str(self.sealID)}
+            if isinstance(statusEN, int):
+                params = {'status':statusEN }
+                status, res = self.callNetroApi('POST', '/set_status.json', params)
                 if status == 'ok':
+                    self.updateAPIinfo(res)
                     logging.debug(f'res = {res}')
                     self.netro['status'] = statusEN
     
-                    return(res['status'])
+                    return(status)
                 else:
                     return(None)
             return(None)
@@ -193,47 +201,53 @@ class netroAccess(object):
             logging.debug(f'Exception set_status {self.serialID} {e} ')
             return(None)
         
-    def set_watering(self, duration=1, delay=0, zone_list = None):
+    def set_watering(self, duration=1, delay=0, zone = None) -> str:
         try:
-            logging.debug(f'set_watering {self.serialID} {duration} {delay} {zone_list}')
-            params = {'duration':int(duration)}
-            if delay != 0:
-                params['delay']=int(delay)
-            if zone_list is not None and type(zone_list) is list:
-                params['zones'] = int(zone_list) 
-            status, res = self._callApi('POST', '/water.json', params)
-            if status == 'ok':
-                logging.debug(f'res = {res}')
-                return(res)
+            logging.debug(f'set_watering  {duration} {delay} {zone}')
+            
+            if isinstance(duration, int):
+                params = {'duration':duration}
+                if isinstance(delay, int):
+                    params['delay']=delay
+                if isinstance(zone, int):
+                    params['zones'] = [zone]
+                    status, res = self.callNetroApi('POST', '/water.json', params)
+
+                    if status == 'ok':
+                        self.updateAPIinfo(res)
+                        logging.debug(f'res = {res}')
+                        return(status)
+                else:
+                    return(None)
             else:
                 return(None)
         except Exception as e:
             logging.debug(f'Exception set_status {self.serialID} {e} ')
             return(None)
 
-    def stop_watering(self):
+    def stop_watering(self)  -> str:
         try:
-            logging.debug(f'stop_watering {self.serialID} ')
-            params = {'key':str(self.serialID)}
-            status, res = self._callApi('POST', '/stop_water.json', params)
+            logging.debug(f'stop_watering ')
+            status, res = self.callNetroApi('POST', '/stop_water.json')
             if status == 'ok':
+                self.updateAPIinfo(res)
                 logging.debug(f'res = {res}')
-                return(res)
+                return(status)
             else:
                 return(None)
         except Exception as e:
             logging.debug(f'Exception stop_watering {self.serialID} {e} ')
             return(None)
         
-    def set_no_water_days(self, skip_days=1):
+    def set_no_water_days(self, skip_days=None) -> str:
         try:
-            logging.debug(f'set_no_water_days {self.serialID}')
-            params = {'key':str(self.serialID),
-                      'days':int(skip_days)}
-            status, res = self._callApi('POST', '/no_water.json', params)
-            if status == 'ok':
-                logging.debug(f'res = {res}')
-                return(res)
+            logging.debug(f'set_no_water_days {skip_days}')
+            if isinstance(skip_days, int):
+                params = {'days':skip_days}
+                status, res = self.callNetroApi('POST', '/no_water.json', params)
+                if status == 'ok':
+                    logging.debug(f'res = {res}')
+                    return(status)
             else:
                 return(None)
         except Exception as e:
@@ -247,7 +261,7 @@ class netroAccess(object):
             params = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
-            status, res = self._callApi('GET', '/sensor_data.json', params)
+            status, res = self.callNetroApi('GET', '/sensor_data.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
                 return(res)
@@ -260,13 +274,18 @@ class netroAccess(object):
     def callNetroApi(self, method='GET',url=None, body=None):
         try:
             logging.debug(f'callNetroApi {url} {body}')
+            payload = {}
+            if body is None:
+                payload['key'] = self.serialID
+            else:
+                payload = body
+                payload['key'] = self.serialID
             status, res = self._callApi(method, url, body)
             response = res
             if status == 'ok':
                 if 'errors' in res and len(res['errors']>0):
                     status = 'error'
                     response = res['errors']
-                self.netro['meta']=res['meta']
             return(status, response)
         except KeyError as e:
             return ('error', e)
@@ -285,12 +304,6 @@ class netroAccess(object):
                 'Content-Type'  : 'application/json',
                 'Accept'        : 'application/json',
             }
-        if body is None:
-            payload['key'] = self.serialID
-        else:
-            #payload = json.dumps(body)
-            payload = body
-            payload['key'] = self.serialID
 
         logging.debug(f' call info url={completeUrl}, header {headers}, params ={payload}')
 
