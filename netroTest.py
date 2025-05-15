@@ -33,16 +33,18 @@ print(netro1.netro)
 #print(test2)
 
 name1 = netro1.device_name()
-type1=netro1.device_type()
+type1= netro1.device_type()
 zones = netro1.zone_list()
 zone2 = netro1.zone_info(6)
 moisture = netro1.get_moisture_info()
 print()
-print( moisture)
+#chedules = netro1.get_schedules()
 
-schedules = netro1.get_schedules()
-schedules1= netro1.get_schedules(1)
-events = netro1.get_events()
+testEN = netro1.set_status(0)
+#time.sleep(1)
+testEN = netro1.set_status(1)
+test3 = netro1.set_watering(1,0,1)
+
 
 
 payload = {}
