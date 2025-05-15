@@ -5,6 +5,7 @@ import json
 from threading import Lock
 from datetime import timedelta, datetime, timezone
 from tzlocal import get_localzone
+import numpy as np
 
 try:
     #import udi_interface
@@ -26,18 +27,14 @@ class netroAccess(object):
         self.serialID = serial_nbr
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
-        self.device_type = ''
+
         self.tz = get_localzone()
         self.get_info()
 
+    def device_type(self) -> str:
+        return(self.netro['type'])
 
-
-
-
-    def get_device_type(self) -> str:
-        return(self.device_type)
-
-    def get_status(self):
+    def status(self):
         logging.debug('get_status')
         try:
             return(STATUS_CODE[self.netro['info']['status']])
@@ -46,29 +43,29 @@ class netroAccess(object):
             return(None)
     
     
-    def get_zone_list(self):
+    def zone_list(self):
         logging.debug('get_zone_list')
-        return(self.netro['active_zone_list'])
+        return(self.netro['active_zones'])
 
-    def get_zone_info(self, zone_nbr=None):
+    def zone_info(self, zone_nbr=None):
         try:
-            logging.debuf('get_device_name')
+            logging.debug('get_zone_info')
 
-            if self.device_type == 'controller':
-                return(self.netro['active_zone_list'][zone_nbr])
+            if self.netro['type'] == 'controller':
+                return(self.netro['active_zones'][zone_nbr])
                                             
         except KeyError as e:
-            logging.error(f'Error: get_zone_info {e}')
+            logging.error(f'Error: get_zone_info - zone may not be enabled {e}')
             return(None)
         
 
-    def get_device_name(self):
+    def device_name(self):
         try:
             logging.debug('get_device_name')
-            if self.device_type == 'controller':
+            if self.netro['type'] == 'controller':
                 return(self.netro['info']['device']['name'])
-            elif self.device_type == 'sensor':
-               return('sensor'+str(self.serialID))
+            elif self.netro['type'] == 'sensor':
+               return(self.netro['name'])
             
             else:
                 return('Unknown')
@@ -91,14 +88,16 @@ class netroAccess(object):
                 unix_time = int(date_time_obj.timestamp())
                 self.netro['last_api_time'] = unix_time  
                 if 'device' in res['data']: # controller
-                    self.device_type = 'controller'
+                    self.netro['type'] = 'controller'
+                    self.netro['name'] = res['data']['device']['name']
                     self.netro['info'] = res['data'] 
-                    self.netro['active_zone_list'] = []
+                    self.netro['active_zones'] = {}
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
                         if zone['enabled']:
-                            self.netro['active_zone_list'].append(zone)
+                            self.netro['active_zones'][zone['ith']] = zone
                 elif 'sensor_data' in res['data']: #sensor
-                    self.device_type ='sensor'
+                    self.netro['type'] ='sensor'
+                    self.netro['name'] = res['data']['sensor']['name']
                     self.netro['info'] = res['data']
                 logging.debug(f'self.netro {self.netro}')
                 return(status)
@@ -109,16 +108,32 @@ class netroAccess(object):
             return(None)
         
 
-    def get_moisture(self, zone_list=None ) -> dict:
+    def _process_moisture_info(self, data):
+        logging.debug(f'_process_moisture_info {data}')
+        now_obj = datetime.now()
+        if len(data)>0:
+            for indx, m_data in enumerate(data):
+                mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
+                days_ago = (now_obj - mois_date_obj).days
+                if 'moisture' not in self.netro['active_zones'][m_data['zone']]:
+                    self.netro['active_zones'][m_data['zone']]['moisture'] = {}
+                self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
+            for indx, zone in enumerate (self.netro['active_zones']):
+                data = {}
+                for day in enumerate(zone['moisture']):
+                    data['day'] = day
+                    data['moisture'] = zone['moisture'][day]
+                f = np.polyfit(data['day'], data['moisture'], deg=1)
+                logging.debug(f'moisture slope {f[0]}')
+                
+    def get_moisture_info(self, zone_list=None ) -> dict:
         try:
             logging.debug(f'get_moisture {self.serialID}')
             params = {}
-            params['zones'] = zone_list 
             status, res = self._callApi('GET', '/moistures.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')                
-                if zone_list is None: # all zones are updated
-                    logging.debug('all zones')
+                self._process_moisture_info(res['data']['moistures'])
                 return(res)
             else:
                 return(None)
@@ -133,11 +148,10 @@ class netroAccess(object):
             params = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
-                status, res = self._callApi('GET', '/schedules.json', params)
-                logging.debug(f'status = {status}  res = {res} ')
-                return(res)
-            else:
-                return(None)
+            status, res = self._callApi('GET', '/schedules.json', params)
+            logging.debug(f'status = {status}  res = {res} ')
+            return(res)
+
         except Exception as e:
             logging.debug(f'Exception get_schedules {self.serialID} {e} ')
             return(None)

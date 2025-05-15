@@ -24,11 +24,26 @@ serial2 = 'c82e18810de8'
 serial3 = 'c82e1881d038'
 netro1 = netroAccess(serial1)
 netro2 = netroAccess(serial2)
+netro3 = netroAccess(serial3)
 test1 = netro1.get_info()
 print(test1)
+print(netro1.netro)
+#test2 = netro2.get_info()
+
+#print(test2)
+
+name1 = netro1.device_name()
+type1=netro1.device_type()
+zones = netro1.zone_list()
+zone2 = netro1.zone_info(6)
+moisture = netro1.get_moisture_info()
 print()
-test2 = netro2._callApi('GET', '/info.json')
-print(test2)
+print( moisture)
+
+schedules = netro1.get_schedules()
+schedules1= netro1.get_schedules(1)
+events = netro1.get_events()
+
 
 payload = {}
 #payload['event']=3
