@@ -43,6 +43,17 @@ class netroAccess(object):
         return(epoch_time)
 
 
+    def start_stop_dates(self, days_back):
+        day0 = datetime.now()
+        if isinstance(days_back, int):
+            #day1 = day0 - timedelta(days=1)
+            day2  = day0 - timedelta(days=days_back)
+            day_stop = day0.strftime("%Y-%m-%d")
+            day_start =  day2.strftime("%Y-%m-%d")
+
+        return(day_start, day_stop)
+    
+
     def get_status(self):
         logging.debug('get_status')
         try:
@@ -50,6 +61,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'ERROR - no key found {e}')
             return(None)
+    
     
     
     def zone_list(self):
@@ -136,23 +148,28 @@ class netroAccess(object):
                     self.netro['active_zones'][m_data['zone']]['moisture'] = {}
                 self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
             for indx, zone in enumerate (self.netro['active_zones']):
-                data = {}
-                for day in enumerate(zone['moisture']):
-                    data['day'] = day
-                    data['moisture'] = zone['moisture'][day]
-                f = np.polyfit(data['day'], data['moisture'], deg=1)
+                d_list = []
+                m_list = []
+                for day in self.netro['active_zones'][zone]['moisture']:
+                    d_list.append(day)
+                    m_list.append(self.netro['active_zones'][zone]['moisture'][day])
+                x=np.array(d_list)
+                y=np.array(m_list)
+                f = np.polyfit(x,y, deg=1)
+                self.netro['active_zones'][zone]['polyfit'] = f
                 logging.debug(f'moisture slope {f[0]}')
                 
 
 
-    def get_moisture_info(self, zone_list=None ) -> dict:
+    def get_moisture_info(self, days_back=None, zone_list=None ) -> dict:
         try:
             logging.debug(f'get_moisture')
+
             params = {}
-            status, res = self._callApi('GET', '/moistures.json', params)
-            if status == 'ok':
-                logging.debug(f'res = {res}')                
-                self._process_moisture_info(res['data']['moistures'])
+            if isinstance(days_back, int):
+                start_str, stop_str = self.start_stop_dates(days_back)
+                params['start_date']=start_str
+                params['end_date']=stop_str
             if isinstance(zone_list, list):
                 params['zones'] = zone_list 
             status, res = self.callNetroApi('GET', '/moistures.json', params)
@@ -160,7 +177,7 @@ class netroAccess(object):
                 logging.debug(f'res = {res}')                
                 if zone_list is None: # all zones are updated
                     logging.debug('all zones')
-
+                    self._process_moisture_info(res['data']['moistures'])
 
                 self.updateAPIinfo(res)
                 return(res)
@@ -304,7 +321,7 @@ class netroAccess(object):
             else:
                 payload = body
                 payload['key'] = self.serialID
-            status, res = self._callApi(method, url, body)
+            status, res = self._callApi(method, url, payload)
             response = res
             if status == 'ok':
                 if 'errors' in res and len(res['errors']>0):
@@ -314,12 +331,12 @@ class netroAccess(object):
         except KeyError as e:
             return ('error', e)
 
-    def _callApi(self, method='GET', url=None, body=None):
+    def _callApi(self, method='GET', url=None, payload=None):
         # When calling an API, get the access token (it will be refreshed if necessary)
         #self.apiLock.acquire()
 
         response = None
-        payload = {}
+        #payload = body
         completeUrl = self.yourApiEndpoint + url
 
         headers = {}
@@ -328,7 +345,8 @@ class netroAccess(object):
                 'Content-Type'  : 'application/json',
                 'Accept'        : 'application/json',
             }
-
+        #if payload is not None:
+        #    payload = json.dumps(payload)
         logging.debug(f' call info url={completeUrl}, header {headers}, params ={payload}')
 
         try:
