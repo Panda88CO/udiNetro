@@ -200,12 +200,13 @@ class netroStart(udi_interface.Node):
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
             api = netroAccess(device)
-            if api.device_type == 'controller':
-                name = api.get_device_name()
+            if api.device_type() == 'controller':
+                name = self.poly.getValidName(api.device_name())
                 self.node_dict[device] = netroController(self.poly, device, device, name, api )
                 assigned_primary_addresses.append(device)
-            elif api.device_type == 'sensor':
-                self.node_dict[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+            elif api.device_type() == 'sensor':
+                name = self.poly.getValidName(api.device_name())
+                self.node_dict[device] = netroSensor(self.poly, device, device, name , api )
                 assigned_primary_addresses.append(device)
        
            

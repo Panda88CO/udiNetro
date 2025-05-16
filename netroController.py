@@ -17,6 +17,7 @@ class netroController(udi_interface.Node):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
+  
         self.ISYforced = False
         self.netro_api = api
         self.primary = primary
@@ -35,12 +36,21 @@ class netroController(udi_interface.Node):
         self.nodeReady = True
         logging.info('_init_ Netro Irrigation Controller Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
+        self.netro_api.get_info()
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
         #self.CO_setDriver('ST', 1)
-
+        self.zone_nodes = {}
+        active_zones = self.netro_api.zone_list()
+        logging.debug(f'Adding  {len(active_zones)}')
+        for zone_nbr in active_zones:
+            zone = active_zones[zone_nbr]
+            name = self.poly.getValidName(zone['name'])
+            address = self.poly.getValidAddress('zone_'+str(zone_nbr))
+            self.zone[zone_nbr] = netroZone(self.poly, self.primary, address, name , self.netro_api )
         self.nodeReady = True
+
         #self.updateISYdrivers()
         #self.update_time()
         #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()

@@ -33,13 +33,15 @@ class netroSensor(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.nodeReady = True
-        logging.info('_init_ Tesla ClimateNode Status Node COMPLETE')
+        self.netro_api.get_info()
+        logging.info('_init_ Netro Sensor NOde  COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
         logging.debug('Start TeslaEV Climate Node')  
         #self.CO_setDriver('ST', 1)
         self.nodeReady = True
+        
         #self.updateISYdrivers()
         #self.update_time()
         #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()

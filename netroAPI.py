@@ -27,14 +27,10 @@ class netroAccess(object):
         self.serialID = serial_nbr
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
+        self.get_info() #Get latest API data 
 
     def device_type(self) -> str:
         return(self.netro['type'])
-
-    def status(self):
-        self.device_type = ''
-        #self.tz = get_localzone()
-        self.get_info()
 
     def daytimestr2epocTime(self, time_str) -> int:
         dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
