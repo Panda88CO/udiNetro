@@ -212,12 +212,12 @@ class netroStart(udi_interface.Node):
            
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
-        for indx, node  in enumerate(self.nodes_in_db):
-            #node = self.nodes_in_db[nde]
-            logging.debug(f'Scanning db for node : {node}')
-            if node['primaryNode'] not in assigned_primary_addresses:
-                logging.debug('Removing node : {} {}'.format(node['name'], node))
-                self.poly.delNode(node['address'])
+        #for indx, node  in enumerate(self.nodes_in_db):
+        #    #node = self.nodes_in_db[nde]
+        #    logging.debug(f'Scanning db for node : {node}')
+        #    if node['primaryNode'] not in assigned_primary_addresses:
+        #        logging.debug('Removing node : {} {}'.format(node['name'], node))
+        #        self.poly.delNode(node['address'])
             
 
         self.update_all_drivers()
