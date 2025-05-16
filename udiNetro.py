@@ -210,8 +210,7 @@ class netroStart(udi_interface.Node):
                 assigned_primary_addresses.append(device)
        
            
-        logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
-
+        #logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
         #for indx, node  in enumerate(self.nodes_in_db):
         #    #node = self.nodes_in_db[nde]
         #    logging.debug(f'Scanning db for node : {node}')
