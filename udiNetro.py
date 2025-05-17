@@ -43,7 +43,7 @@ class netroStart(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-
+        self.n_queue = []
         polyglot.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler)
         polyglot.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         #polyglot.subscribe(polyglot.ADDNODEDONE, TEV.node_queue)        
@@ -59,9 +59,10 @@ class netroStart(udi_interface.Node):
         self.hb = 0
         self.connected = False
         self.nodeDefineDone = False
-
+        self.wait_for_node_done()
         self.poly.updateProfile()
         self.poly.ready()
+        self.node = self.poly.getNode(address)
         self.tempUnit = 0 # C
         self.distUnit = 0 # KM
         self.customParam_done = False
@@ -93,12 +94,14 @@ class netroStart(udi_interface.Node):
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
             api = netroAccess(device)
-            if api.device_type == 'controller':
-                name = api.get_device_name()
+            name = api.get_device_name()
+            logging.debug(f'Name : {name}, {api.device_type() }')
+            if api.device_type() == 'controller':
+  
                 self.node_dict[device] = netroController(self.poly, device, device, name, api )
                 assigned_primary_addresses.append(device)
-            elif api.device_type == 'sensor':
-                self.node_dict[device] = netroSensor(self.poly, device, device, 'sensor'+ device , api )
+            elif api.device_type() == 'sensor':
+                self.node_dict[device] = netroSensor(self.poly, device, device, name , api )
                 assigned_primary_addresses.append(device)
        
            

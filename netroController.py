@@ -36,7 +36,7 @@ class netroController(udi_interface.Node):
         self.nodeReady = True
         logging.info('_init_ Netro Irrigation Controller Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
-        self.netro_api.get_info()
+        
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
