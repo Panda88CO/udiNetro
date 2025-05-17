@@ -49,7 +49,7 @@ class netroController(udi_interface.Node):
             name = self.poly.getValidName(tmp_zone['name'])
 
             address = self.poly.getValidAddress(self.address[:10]+'_z'+str(key))
-            self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.primary, address, name , self.netro_api )
+            self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
         self.nodeReady = True
 
         #self.updateISYdrivers()
