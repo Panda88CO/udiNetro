@@ -6,7 +6,7 @@ from threading import Lock
 from datetime import timedelta, datetime, timezone
 
 import numpy as np
-
+import re
 try:
     #import udi_interface
     from udi_interface import LOGGER
@@ -33,14 +33,19 @@ class netroAccess(object):
         return(self.netro['type'])
 
     def daytimestr2epocTime(self, time_str) -> int:
-        dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
-        epoch_time = int(dt.timestamp())
-        return(epoch_time)
+
+        date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
+        date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
+        unix_time = int(date_time_obj.timestamp())
+
+        return(unix_time)
+
 
     def daystr2epocTime(self, time_str) -> int:
-        dt = datetime.strptime(time_str, "%Y-%m-%d")
-        epoch_time = int(dt.timestamp())
-        return(epoch_time)
+        date_time_obj = datetime.strptime(time_str, "%Y-%m-%d")
+        date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
+        unix_time = int(date_time_obj.timestamp())
+        return(unix_time)
 
 
     def start_stop_dates(self, days):
@@ -49,10 +54,14 @@ class netroAccess(object):
         last_day='' 
         if isinstance(days, int):
             day2  = day0 + timedelta(days=days)
-            first_day = day0.strftime("%Y-%m-%d")
-            last_day =  day2.strftime("%Y-%m-%d")
+            if days > 0:
+                start_day = day0.strftime("%Y-%m-%d")
+                end_day =  day2.strftime("%Y-%m-%d")
+            else:
+                end_day = day0.strftime("%Y-%m-%d")
+                start_day =  day2.strftime("%Y-%m-%d")              
 
-        return(first_day, last_day)
+        return(start_day, end_day)
     
 
     def get_status(self):
@@ -99,9 +108,7 @@ class netroAccess(object):
         try:
             date_time_str = res['meta']['last_active']
             logging.debug('updateAPIinfo {}'.format(res['meta']))
-            date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
-            date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
-            unix_time = int(date_time_obj.timestamp())
+            unix_time = self.daytimestr2epocTime(date_time_str)
             self.netro['last_api_time'] = unix_time     
             self.netro['calls_remaining'] = res['meta']['token_remaining']   
             return('ok')
@@ -192,8 +199,8 @@ class netroAccess(object):
         try:
             logging.debug(f'_process_schedule_info {data}')   
             for indx, sch_data in enumerate(data):
-                sch_start_time = self.daytimestr2epocTime(datetime.strptime(sch_data['start_time'], '%Y-%m-%dT%H:%M:%S'))
-                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(sch_data['stop_time'], '%Y-%m-%dT%H:%M:%S'))
+                sch_start_time = self.daytimestr2epocTime(datetime.strptime(sch_data['start_time']))
+                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(sch_data['stop_time']))
 
                 zone = sch_data['zone']
                 sch_type = sch_data['source']
@@ -236,9 +243,35 @@ class netroAccess(object):
         try:
             logging.debug(f'_process_event_data {data}')   
             for indx, e_data in enumerate(data):
-                sch_start_time = self.daytimestr2epocTime(datetime.strptime(e_data['start_time'], '%Y-%m-%dT%H:%M:%S'))
-                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(e_data['stop_time'], '%Y-%m-%dT%H:%M:%S'))
-
+                time = self.daytimestr2epocTime(datetime.strptime(e_data['time']))
+                if e_data['event'] == 1:
+                    if 'offline_event' not in self.netro:
+                        self.netro['offline_event'] = time
+                    elif time > self.netro['offline_event']:
+                        self.netro['offline_event'] = time
+                elif e_data['event'] == 2:
+                    if 'online_event' not in self.netro:
+                        self.netro['oline_event'] = time
+                    elif time > self.netro['online_event']:
+                        self.netro['online_event'] = time
+                elif e_data['event'] == 3:
+                    match = re.search(r'zone (\d+)', e_data['event']['message'] )
+                    if match:
+                        zone_nbr = int(match.group(1))
+                    if 'last_start' not in self.netro['active_zones'][zone_nbr]:
+                        self.netro['active_zones'][zone_nbr]['last_start' ] = time
+                    elif time > self.netro['active_zones'][zone_nbr]['last_start' ]:
+                        self.netro['active_zones'][zone_nbr]['last_start' ] = time
+                elif e_data['event'] == 4:
+                    match = re.search(r'zone (\d+)', e_data['event']['message'] )
+                    if match:
+                        zone_nbr = int(match.group(1))
+                    if 'last_stop' not in self.netro['active_zones'][zone_nbr]:
+                        self.netro['active_zones'][zone_nbr]['last_stop' ] = time
+                    elif time > self.netro['active_zones'][zone_nbr]['last_stop' ]:
+                        self.netro['active_zones'][zone_nbr]['last_stop' ] = time
+                else:
+                    logging.error(f'ERROR - unsupported event {e_data}')
 
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')
@@ -252,11 +285,10 @@ class netroAccess(object):
                 start_str, stop_str = self.start_stop_dates(days_back)
                 params['start_date']=start_str
                 params['end_date']=stop_str
-            params = {}
             status, res = self.callNetroApi('GET', '/events.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
-                self._process_event_data(res)
+                self._process_event_data(res['data']['events'])
                 self.updateAPIinfo(res)
                 return(res)
             else:
