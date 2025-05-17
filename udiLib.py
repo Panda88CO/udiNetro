@@ -18,7 +18,7 @@ from os import truncate
 import time
 import math
 import numbers 
-import datetime
+from datetime import datetime
 
 def node_queue(self, data):
     self.n_queue.append(data['address'])

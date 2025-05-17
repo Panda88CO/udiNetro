@@ -240,6 +240,9 @@ class netroAccess(object):
                 sch_stop_time = self.daytimestr2epocTime(datetime.strptime(e_data['stop_time'], '%Y-%m-%dT%H:%M:%S'))
 
 
+        except KeyError as e:
+            logging.error(f'ERROR parsing schedule data {e}')
+
         
     def get_events(self, days_back = None) -> dict:
         try:
