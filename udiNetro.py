@@ -92,7 +92,7 @@ class netroStart(udi_interface.Node):
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
             api = netroAccess(device)
-            name = api.get_device_name()
+            name = api.device_name()
             logging.debug(f'Name : {name}, {api.device_type() }')
             if api.device_type() == 'controller':
   
