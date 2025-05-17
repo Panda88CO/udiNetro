@@ -43,7 +43,7 @@ class netroController(udi_interface.Node):
         #self.CO_setDriver('ST', 1)
         self.zone_nodes = {}
         active_zones = self.netro_api.zone_list()
-        logging.debug(f'Adding  {len(active_zones)}')
+        logging.debug(f'Adding   {len(active_zones)} {active_zones}')
         for zone_nbr in active_zones:
             zone = active_zones[zone_nbr]
             name = self.poly.getValidName(zone['name'])
