@@ -18,7 +18,7 @@ from datetime import timedelta, datetime
 from tzlocal import get_localzone
 from netroController import netroController
 from netroSensor import netroSensor
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done,tempUnitAdjust, display2ISY, sentry2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
@@ -89,19 +89,20 @@ class netroStart(udi_interface.Node):
             self.poly.Notices['No serial IDs input in configuration folder - exiting']
             time.sleep(10)
             sys.exit()
+        api = {}
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
-            api = netroAccess(device)
-            name = api.device_name()
-            logging.debug(f'Name : {name}, {api.device_type() }')
-            if api.device_type() == 'controller':
-  
-                self.node_dict[device] = netroController(self.poly, device, device, name, api )
+            
+            api[indx] = netroAccess(device)
+            name = api[indx].device_name()
+            logging.debug(f'Name : {name}, {api[indx].device_type() }')
+            if api[indx].device_type() == 'controller':
+                self.node_dict[device] = netroController(self.poly, device, device, name,api[indx])
                 assigned_primary_addresses.append(device)
-            elif api.device_type() == 'sensor':
-                self.node_dict[device] = netroSensor(self.poly, device, device, name , api )
+            elif api[indx].device_type() == 'sensor':
+                self.node_dict[device] = netroSensor(self.poly, device, device, name , api[indx] )
                 assigned_primary_addresses.append(device)
-       
+
            
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
