@@ -200,6 +200,7 @@ class netroStart(udi_interface.Node):
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
             api = netroAccess(device)
+            logging.debug(f'Device Type: {api.device_type()}')
             if api.device_type() == 'controller':
                 name = self.poly.getValidName(api.device_name())
                 self.node_dict[device] = netroController(self.poly, device, device, name, api )
