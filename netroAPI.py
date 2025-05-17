@@ -32,7 +32,7 @@ class netroAccess(object):
     def device_type(self) -> str:
         return(self.netro['type'])
 
-    def daytimestr2epocTime(self, time_str) -> int:
+    def daytimestr2epocTime(self, date_time_str) -> int:
 
         date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
         date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
@@ -50,8 +50,8 @@ class netroAccess(object):
 
     def start_stop_dates(self, days):
         day0 = datetime.now()
-        first_day = ''
-        last_day='' 
+        start_day = ''
+        end_day='' 
         if isinstance(days, int):
             day2  = day0 + timedelta(days=days)
             if days > 0:
@@ -241,8 +241,10 @@ class netroAccess(object):
         
     def _process_event_data(self, data):
         try:
+            
             logging.debug(f'_process_event_data {data}')   
             for indx, e_data in enumerate(data):
+                zone_nbr = None
                 time = self.daytimestr2epocTime(datetime.strptime(e_data['time']))
                 if e_data['event'] == 1:
                     if 'offline_event' not in self.netro:
@@ -258,18 +260,20 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['event']['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    if 'last_start' not in self.netro['active_zones'][zone_nbr]:
-                        self.netro['active_zones'][zone_nbr]['last_start' ] = time
-                    elif time > self.netro['active_zones'][zone_nbr]['last_start' ]:
-                        self.netro['active_zones'][zone_nbr]['last_start' ] = time
+                    if isinstance(zone_nbr, int:)
+                        if 'last_start' not in self.netro['active_zones'][zone_nbr]:
+                            self.netro['active_zones'][zone_nbr]['last_start' ] = time
+                        elif time > self.netro['active_zones'][zone_nbr]['last_start' ]:
+                            self.netro['active_zones'][zone_nbr]['last_start' ] = time
                 elif e_data['event'] == 4:
                     match = re.search(r'zone (\d+)', e_data['event']['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    if 'last_stop' not in self.netro['active_zones'][zone_nbr]:
-                        self.netro['active_zones'][zone_nbr]['last_stop' ] = time
-                    elif time > self.netro['active_zones'][zone_nbr]['last_stop' ]:
-                        self.netro['active_zones'][zone_nbr]['last_stop' ] = time
+                    if isinstance(zone_nbr, int:)
+                        if 'last_stop' not in self.netro['active_zones'][zone_nbr]:
+                            self.netro['active_zones'][zone_nbr]['last_stop' ] = time
+                        elif time > self.netro['active_zones'][zone_nbr]['last_stop' ]:
+                            self.netro['active_zones'][zone_nbr]['last_stop' ] = time
                 else:
                     logging.error(f'ERROR - unsupported event {e_data}')
 
