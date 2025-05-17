@@ -65,7 +65,7 @@ class netroAccess(object):
     
     
     def zone_list(self):
-        logging.debug('get_zone_list')
+        logging.debug('zone_list')
         return(self.netro['active_zones'])
 
     def zone_info(self, zone_nbr=None):
