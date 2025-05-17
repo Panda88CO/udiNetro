@@ -45,13 +45,15 @@ class netroAccess(object):
 
     def start_stop_dates(self, days_back):
         day0 = datetime.now()
+        day_start = ''
+        day_end='' 
         if isinstance(days_back, int):
             #day1 = day0 - timedelta(days=1)
             day2  = day0 - timedelta(days=days_back)
-            day_stop = day0.strftime("%Y-%m-%d")
+            day_end = day0.strftime("%Y-%m-%d")
             day_start =  day2.strftime("%Y-%m-%d")
 
-        return(day_start, day_stop)
+        return(day_start, day_end)
     
 
     def get_status(self):
