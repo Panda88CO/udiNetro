@@ -44,11 +44,11 @@ class netroController(udi_interface.Node):
         self.zone_nodes = {}
         active_zones = self.netro_api.zone_list()
         logging.debug(f'Adding   {len(active_zones)} {active_zones}')
-        for zone_nbr in active_zones:
-            zone = active_zones[zone_nbr]
-            name = self.poly.getValidName(zone['name'])
-            address = self.poly.getValidAddress('zone_'+str(zone_nbr))
-            self.zone[zone_nbr] = netroZone(self.poly, self.primary, address, name , self.netro_api )
+        for tmp_zone in active_zones:
+            logging.debug(f'Selected Zone {tmp_zone}')
+            name = self.poly.getValidName(tmp_zone['name'])
+            address = self.poly.getValidAddress('zone_'+str(tmp_zone['ith']))
+            self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.primary, address, name , self.netro_api )
         self.nodeReady = True
 
         #self.updateISYdrivers()

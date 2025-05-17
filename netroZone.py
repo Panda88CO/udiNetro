@@ -17,7 +17,7 @@ class netroZone(udi_interface.Node):
         super(netroZone, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
-        self.ISYforced = False
+
         self.netro_api = api
         self.primary = primary
         self.address = address
