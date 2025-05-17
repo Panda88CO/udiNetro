@@ -47,7 +47,8 @@ class netroController(udi_interface.Node):
         for key, tmp_zone in active_zones.items():
             logging.debug(f'Key {key} Selected Zone {tmp_zone}')
             name = self.poly.getValidName(tmp_zone['name'])
-            address = self.poly.getValidAddress('zone_'+str(key))
+
+            address = self.poly.getValidAddress(address+'z'+str(key))
             self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.primary, address, name , self.netro_api )
         self.nodeReady = True
 
