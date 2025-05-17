@@ -43,7 +43,6 @@ class netroStart(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        self.n_queue = []
         polyglot.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler)
         polyglot.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         #polyglot.subscribe(polyglot.ADDNODEDONE, TEV.node_queue)        
@@ -59,7 +58,6 @@ class netroStart(udi_interface.Node):
         self.hb = 0
         self.connected = False
         self.nodeDefineDone = False
-        self.wait_for_node_done()
         self.poly.updateProfile()
         self.poly.ready()
         self.node = self.poly.getNode(address)
