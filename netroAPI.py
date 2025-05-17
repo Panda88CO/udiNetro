@@ -43,17 +43,16 @@ class netroAccess(object):
         return(epoch_time)
 
 
-    def start_stop_dates(self, days_back):
+    def start_stop_dates(self, days):
         day0 = datetime.now()
-        day_start = ''
-        day_end='' 
-        if isinstance(days_back, int):
-            #day1 = day0 - timedelta(days=1)
-            day2  = day0 - timedelta(days=days_back)
-            day_end = day0.strftime("%Y-%m-%d")
-            day_start =  day2.strftime("%Y-%m-%d")
+        first_day = ''
+        last_day='' 
+        if isinstance(days, int):
+            day2  = day0 + timedelta(days=days)
+            first_day = day0.strftime("%Y-%m-%d")
+            last_day =  day2.strftime("%Y-%m-%d")
 
-        return(day_start, day_end)
+        return(first_day, last_day)
     
 
     def get_status(self):
@@ -140,27 +139,29 @@ class netroAccess(object):
         
 
     def _process_moisture_info(self, data):
-        logging.debug(f'_process_moisture_info {data}')
-        now_obj = datetime.now()
-        if len(data)>0:
-            for indx, m_data in enumerate(data):
-                mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
-                days_ago = (now_obj - mois_date_obj).days
-                if 'moisture' not in self.netro['active_zones'][m_data['zone']]:
-                    self.netro['active_zones'][m_data['zone']]['moisture'] = {}
-                self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
-            for indx, zone in enumerate (self.netro['active_zones']):
-                d_list = []
-                m_list = []
-                for day in self.netro['active_zones'][zone]['moisture']:
-                    d_list.append(day)
-                    m_list.append(self.netro['active_zones'][zone]['moisture'][day])
-                x=np.array(d_list)
-                y=np.array(m_list)
-                f = np.polyfit(x,y, deg=1)
-                self.netro['active_zones'][zone]['polyfit'] = f
-                logging.debug(f'moisture slope {f[0]}')
-                
+        try:
+            logging.debug(f'_process_moisture_info {data}')
+            now_obj = datetime.now()
+            if len(data)>0:
+                for indx, m_data in enumerate(data):
+                    mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
+                    days_ago = (now_obj - mois_date_obj).days
+                    if 'moisture' not in self.netro['active_zones'][m_data['zone']]:
+                        self.netro['active_zones'][m_data['zone']]['moisture'] = {}
+                    self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
+                for indx, zone in enumerate (self.netro['active_zones']):
+                    d_list = []
+                    m_list = []
+                    for day in self.netro['active_zones'][zone]['moisture']:
+                        d_list.append(day)
+                        m_list.append(self.netro['active_zones'][zone]['moisture'][day])
+                    x=np.array(d_list)
+                    y=np.array(m_list)
+                    f = np.polyfit(x,y, deg=1)
+                    self.netro['active_zones'][zone]['polyfit'] = f
+                    logging.debug(f'moisture slope {f[0]}')
+        except KeyError as e:
+            logging.error(f'ERROR parcing moisture data: {e}')                    
 
 
     def get_moisture_info(self, days_back=None, zone_list=None ) -> dict:
@@ -182,38 +183,77 @@ class netroAccess(object):
                     self._process_moisture_info(res['data']['moistures'])
 
                 self.updateAPIinfo(res)
-                return(res)
-            else:
-                return(None)
+            return(status)
         except Exception as e:
             logging.debug(f'Exception get_moisture {self.serialID} {e} ')
             return(None)
-        
 
-    def get_schedules(self, zone_list=None ) -> dict:
+    def _process_schedule_info(self, data):
+        try:
+            logging.debug(f'_process_schedule_info {data}')   
+            for indx, sch_data in enumerate(data):
+                sch_start_time = self.daytimestr2epocTime(datetime.strptime(sch_data['start_time'], '%Y-%m-%dT%H:%M:%S'))
+                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(sch_data['stop_time'], '%Y-%m-%dT%H:%M:%S'))
+
+                zone = sch_data['zone']
+                sch_type = sch_data['source']
+                sch_status = sch_data['status']
+                if 'next_start' not in self.netro['active_zones'][zone]:
+                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                    self.netro['active_zones'][zone]['next_stop'] = sch_stop_time
+                    self.netro['active_zones'][zone]['type'] = sch_type
+                    self.netro['active_zones'][zone]['status'] = sch_status                    
+                elif sch_start_time < self.netro['active_zones'][zone]['next_start']:
+                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                    self.netro['active_zones'][zone]['type'] = sch_type
+                    self.netro['active_zones'][zone]['status'] = sch_status  
+
+        except KeyError as e:
+            logging.error(f'ERROR parsing schedule data {e}')
+
+    def get_schedules(self, next_days=None, zone_list=None ) -> dict:
         try:
             logging.debug(f'get_schedules ')
-            params = {}
+            params={}
+            if isinstance(next_days, int):
+                first_day, last_day = self.start_stop_dates(next_days)
+                params['start_date']=first_day
+                params['end_date']=last_day
             if isinstance(zone_list, list):
                 params['zones'] = zone_list 
             status, res = self.callNetroApi('GET', '/schedules.json', params)
-            logging.debug(f'status = {status}  res = {res} ')
-            self.updateAPIinfo(res)
-            return(res)
+            if status == 'ok:':
+                self._process_schedule_info(res)
+                self.updateAPIinfo(res)
+            return(status)
 
         except Exception as e:
             logging.debug(f'Exception get_schedules {e} ')
             return(None)
         
-    def get_events(self, zone_list=None ) -> dict:
+    def _process_event_data(self, data):
+        try:
+            logging.debug(f'_process_event_data {data}')   
+            for indx, e_data in enumerate(data):
+                sch_start_time = self.daytimestr2epocTime(datetime.strptime(e_data['start_time'], '%Y-%m-%dT%H:%M:%S'))
+                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(e_data['stop_time'], '%Y-%m-%dT%H:%M:%S'))
+
+
+        
+    def get_events(self, days_back = None) -> dict:
         try:
             logging.debug(f'get_events {self.serialID}')
+            params={}
+            if isinstance(days_back, int):
+                start_str, stop_str = self.start_stop_dates(days_back)
+                params['start_date']=start_str
+                params['end_date']=stop_str
             params = {}
-            if isinstance(zone_list, list):
-                params['zones'] = zone_list 
             status, res = self.callNetroApi('GET', '/events.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
+                self._process_event_data(res)
                 self.updateAPIinfo(res)
                 return(res)
             else:
@@ -282,9 +322,9 @@ class netroAccess(object):
             logging.debug(f'Exception stop_watering {self.serialID} {e} ')
             return(None)
         
-    def set_no_water_days(self, skip_days=None) -> str:
+    def set_skip_water_days(self, skip_days=None) -> str:
         try:
-            logging.debug(f'set_no_water_days {skip_days}')
+            logging.debug(f'set_skip_water_days {skip_days}')
             if isinstance(skip_days, int):
                 params = {'days':skip_days}
                 status, res = self.callNetroApi('POST', '/no_water.json', params)
@@ -294,7 +334,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception set_no_water_days {self.serialID} {e} ')
+            logging.debug(f'Exception set_skip_water_days {self.serialID} {e} ')
             return(None)        
     ####################
 
