@@ -199,20 +199,20 @@ class netroAccess(object):
         try:
             logging.debug(f'_process_schedule_info {data}')   
             for indx, sch_data in enumerate(data):
-                sch_start_time = self.daytimestr2epocTime(datetime.strptime(sch_data['start_time']))
-                sch_stop_time = self.daytimestr2epocTime(datetime.strptime(sch_data['stop_time']))
+                sch_start_time = self.daytimestr2epocTime(sch_data['start_time'])
+                sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
 
                 zone = sch_data['zone']
                 sch_type = sch_data['source']
                 sch_status = sch_data['status']
                 if 'next_start' not in self.netro['active_zones'][zone]:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
-                    self.netro['active_zones'][zone]['next_stop'] = sch_stop_time
+                    self.netro['active_zones'][zone]['next_end'] = sch_end_time
                     self.netro['active_zones'][zone]['type'] = sch_type
                     self.netro['active_zones'][zone]['status'] = sch_status                    
                 elif sch_start_time < self.netro['active_zones'][zone]['next_start']:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
-                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                    self.netro['active_zones'][zone]['next_end'] = sch_end_time
                     self.netro['active_zones'][zone]['type'] = sch_type
                     self.netro['active_zones'][zone]['status'] = sch_status  
 
@@ -230,8 +230,8 @@ class netroAccess(object):
             if isinstance(zone_list, list):
                 params['zones'] = zone_list 
             status, res = self.callNetroApi('GET', '/schedules.json', params)
-            if status == 'ok:':
-                self._process_schedule_info(res)
+            if status == 'ok':
+                self._process_schedule_info(res['data']['schedules'])
                 self.updateAPIinfo(res)
             return(status)
 
@@ -245,7 +245,7 @@ class netroAccess(object):
             logging.debug(f'_process_event_data {data}')   
             for indx, e_data in enumerate(data):
                 zone_nbr = None
-                time = self.daytimestr2epocTime(datetime.strptime(e_data['time']))
+                time = self.daytimestr2epocTime(e_data['time'])
                 if e_data['event'] == 1:
                     if 'offline_event' not in self.netro:
                         self.netro['offline_event'] = time
@@ -257,19 +257,19 @@ class netroAccess(object):
                     elif time > self.netro['online_event']:
                         self.netro['online_event'] = time
                 elif e_data['event'] == 3:
-                    match = re.search(r'zone (\d+)', e_data['event']['message'] )
+                    match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    if isinstance(zone_nbr, int:)
+                    if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
                         elif time > self.netro['active_zones'][zone_nbr]['last_start' ]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
                 elif e_data['event'] == 4:
-                    match = re.search(r'zone (\d+)', e_data['event']['message'] )
+                    match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    if isinstance(zone_nbr, int:)
+                    if isinstance(zone_nbr, int):
                         if 'last_stop' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_stop' ] = time
                         elif time > self.netro['active_zones'][zone_nbr]['last_stop' ]:
