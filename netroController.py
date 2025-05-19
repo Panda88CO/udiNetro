@@ -95,10 +95,10 @@ class netroController(udi_interface.Node):
             logging.info(f'Irrigation Contrller  updateISYdrivers {self.EVid}: {self.drivers}')
             
             self.update_time()
-            self.setDriverTemp('ST', self.netro_api.get_status())
+            self.CO_setDriver('ST', self.netro_api.get_status())
 
             #self.setDriverTemp('GV0', 0)
-            self.setDriverTemp('GV1',len(self.netro_api.zone_list()))        
+            self.CO_setDriver('GV1',len(self.netro_api.zone_list()))        
             self.setDriverTemp('GV2', 0)
             self.setDriverTemp('GV3',0)
             self.setDriverTemp('GV4',0)
@@ -176,9 +176,9 @@ class netroController(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},  #Irrigation state
+            {'driver': 'ST', 'value': 0, 'uom': 25},    #Irrigation state
             #{'driver': 'GV0', 'value': 0, 'uom': 25},  #Irrigation state
-            {'driver': 'GV1', 'value': 0, 'uom': 72},  #Nmber of enabled zones
+            {'driver': 'GV1', 'value': 0, 'uom': 72},   #Nmber of enabled zones
             {'driver': 'GV2', 'value': 0, 'uom': 151},  #Next Start Time
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Previous Start Time
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
@@ -186,7 +186,7 @@ class netroController(udi_interface.Node):
             {'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
             {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
             {'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
-            {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last update
+            {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
 
             ]
 

@@ -34,7 +34,10 @@
       <range  uom="25" subset="99" nls="UNKNOWN"  />
   </editor> 
 
-  <editor id="Days" > 
+  <editor id="setMinutes" > 
+     <range  uom="44"  min="0" max="120" prec="0" />
+  </editor> 
+  <editor id="setDays" > 
      <range  uom="10" min="0" max="365" />
   </editor>
 
@@ -50,6 +53,10 @@
      <range  uom="72" min="0" max="100" />
   </editor>
 
+    <editor id="slope" > 
+     <range  uom="72" min="-100" max="100" prec="1" />
+  </editor>
+
     <editor id="Sunlight" > 
      <range  uom="36" min="0" max="10000" prec="1" />
   </editor>
@@ -63,4 +70,6 @@
   <editor id="BOOLSTATE" > 
      <range  uom="25" subset="0,1,98,99" nls="BOOLSTATE"/>
   </editor> 
+
+
 </editors> 

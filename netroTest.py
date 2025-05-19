@@ -9,7 +9,7 @@ import time
 import json
 from netroAPI import netroAccess
 #from datetime import timedelta, datetime
-from tzlocal import get_localzone
+#from tzlocal import update_localzone
 
 try:
     #import udi_interface
@@ -25,23 +25,27 @@ serial3 = 'c82e1881d038'
 netro1 = netroAccess(serial1)
 netro2 = netroAccess(serial2)
 #netro3 = netroAccess(serial3)
-test1 = netro1.get_info()
-event1 = netro1.get_events(-5)
-print(test1)
+#test1 = netro1.update_info()
+zone_type = netro1.zone_config(1)
+moisture = netro1.update_moisture_info(-5)
+#event1 = netro1.update_events(-5)
+#print(test1)
 print(netro1.netro)
-#test2 = netro2.get_info()
-sch1=netro1.get_schedules(7)
+#test2 = netro2.update_info()
+#sch1=netro1.update_schedules(7)
 
-moisture = netro1.get_moisture_info(-5)
+#moisture = netro1.update_moisture_info(-5)
+moisture1 = netro1.moisture(6)
+moisture2 = netro1.moisture_slope(1)
 #print(test2)
 
 name1 = netro1.device_name()
 type1= netro1.device_type()
 zones = netro1.zone_list()
 zone2 = netro1.zone_info(6)
-event1 = netro1.get_events(-5)
+event1 = netro1.update_events(-5)
 print()
-#chedules = netro1.get_schedules()
+#chedules = netro1.update_schedules()
 
 testEN = netro1.set_status(0)
 #time.sleep(1)

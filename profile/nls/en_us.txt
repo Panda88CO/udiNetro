@@ -58,9 +58,10 @@ ZoneType-0=SMART
 ZoneType-1=ASSISTANT
 ZoneType-2=TIMER
 ZoneType-99=Unknown
-ST-nlszone-GV3-NAME=Previous Start Time
-ST-nlszone-GV4-NAME=Previous End Time 
-ST-nlszone-GV5-NAME=Next Start Time 
+ST-nlszone-GV4-NAME=Previous Start Time
+ST-nlszone-GV5-NAME=Previous End Time 
+ST-nlszone-GV6-NAME=Next Start Time 
+ST-nlszone-GV7-NAME=Next End Time 
 ST-nlszone-GV19-NAME=Last Update
 
 
@@ -72,6 +73,8 @@ StartStop-0=Stop
 StartStop-1=Start
 CMD-nlszone-SkipDays-NAME=Days to Skip Watering 
 CMD-nlszone-Enable-NAME=Controller State
+
+
 
 
 ND-sensor-NAME=Irrigation Sensor
@@ -86,3 +89,4 @@ ST-nlssensor-GV2-NAME=Sun Light
 ST-nlssensor-GV3-NAME=Temperature
 ST-nlssensor-GV4-NAME=Battery Level (0-100)
 CMD-nls_ctrl-Update-NAME=Update Data
+

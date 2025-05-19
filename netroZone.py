@@ -8,10 +8,10 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 import time
-        
+import re        
                
 class netroZone(udi_interface.Node):
-    from  udiLib import node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import zoneconfig2ISY, node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroZone, self).__init__(polyglot, primary, address, name)
@@ -22,6 +22,12 @@ class netroZone(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
+        match = re.search(r'_z (\d+)', self.name )
+        if match:
+            self.zone_nbr = int(match.group(1))
+        else:
+            self.zone_nbr = -1
+
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
@@ -37,10 +43,11 @@ class netroZone(udi_interface.Node):
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
-        logging.debug('Start Netro Irrigation Controller Node')  
+        logging.debug('Start Netro Irrigation Controller Node') 
+
         #self.CO_setDriver('ST', 1)
         self.nodeReady = True
-        #self.updateISYdrivers()
+        self.updateISYdrivers()
         #self.update_time()
         #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()
 
@@ -82,21 +89,24 @@ class netroZone(udi_interface.Node):
 
             logging.info(f'Irrigation Contrller  updateISYdrivers {self.EVid}: {self.drivers}')
             
-            self.update_time()
-            self.setDriverTemp('ST', 0)
+           #self.update_time()
+            self.CO_setDriver('ST', self.netro_api.get_zone_status(self.zone_nbr))
+            self.CO_setDriver('GV0', self.zone_nbr)
 
-            self.setDriverTemp('GV0', 0)
-            self.setDriverTemp('GV1',0)        
-            self.setDriverTemp('GV2', 0)
-            self.setDriverTemp('GV3',0)
-            self.setDriverTemp('GV4',0)
+            self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.zone_config(self.zone_nbr)))        
+            self.setDriverTemp('GV2', self.netro_api.moisture(self.zone_nbr) )
+            self.setDriverTemp('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
+            self.setDriverTemp('GV4', self.netro_api.last_sch_start(self.zone_nbr))
+            self.setDriverTemp('GV5', self.netro_api.last_sch_end(self.zone_nbr))
+            self.setDriverTemp('GV6', self.netro_api.next_sch_start(self.zone_nbr))
+            self.setDriverTemp('GV7', self.netro_api.next_sch_end(self.zone_nbr))
           
 
-            self.CO_setDriver('GV10', 0, 25)
-            self.CO_setDriver('GV11',0, 25)
+            #self.CO_setDriver('GV10', 0, 25)
+            #self.CO_setDriver('GV11',0, 25)
 
-            self.CO_setDriver('GV18',0)
-            self.CO_setDriver('GV19', 0)
+            #self.CO_setDriver('GV18',0)
+            self.CO_setDriver('GV19',self.netro_api.api_last_update() )
         except Exception as e:
             logging.error(f'updateISYdrivers Netro Irrigation Controller  failed: Nodes may not be 100% ready {e}')
 
@@ -122,27 +132,17 @@ class netroZone(udi_interface.Node):
 
     def water_control (self, command):
         logging.info('water_control called') 
-        driverTemp = None
-        passengerTemp = None
+        duration = 0
+        delay=0
+
         query = command.get("query")
-        if 'driver.uom4' in query:
-            driverTemp = int(query.get('driver.uom4'))
-        elif 'driver.uom17' in query:
-            driverTemp = int((int(query.get('driver.uom17'))-32)*5/9)
-        if 'passenger.uom4' in query:
-            passengerTemp = int(query.get('passenger.uom4'))  
-        elif 'passenger.uom17' in query:
-            passengerTemp = int((int(query.get('passenger.uom17'))-32)*5/9)
-        code, res = self.TEVcloud.teslaEV_SetCabinTemps(self.EVid, driverTemp, passengerTemp)
-        if code in ['ok']:
-            self.CO_setDriver('GV21', self.command_res2ISY(res), 25)
-            self.setDriverTemp( 'GV3', driverTemp )
-            self.setDriverTemp( 'GV4', passengerTemp)
-        else:
-            logging.info('Not able to send command - EV is not online')
-            self.CO_setDriver('GV21', self.code2ISY(code), 25)
-            self.CO_setDriver('GV3', None, 25)
-            self.CO_setDriver('GV4', None, 25)
+        if 'Duration.uom44' in query:
+            duration = int(query.get('Duration.uom44'))
+        if 'Delay.uom44' in query:
+            delay = int(query.get('Delay.uom44'))  
+     
+        status = self.netro_api.set_watering(duration, delay, self.zone_nbr)    
+        logging.debug(f'set_watering {status}')
 
 
     def skip_days (self, command):
@@ -164,15 +164,18 @@ class netroZone(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},  #Status /enabled
-            {'driver': 'GV0', 'value': 0, 'uom': 25},  #Irrigation state
-            {'driver': 'GV1', 'value': 0, 'uom': 0},  #Nmber of enabled zones
-            {'driver': 'GV2', 'value': 0, 'uom': 151},  #Next Start Time
-            {'driver': 'GV3', 'value': 0, 'uom': 151},  #Previous Start Time
+            {'driver': 'ST', 'value': 99, 'uom': 25},  #Zone Status
+            {'driver': 'GV0', 'value': 0, 'uom': 0},  #Zone Number
+            {'driver': 'GV1', 'value': 99, 'uom': 25},  #Zone config
+            {'driver': 'GV2', 'value': 0, 'uom': 72},  #Moisture
+            {'driver': 'GV3', 'value': 0, 'uom': 72},  #moisture slope 
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
-            {'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
-            {'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
-            {'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
+            {'driver': 'GV5', 'value': 0, 'uom': 151},  #Previous End Time
+            {'driver': 'GV6', 'value': 0, 'uom': 151},  #Previous End Time
+            {'driver': 'GV7', 'value': 0, 'uom': 151},  #Previous End Time
+            #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
+            #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
+            #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last update
 
             ]

@@ -20,6 +20,16 @@ import math
 import numbers 
 from datetime import datetime
 
+
+STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
+ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
+
+def ctrl_status2ISY(self, status_str) -> int:
+    return(STATUS_CODE[status_str])
+
+def zoneconfig2ISY(self,config_str) -> int:
+    return(ZONE_CONFIG[config_str])
+
 def node_queue(self, data):
     self.n_queue.append(data['address'])
 

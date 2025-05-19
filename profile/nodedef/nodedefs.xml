@@ -38,14 +38,6 @@
          </sends>
          <accepts>
             <cmd id="Update" />
-            <cmd id="Water" >   
-               <p id="StartStop" editor="StartStop" />
-               <p id="Duration" editor="Minutes" />
-               <p id="Delay" editor="Minutes" />                
-            </cmd >
-            <cmd id="SkipDays" >   
-               <p id="" editor="Days" /> 
-            </cmd >         
            <cmd id="Enable" >   
                <p id="" editor="setEnable" /> 
             </cmd >
@@ -60,9 +52,11 @@
          <st id="GV0" editor="Nbr_Zones" /> 
          <st id="GV1" editor="ZoneType" /> 
          <st id="GV2" editor="Moisture" />
-         <st id="GV3" editor="unixtime" />
+         <st id="GV3" editor="slope" />         
          <st id="GV4" editor="unixtime" />
          <st id="GV5" editor="unixtime" />
+         <st id="GV6" editor="unixtime" />
+         <st id="GV7" editor="unixtime" />
          <st id="GV19" editor="unixtime" />
 
 
@@ -74,12 +68,12 @@
          </sends>
          <accepts>
             <cmd id="Water" >   
-               <p id="StartStop" editor="StartStop" />
-               <p id="Duration" editor="Minutes" />
-               <p id="Delay" editor="Minutes" />                
+               <!--<p id="StartStop" editor="StartStop" />-->
+               <p id="Duration" editor="setMinutes" />
+               <p id="Delay" editor="setMinutes" />                
             </cmd >
             <cmd id="SkipDays" >   
-               <p id="" editor="Days" /> 
+               <p id="" editor="setDays" /> 
             </cmd >         
            <cmd id="Enable" >   
                <p id="" editor="setEnable" /> 
