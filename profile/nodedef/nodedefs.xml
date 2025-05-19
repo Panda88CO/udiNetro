@@ -52,7 +52,7 @@
    <nodeDef id="zone" nls="nlszone">
       <editors />
       <sts>
-         <st id="ST" editor="Enabled" /> 
+         <st id="ST" editor="Sch_Status" /> 
          <st id="GV0" editor="Nbr_Zones" /> 
          <st id="GV1" editor="ZoneType" /> 
          <st id="GV2" editor="Moisture" />

@@ -22,7 +22,7 @@ class netroZone(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        match = re.search(r'_z (\d+)', self.name )
+        match = re.search(r'_z (\d+)', self.address )
         if match:
             self.zone_nbr = int(match.group(1))
         else:
@@ -90,7 +90,7 @@ class netroZone(udi_interface.Node):
             logging.info(f'Irrigation Contrller  updateISYdrivers {self.zone_nbr}: {self.drivers}')
             
            #self.update_time()
-            self.CO_setDriver('ST', self.netro_api.get_zone_status(self.zone_nbr))
+            self.CO_setDriver('ST', self.netro_api.zone_status(self.zone_nbr))
             self.CO_setDriver('GV0', self.zone_nbr)
 
             self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.zone_config(self.zone_nbr)))        

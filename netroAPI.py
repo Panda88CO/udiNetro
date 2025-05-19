@@ -94,7 +94,14 @@ class netroAccess(object):
             logging.error(f'Error: update_zone_info - zone may not be enabled {e}')
             return(None)
         
+    def zone_status(self, zone_nbr):
+        try:
+            logging.debug(f'zone_status {zone_nbr}')
+            return(self.netro['active_zones'][zone_nbr]['status'])
 
+        except KeyError as e:
+            logging.error(f'ERROR - zone_config {e} ')
+ 
     def zone_config(self, zone_nbr) -> str:
         try:
             logging.debug(f'zone_config {zone_nbr}')
