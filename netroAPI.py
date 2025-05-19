@@ -174,7 +174,7 @@ class netroAccess(object):
 
     def _process_moisture_info(self, data):
         try:
-            logging.debug(f'_process_moisture_info {json.dumps(data, indent=4)}'
+            logging.debug(f'_process_moisture_info {json.dumps(data, indent=4)}')
             now_obj = datetime.now()
             if len(data)>0:
                 for indx, m_data in enumerate(data):
@@ -240,7 +240,7 @@ class netroAccess(object):
 
     def _process_schedule_info(self, data):
         try:
-            logging.debug(f'_process_schedule_info {json.dumps(data, indent=4}')   
+            logging.debug(f'_process_schedule_info {json.dumps(data, indent=4)}')   
             for indx, sch_data in enumerate(data):
                 sch_start_time = self.daytimestr2epocTime(sch_data['start_time'])
                 sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
