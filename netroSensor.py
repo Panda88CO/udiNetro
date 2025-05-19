@@ -51,7 +51,8 @@ class netroSensor(udi_interface.Node):
     
     #def climateNodeReady (self):
     #    return(self.nodeReady )
-    
+    def ISYupdate (self, command):
+        logging.info('ISY-update called')
 
     def poll(self):
         pass
