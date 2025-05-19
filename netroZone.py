@@ -43,7 +43,7 @@ class netroZone(udi_interface.Node):
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
-        logging.debug('Start Netro Irrigation Controller Node') 
+        logging.debug(f'Start Netro Irrigation Controller Node {self.zone_nbr}') 
 
         #self.CO_setDriver('ST', 1)
         self.nodeReady = True
@@ -87,7 +87,7 @@ class netroZone(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Contrller  updateISYdrivers {self.EVid}: {self.drivers}')
+            logging.info(f'Irrigation Contrller  updateISYdrivers {self.zone_nbr}: {self.drivers}')
             
            #self.update_time()
             self.CO_setDriver('ST', self.netro_api.get_zone_status(self.zone_nbr))

@@ -71,24 +71,19 @@ class netroSensor(udi_interface.Node):
     #    self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
     #    self.updateISYdrivers()
 
-    def update_time(self):
-        try:
-            temp = self.TEVcloud.teslaEV_GetTimestamp(self.EVid)
-            self.CO_setDriver('GV19', temp, 151)
-        except ValueError:
-            self.CO_setDriver('GV19', None, 25)
+
         '''
         try:
             temp = round(float(self.TEVcloud.teslaEV_GetTimeSinceLastStatusUpdate(self.EVid)/60), 0)
             self.CO_setDriver('GV20', temp, 44)
         except ValueError:
             self.CO_setDriver('GV20', None, 25)
-        '''
+        
 
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Climate updateISYdrivers {self.EVid}: {self.drivers}')
+            logging.info(f'Climate updateISYdrivers: {self.drivers}')
             
             self.update_time()
             self.setDriverTemp('ST', self.TEVcloud.teslaEV_GetCabinTemp(self.EVid))
@@ -132,7 +127,7 @@ class netroSensor(udi_interface.Node):
             logging.info('Not able to send command - EV is not online')
             self.CO_setDriver('GV21', self.code2ISY(code), 25)
             self.CO_setDriver('GV9', None, 25)            
-
+        '''
 
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 
