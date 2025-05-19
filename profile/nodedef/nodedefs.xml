@@ -38,6 +38,10 @@
          </sends>
          <accepts>
             <cmd id="Update" />
+            <cmd id="StopWater" />
+            <cmd id="SkipDays" >   
+               <p id="" editor="setDays" /> 
+            </cmd >              
            <cmd id="Enable" >   
                <p id="" editor="setEnable" /> 
             </cmd >
@@ -72,12 +76,8 @@
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
-            <cmd id="SkipDays" >   
-               <p id="" editor="setDays" /> 
-            </cmd >         
-           <cmd id="Enable" >   
-               <p id="" editor="setEnable" /> 
-            </cmd >
+       
+
          </accepts>
       </cmds>
    </nodeDef> 

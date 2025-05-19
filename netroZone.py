@@ -145,13 +145,6 @@ class netroZone(udi_interface.Node):
         logging.debug(f'set_watering {status}')
 
 
-    def skip_days (self, command):
-        logging.info('skip_days called')
-  
-      
-
-    def enable (self, command):
-        logging.info('enable called')
 
 
 
@@ -159,8 +152,8 @@ class netroZone(udi_interface.Node):
     commands = { 
                  'Update' : update,
                  'Water' : water_control,
-                 'SkipDays' : skip_days,
-                 'Enable' : enable,
+                 #'SkipDays' : skip_days,
+                 #'Enable' : enable,
                 }
 
     drivers = [

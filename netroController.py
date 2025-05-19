@@ -130,47 +130,30 @@ class netroController(udi_interface.Node):
 
 
 
-
-
-    def water_control (self, command):
-        logging.info('water_control called') 
-        driverTemp = None
-        passengerTemp = None
-        query = command.get("query")
-        if 'driver.uom4' in query:
-            driverTemp = int(query.get('driver.uom4'))
-        elif 'driver.uom17' in query:
-            driverTemp = int((int(query.get('driver.uom17'))-32)*5/9)
-        if 'passenger.uom4' in query:
-            passengerTemp = int(query.get('passenger.uom4'))  
-        elif 'passenger.uom17' in query:
-            passengerTemp = int((int(query.get('passenger.uom17'))-32)*5/9)
-        code, res = self.TEVcloud.teslaEV_SetCabinTemps(self.EVid, driverTemp, passengerTemp)
-        if code in ['ok']:
-            self.CO_setDriver('GV21', self.command_res2ISY(res), 25)
-            self.setDriverTemp( 'GV3', driverTemp )
-            self.setDriverTemp( 'GV4', passengerTemp)
-        else:
-            logging.info('Not able to send command - EV is not online')
-            self.CO_setDriver('GV21', self.code2ISY(code), 25)
-            self.CO_setDriver('GV3', None, 25)
-            self.CO_setDriver('GV4', None, 25)
-
-
     def skip_days (self, command):
         logging.info('skip_days called')
-  
-      
+        query = command.get("query")
+        if 'SkipDays.uom10' in query:
+            skip_days = int(query.get('SkipDays.uom10'))
+            self.netro_api.set_skip_water_days(skip_days)
+            #update
 
     def enable (self, command):
         logging.info('enable called')
+        query = command.get("query")
+        if 'enable.uom25' in query:
+            status = int(query.get('enable.uom25'))
+            self.netro_api.set_status(status)
+            #Update
+
+
 
 
 
     id = 'irr_ctrl'
     commands = { 
                  'Update' : update,
-                 'Water' : water_control,
+
                  'SkipDays' : skip_days,
                  'Enable' : enable,
                 }
