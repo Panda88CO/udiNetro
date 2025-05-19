@@ -174,7 +174,7 @@ class netroAccess(object):
 
     def _process_moisture_info(self, data):
         try:
-            logging.debug(f'_process_moisture_info {data}')
+            logging.debug(f'_process_moisture_info {json.dumps(data}, indent=4')
             now_obj = datetime.now()
             if len(data)>0:
                 for indx, m_data in enumerate(data):
