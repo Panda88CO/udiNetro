@@ -28,7 +28,9 @@ class netroController(udi_interface.Node):
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-
+        #polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
+        #polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
+        polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -62,6 +64,11 @@ class netroController(udi_interface.Node):
     #def climateNodeReady (self):
     #    return(self.nodeReady )
     
+
+
+    def systemPoll(self):
+        logging.debug('systemPoll')
+
 
     def poll(self):
         pass
