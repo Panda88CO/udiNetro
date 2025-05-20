@@ -15,19 +15,17 @@ class netroZone(udi_interface.Node):
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroZone, self).__init__(polyglot, primary, address, name)
-        logging.info(f'_init_ Netro Irrigation Controller node {primary} {address} {name}')
+        logging.info(f'_init_ Netro Irrigation Zone node {primary} {address} {name}')
         self.poly = polyglot
 
         self.netro_api = api
         self.primary = primary
         self.address = address
         self.name = name
-        match = re.search(r'_z (\d+)', str(self.address) )
+        match = re.search(r'\d+', self.address )
         logging.debug(f'Zone number match {match}')
-        if match:
-            self.zone_nbr = int(match.group(1))
-        else:
-            self.zone_nbr = -1
+
+        self.zone_nbr = int(match.group()) if match else -1
 
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
