@@ -321,7 +321,7 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug(f'event 3 {zone_nbr}')
+                    logging.debug('event 3 {} {}'.format(zone_nbr, json.dumps(self.netro['active_zones'], indent=4)))
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
@@ -338,7 +338,7 @@ class netroAccess(object):
                         elif time > self.netro['active_zones'][zone_nbr]['last_end' ]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
                 else:
-                    logging.error(f'ERROR - unsupported event {e_data}')
+                    logging.error(f'ERROR - unsupported event {e_data} ')
 
         except KeyError as e:
             logging.error(f'ERROR parsing event data {e}')
