@@ -81,7 +81,7 @@ class netroController(udi_interface.Node):
 
             logging.info(f'Irrigation Contrller  updateISYdrivers {self.drivers}')
             
-            self.update_time()
+            #self.update_time()
             self.CO_setDriver('ST', self.netro_api.get_status())
 
             #self.setDriverTemp('GV0', 0)

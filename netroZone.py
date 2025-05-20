@@ -22,7 +22,7 @@ class netroZone(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        match = re.search(r'\d+', self.address )
+        match = re.search(r'_z\d+', self.address )
         logging.debug(f'Zone number match {match}')
 
         self.zone_nbr = int(match.group()) if match else -1
@@ -75,14 +75,7 @@ class netroZone(udi_interface.Node):
     #    self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
     #    self.updateISYdrivers()
 
-    def update_time(self):
-        try:
-            temp = self.TEVcloud.teslaEV_GetTimestamp(self.EVid)
-            self.CO_setDriver('GV19', temp, 151)
-        except ValueError:
-            self.CO_setDriver('GV19', None, 25)
-
-
+   
     def updateISYdrivers(self):
         try:
 
