@@ -16,9 +16,6 @@ except ImportError:
     import logging
     logging.basicConfig(level=30)
 
-EVENT_DAYS = -7
-SCH_DAYS = 7
-MOIST_DAYS = -5
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
@@ -31,9 +28,9 @@ class netroAccess(object):
         self.netro= {}
         self.update_info() #Get latest API data
         if self.netro['type'] == 'controller':
-            self.update_events(EVENT_DAYS)
-            self.update_moisture_info(MOIST_DAYS)
-            self.update_schedules(SCH_DAYS)
+            self.update_events( self.EVENTDAYS)
+            self.update_moisture_info(self.MOIST_DAYS )
+            self.update_schedules(self.SCH_DAYS)
         elif self.netro['type'] == 'sensor':
             self.update_sensor_data()
 

@@ -30,13 +30,12 @@ class netroStart(udi_interface.Node):
         logging.debug('Init Message system')
         self.poly = polyglot
         self.node = None
-        self.CELCIUS = 0
-        self.FARENHEIT = 1 
-
-        self.supportedParams = ['DIST_UNIT', 'TEMP_UNIT']
+        self.EVENT_DAYS = -7
+        self.SCH_DAYS = 7
+        self.MOIST_DAYS = -5
         self.paramsProcessed = False
         self.customParameters = Custom(self.poly, 'customparams')
-        self.portalData = Custom(self.poly, 'customNSdata')
+        #self.portalData = Custom(self.poly, 'customNSdata')
         self.Notices = Custom(polyglot, 'notices')
         self.ISYforced = False
         self.initialized = False
@@ -161,17 +160,17 @@ class netroStart(udi_interface.Node):
                 self.customParameters['SERIALID'] = 'Input list of serial numbers (space separated)'
                 self.poly.Notices['SERIALID'] = 'SerialID(s) not specified'
     
-            if 'TEMP_UNIT' in userParams:
-                if self.customParameters['TEMP_UNIT'] != 'C or F':
-                    self.temp_unit = str(self.customParameters['TEMP_UNIT'])
-                    if self.temp_unit[0].upper() not in ['C', 'F']:
-                        logging.error(f'Unsupported temperatue unit {self.temp_unit}')
-                        self.poly.Notices['temp'] = 'Unknown distance Unit specified'
-            else:
-                logging.warning('No TEMP_UNIT')
-                self.customParameters['TEMP_UNIT'] = 'C or F'
+            if 'EVENTDAYS' in userParams:
+                if  isinstance(self.customParameters['EVENTDAYS'], int):
+                    self.EVENTDAYS = self.customParameters['EVENTDAYS']
+    
+            if 'SCH_DAYS' in userParams:
+                if  isinstance(self.customParameters['SCH_DAYS'], int):
+                    self.SCH_DAYS = self.customParameters['SCH_DAYS']
 
-
+            if 'MOIST_DAYS' in userParams:
+                if  isinstance(self.customParameters['MOIST_DAYS'], int):
+                    self.MOIST_DAYS = self.customParameters['MOIST_DAYS']
             self.customParam_done = True
 
             logging.debug('customParamsHandler finish ')
@@ -222,8 +221,6 @@ class netroStart(udi_interface.Node):
         #        self.poly.delNode(node['address'])
             
 
-        self.update_all_drivers()
-
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
         time.sleep(2)
@@ -248,50 +245,22 @@ class netroStart(udi_interface.Node):
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
-        '''
-        if self.TEVcloud:
-            if self.tesla_api.authenticated() and self.initialized:
-                time_n = int(time.time())
-                last_time = self.TEVcloud.teslaEV_GetTimestamp(self.EVid)
-                logging.debug(f'tine now {time_n} , last_time {last_time}')
-                if last_time is None:
-                    code, state = self.TEVcloud.teslaEV_GetCarState(self.EVid)
-                    if state:
-                        self.CO_setDriver('ST', self.state2ISY(state), 25)
-                        self.poly.Notices.delete('offline')
-                    else:
-                        self.poly.Notices['offline']='API connection Failure - please re-authenticate'
-                        self.CO_setDriver('ST', 98, 25)
-                            #self.TEVcloud.teslaEV_get_vehicles()
-                elif isinstance(time_n, int) and isinstance(last_time, int):
-                    if (time_n - last_time) > self.STATE_UPDATE_MIN * 60:
-                        code, state = self.TEVcloud.teslaEV_GetCarState(self.EVid)
-                        if state:
-                            self.CO_setDriver('ST', self.state2ISY(state), 25)
-                            self.poly.Notices.delete('offline')
-                        else:
-                            self.poly.Notices['offline']='API connection Failure - please re-authenticate'
-                            self.CO_setDriver('ST', 98, 25)
-                            #self.TEVcloud.teslaEV_get_vehicles()
-                if 'longPoll' in pollList: 
-                    self.longPoll()
-                    if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
-                        self.heartbeat()
-                if self.nbr_wall_conn != 0:
-                        self.power_share_node.poll('all')
-                if 'shortPoll' in pollList:
-                    self.shortPoll()
-                    if self.nbr_wall_conn != 0:
-                        self.power_share_node.poll('critical')
-            else:
-                logging.info('Waiting for system/nodes to initialize')
-        '''
+    
+        if 'longPoll' in pollList: 
+            self.longPoll()
+            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                self.heartbeat()
+        if self.nbr_wall_conn != 0:
+                self.power_share_node.poll('all')
+        if 'shortPoll' in pollList:
+            self.shortPoll()
+
+    
     def shortPoll(self):
         try:
             logging.info('Tesla EV Controller shortPoll(HeartBeat)')
             self.heartbeat()
-            if self.nbr_wall_conn != 0:
-                self.power_share_node.poll('critical')
+
 
 
         except Exception:
@@ -301,9 +270,7 @@ class netroStart(udi_interface.Node):
         try:
             logging.info('Tesla EV  Controller longPoll - connected = {}'.format(self.tesla_api.authenticated()))
             logging.debug(f'long poll list - checking for token update required')
-            #elf.tesla_api.teslaEV_streaming_check_certificate_update(self.EVid) #We need to check if we need to update streaming server credentials
-            #if self.nbr_wall_conn != 0:
-                #self.power_share_node.poll('critical')
+
         except Exception:
             logging.info(f'Not all nodes ready:')
 
@@ -356,8 +323,7 @@ class netroStart(udi_interface.Node):
 
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},   #car State            
-           
+            {'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
             ]
 
     
