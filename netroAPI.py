@@ -16,7 +16,9 @@ except ImportError:
     import logging
     logging.basicConfig(level=30)
 
-
+EVENT_DAYS = -7
+SCH_DAYS = 7
+MOIST_DAYS = -5
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
@@ -29,9 +31,9 @@ class netroAccess(object):
         self.netro= {}
         self.update_info() #Get latest API data
         if self.netro['type'] == 'controller':
-            self.update_events()
-            self.update_moisture_info()
-            self.update_schedules()
+            self.update_events(EVENT_DAYS)
+            self.update_moisture_info(MOIST_DAYS)
+            self.update_schedules(SCH_DAYS)
         elif self.netro['type'] == 'sensor':
             self.update_sensor_data()
 
@@ -319,6 +321,7 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
+                    logging.debug(f'event 3 {zone_nbr}')
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
@@ -328,6 +331,7 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
+                    logging.debug(f'event 4 {zone_nbr}')
                     if isinstance(zone_nbr, int):
                         if 'last_end' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
@@ -337,7 +341,7 @@ class netroAccess(object):
                     logging.error(f'ERROR - unsupported event {e_data}')
 
         except KeyError as e:
-            logging.error(f'ERROR parsing schedule data {e}')
+            logging.error(f'ERROR parsing event data {e}')
 
         
     def update_events(self, days_back = None) -> dict:
