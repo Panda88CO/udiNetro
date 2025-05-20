@@ -132,10 +132,9 @@ class netroController(udi_interface.Node):
 
 
 
-    id = 'irr_ctrl'
+    id = 'irrctrl'
     commands = { 
                  'Update' : update,
-
                  'SkipDays' : skip_days,
                  'Enable' : enable,
                 }

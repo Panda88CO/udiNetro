@@ -1,10 +1,9 @@
 <nodeDefs> 
 
-   <nodeDef id="controller" nls="nls_ctrl">
+   <nodeDef id="controller" nls="nlsctrl">
       <editors />
       <sts>
          <st id="ST" editor="Enabled" />
-        
       </sts>
       <cmds>
          <sends>
@@ -16,7 +15,7 @@
       </cmds>
    </nodeDef> 
 
-   <nodeDef id="irr_ctrl" nls="nls_irr_ctrl">
+   <nodeDef id="irrctrl" nls="nlsirrctrl">
       <editors />
       <sts>
          <st id="ST" editor="IrrState" />
