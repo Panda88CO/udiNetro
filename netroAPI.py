@@ -126,16 +126,16 @@ class netroAccess(object):
             logging.error(f'Error: device_name {e}')
             return(None)
 
-    def updateAPIinfo(self, res) -> int:
+    def extractAPIinfo(self, res) -> int:
         try:
             date_time_str = res['meta']['last_active']
-            logging.debug('updateAPIinfo {}'.format(res['meta']))
+            logging.debug('extractAPIinfo {}'.format(json.dumps(res['meta'], indent=4)))
             unix_time = self.daytimestr2epocTime(date_time_str)
             self.netro['last_api_time'] = unix_time     
             self.netro['calls_remaining'] = res['meta']['token_remaining']   
             return('ok')
         except Exception as e:
-            logging.error(f'ERROR updateAPIinfo: {e} ')
+            logging.error(f'ERROR extractAPIinfo: {e} ')
             return(None)
 
     def api_last_update(self) -> int:
@@ -151,8 +151,8 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/info.json')
 
             if status == 'ok':
-                self.updateAPIinfo(res)
-                logging.debug('res = {}'.format(res['data']))                
+                self.extractAPIinfo(res)
+                logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))                
                 if 'device' in res['data']: # controller
                     self.netro['type'] = 'controller'
                     self.netro['name'] = res['data']['device']['name']
@@ -216,7 +216,7 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/moistures.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}') 
-                self.updateAPIinfo(res)         
+                self.extractAPIinfo(res)         
                 if zone_list is None: # all zones are updated
                     logging.debug('all zones')
                     self._process_moisture_info(res['data']['moistures'])
@@ -292,7 +292,7 @@ class netroAccess(object):
                 params['zones'] = zone_list 
             status, res = self.callNetroApi('GET', '/schedules.json', params)
             if status == 'ok':
-                self.updateAPIinfo(res)
+                self.extractAPIinfo(res)
                 self._process_schedule_info(res['data']['schedules'])
 
             return(status)
@@ -355,7 +355,7 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/events.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
-                self.updateAPIinfo(res)
+                self.extractAPIinfo(res)
                 self._process_event_data(res['data']['events'])
 
                 return(res)
@@ -388,7 +388,7 @@ class netroAccess(object):
                 params = {'status':statusEN }
                 status, res = self.callNetroApi('POST', '/set_status.json', params)
                 if status == 'ok':
-                    self.updateAPIinfo(res)
+                    self.extractAPIinfo(res)
                     logging.debug(f'res = {res}')
                     self.netro['status'] = statusEN
     
@@ -413,7 +413,7 @@ class netroAccess(object):
                     status, res = self.callNetroApi('POST', '/water.json', params)
 
                     if status == 'ok':
-                        self.updateAPIinfo(res)
+                        self.extractAPIinfo(res)
                         logging.debug(f'res = {res}')
                         return(status)
                 else:
@@ -429,7 +429,7 @@ class netroAccess(object):
             logging.debug(f'stop_watering ')
             status, res = self.callNetroApi('POST', '/stop_water.json')
             if status == 'ok':
-                self.updateAPIinfo(res)
+                self.extractAPIinfo(res)
                 logging.debug(f'res = {res}')
                 return(status)
             else:
@@ -463,7 +463,7 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/sensor_data.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
-                self.updateAPIinfo(res)
+                self.extractAPIinfo(res)
                 return(res)
             else:
                 return(None)
