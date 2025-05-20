@@ -25,7 +25,7 @@ class netroZone(udi_interface.Node):
         match = re.search(r'_z\d+', self.address )
         logging.debug(f'Zone number match {match}')
 
-        self.zone_nbr = int(match.group()) if match else -1
+        self.zone_nbr = int(match.group(0)) if match else -1
 
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
