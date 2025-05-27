@@ -258,8 +258,6 @@ class netroStart(udi_interface.Node):
             self.longPoll()
             if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
                 self.heartbeat()
-        if self.nbr_wall_conn != 0:
-                self.power_share_node.poll('all')
         if 'shortPoll' in pollList:
             self.shortPoll()
 
