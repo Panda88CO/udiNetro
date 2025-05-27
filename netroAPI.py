@@ -19,16 +19,19 @@ except ImportError:
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
-    def __init__(self,  serial_nbr):
+    def __init__(self,  serial_nbr, event_days, moist_days, sch_days):
         #super().__init__(polyglot)
         logging.info(f'Netro API initializing')
         #self.poly = polyglot
         self.serialID = serial_nbr
+        self.EVENT_DAYS = event_days
+        self.MOIST_DAYS = moist_days
+        self.SCH_DAYS = sch_days
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
         self.update_info() #Get latest API data
         if self.netro['type'] == 'controller':
-            self.update_events( self.EVENTDAYS)
+            self.update_events( self.EVENT_DAYS)
             self.update_moisture_info(self.MOIST_DAYS )
             self.update_schedules(self.SCH_DAYS)
         elif self.netro['type'] == 'sensor':
@@ -50,8 +53,6 @@ class netroAccess(object):
         date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
         unix_time = int(date_time_obj.timestamp())
         return(unix_time)
-
-
 
     def start_stop_dates(self, days):
         day0 = datetime.now()
