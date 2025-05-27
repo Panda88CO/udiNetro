@@ -114,7 +114,7 @@ class netroStart(udi_interface.Node):
                 self.poly.delNode(node['address'])
             
 
-        self.update_all_drivers()
+        #self.update_all_drivers()
 
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
