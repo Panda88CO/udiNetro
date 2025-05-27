@@ -49,8 +49,8 @@ class netroStart(udi_interface.Node):
         polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)        
         #polyglot.subscribe(polyglot.WEBHOOK, self.webhook)
-        logging.debug('Calling start')
-        polyglot.subscribe(polyglot.START, self.start, 'controller')
+        #logging.debug('Calling start')
+        #olyglot.subscribe(polyglot.START, self.start, 'controller')
         #polyglot.subscribe(polyglot.CUSTOMNS, self.customNSHandler)
         #polyglot.subscribe(polyglot.OAUTH, self.oauthHandler)
         #polyglot.subscribe(polyglot.ADDNODEDONE, self.node_queue)
@@ -88,7 +88,7 @@ class netroStart(udi_interface.Node):
             self.poly.Notices['No serial IDs input in configuration folder - exiting']
             time.sleep(10)
             sys.exit()
-        '''
+   
         api = {}
         for indx, device in enumerate (self.serialID_list):
             logging.debug(f'Instanciating nodes for {device}')
@@ -97,12 +97,14 @@ class netroStart(udi_interface.Node):
             name = api[indx].device_name()
             logging.debug(f'Name : {name}, {api[indx].device_type() }')
             if api[indx].device_type() == 'controller':
+                name = self.poly.getValidName(api[indx].device_name())
                 self.node_dict[device] = netroController(self.poly, device, device, name,api[indx])
                 assigned_primary_addresses.append(device)
             elif api[indx].device_type() == 'sensor':
+                name = self.poly.getValidName(api[indx].device_name())
                 self.node_dict[device] = netroSensor(self.poly, device, device, name , api[indx] )
                 assigned_primary_addresses.append(device)
-        '''
+        
            
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
@@ -114,7 +116,7 @@ class netroStart(udi_interface.Node):
                 self.poly.delNode(node['address'])
             
 
-        #self.update_all_drivers()
+        self.update_all_drivers()
 
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
@@ -191,7 +193,7 @@ class netroStart(udi_interface.Node):
         self.poly.updateProfile()
         assigned_primary_addresses = ['controller']
         #self.poly.setCustomParamsDoc()
-
+        
         while not self.customParam_done  or not self.config_done :
         #while not self.config_done and not self.portalReady :
             logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
