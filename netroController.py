@@ -93,16 +93,17 @@ class netroController(udi_interface.Node):
 
             #self.setDriverTemp('GV0', 0)
             self.CO_setDriver('GV1',len(self.netro_api.zone_list()))        
-            self.setDriverTemp('GV2', 0)
-            self.setDriverTemp('GV3',0)
-            self.setDriverTemp('GV4',0)
-          
-
+            #elf.setDriverTemp('GV2', 0)
+            self.CO_setDriver('GV3',self.netro_api.last_end_time())
+            self.CO_setDriver('GV4',self.netro_api.next_start_time())
+            self.CO_setDriver('GV5',self.netro_api.last_offline_event())
+            self.CO_setDriver('GV6',self.netro_api.last_online_event())                  
+            self.CO_setDriver('GV16', self.netro_api.get_battery_level())
             self.CO_setDriver('GV10', 0, 25)
             self.CO_setDriver('GV11',0, 25)
-
-            self.CO_setDriver('GV18',0)
-            self.CO_setDriver('GV19', 0)
+            self.CO_setDriver('GV17', self.netro_api.apicalls_reamaining())
+            #self.CO_setDriver('GV18',0)
+            self.CO_setDriver('GV19', self.netro_api.last_API)
         except Exception as e:
             logging.error(f'updateISYdrivers climate node  failed: Nodes may not be 100% ready {e}')
 
@@ -150,17 +151,19 @@ class netroController(udi_interface.Node):
             {'driver': 'ST', 'value': 0, 'uom': 25},   #Controller state
             {'driver': 'GV1', 'value': 0, 'uom': 72},   #Nmber of enabled zones
 
-            {'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate
+            #{'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Next Start Time
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
 
-            {'driver': 'GV5', 'value': 0, 'uom': 151},  #last off-line event
-            {'driver': 'GV5', 'value': 0, 'uom': 151},  #last on-line event
+            {'driver': 'GV5', 'value': 99, 'uom': 25},  #last off-line event
+            {'driver': 'GV6', 'value': 0, 'uom': 151},  #last on-line event
+
 
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
             #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
+            {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
-            {'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
+            #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
 
             ]

@@ -51,10 +51,12 @@
 
     <editor id="Moisture" > 
      <range  uom="72" min="0" max="100" />
+     <range  uom="25" subset="99" nls="unknown" />
   </editor>
 
     <editor id="slope" > 
-     <range  uom="72" min="-100" max="100" prec="1" />
+      <range  uom="72" min="-100" max="100" prec="1" />
+      <range  uom="25" subset="99" nls="unknown" />
   </editor>
 
     <editor id="Sunlight" > 
@@ -62,6 +64,7 @@
   </editor>
     <editor id="battery" > 
      <range  uom="72" min="0" max="100" />
+      <range  uom="25" subset="98,99" nls="unknown" />
   </editor>
 
    <editor id="Status" > 
@@ -70,6 +73,9 @@
   <editor id="BOOLSTATE" > 
      <range  uom="25" subset="0,1,98,99" nls="BOOLSTATE"/>
   </editor> 
-
+    <editor id="unixtime" > 
+      <range  uom="151" min="1748387733" max="102063945730" />
+      <range  uom="25" subset="99" nls="unknown" />
+  </editor>
 
 </editors> 
