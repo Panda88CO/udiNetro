@@ -22,7 +22,7 @@ class netroZone(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        match = re.search(r"zo(\d+)", self.address )
+        match = re.search(r"_z(\d+)", self.address )
         logging.debug(f'Zone number match {match}')
 
         self.zone_nbr = int(match.group(1)) if match else -1
