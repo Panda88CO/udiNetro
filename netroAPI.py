@@ -96,7 +96,7 @@ class netroAccess(object):
         
     def zone_status(self, zone_nbr):
         try:
-            logging.debug(f'zone_status {zone_nbr}')
+            logging.debug(f'zone_status {zone_nbr} {json.dump(self.netro, indent=4)}')
             return(self.netro['active_zones'][zone_nbr]['status'])
 
         except KeyError as e:

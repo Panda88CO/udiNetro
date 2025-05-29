@@ -47,7 +47,7 @@ class netroStart(udi_interface.Node):
         #polyglot.subscribe(polyglot.ADDNODEDONE, TEV.node_queue)        
         polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
         polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
-        polyglot.subscribe(polyglot.POLL, self.systemPoll)        
+        #polyglot.subscribe(polyglot.POLL, self.systemPoll)        
         #polyglot.subscribe(polyglot.WEBHOOK, self.webhook)
         #logging.debug('Calling start')
         #olyglot.subscribe(polyglot.START, self.start, 'controller')
@@ -264,7 +264,7 @@ class netroStart(udi_interface.Node):
     
     def shortPoll(self):
         try:
-            logging.info('Tesla EV Controller shortPoll(HeartBeat)')
+            logging.info('Netro Controller shortPoll(HeartBeat)')
             self.heartbeat()
 
 
@@ -274,7 +274,7 @@ class netroStart(udi_interface.Node):
 
     def longPoll(self):
         try:
-            logging.info('Tesla EV  Controller longPoll - connected = {}'.format(self.tesla_api.authenticated()))
+            logging.info('Netro  Controller longPoll - connected = {}'.format(self.tesla_api.authenticated()))
             logging.debug(f'long poll list - checking for token update required')
 
         except Exception:
