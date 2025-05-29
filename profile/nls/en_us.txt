@@ -49,7 +49,7 @@ CMD-nlsirrctrl-Enable-NAME=Controller State
 
 ND-zone-NAME=Irrigation Zone
 ND-zone-ICON=Irrigation
-ST-nlszone-ST-NAME=Zone Enabeld
+ST-nlszone-ST-NAME=Zone Status
 ST-nlszone-GV0-NAME=Zone Number
 ST-nlszone-GV1-NAME=Zone Type
 ST-nlszone-GV2-NAME=Moisture Level (0-100)

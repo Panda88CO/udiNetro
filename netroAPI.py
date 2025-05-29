@@ -142,6 +142,13 @@ class netroAccess(object):
     def api_calls_remaining(self) -> int:
         return(self.netro['calls_remaining'])
     
+    def update_controller_data(self):
+        logging.debug('update_controller')
+        self.update_info()
+        self.update_moisture_info()
+        self.update_events()
+        self.update_schedules()
+
 
     def update_info(self) -> str:
         try:

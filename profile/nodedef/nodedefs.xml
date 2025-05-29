@@ -78,7 +78,7 @@
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
-       
+            
 
          </accepts>
       </cmds>

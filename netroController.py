@@ -53,8 +53,8 @@ class netroController(udi_interface.Node):
             address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
             self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
         self.nodeReady = True
-
-        #self.updateISYdrivers()
+        self.netro_api.update_controller_data()
+        self.updateISYdrivers()
         #self.update_time()
         #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()
 
@@ -125,19 +125,31 @@ class netroController(udi_interface.Node):
         query = command.get("query")
         if 'SkipDays.uom10' in query:
             skip_days = int(query.get('SkipDays.uom10'))
-            self.netro_api.set_skip_water_days(skip_days)
-            #update
+            res = self.netro_api.set_skip_water_days(skip_days)
+            if res == 'ok':
+                time.sleep(2)
+                self.netro_api.update_schedules()
+                self.updateISYdrivers()
 
     def enable (self, command):
         logging.info('enable called')
         query = command.get("query")
         if 'enable.uom25' in query:
             status = int(query.get('enable.uom25'))
-            self.netro_api.set_status(status)
-            #Update
+            res = self.netro_api.set_status(status)
+            if res == 'ok':
+                time.sleep(1)
+                self.CO_setDriver('ST', self.netro_api.get_status())
 
-
-
+    def stop_water (self, command=None):
+        logging.info('stop_water called')
+        res = self.netro_api.stop_watering()
+        time.sleep(1)
+        if res == 'ok':
+            time.sleep(2)
+            self.netro_api.update_events()
+            self.netro_api.update_schedules()
+            self.updateISYdrivers()
 
 
     id = 'irrctrl'
@@ -145,6 +157,7 @@ class netroController(udi_interface.Node):
                  'Update' : update,
                  'SkipDays' : skip_days,
                  'Enable' : enable,
+                 'StopWater' : stop_water,
                 }
 
     drivers = [

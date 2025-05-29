@@ -21,7 +21,7 @@ import numbers
 from datetime import datetime
 
 
-STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
+STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99, 'VALID':0, 'EXECUTING':1, 'EXECUTED':2,}
 ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 
 def ctrl_status2ISY(self, status_str) -> int:
@@ -99,7 +99,7 @@ def state2Nbr(self, val):
         return(0)
     elif val == 'alert':
         return(1)
-    elif val == 'aleinvalidrt':
+    elif val == 'alertinvalid':
         return(97)    
     else:
         return(99)
@@ -148,11 +148,11 @@ def state2ISY(self, state):
     logging.debug(f'state2ISY : state {state}')
     res = 99
     if state is not None:
-        if state.lower() == 'offline':
+        if state.lower() in ['offline', 'VALID']:
             res = 0
-        elif state.lower() == 'online':
+        elif state.lower() in['online', 'EXECUTING']:
             res = 1
-        elif state.lower() == 'asleep':
+        elif state.lower() in ['asleep', 'EXECUTED' ]:
             res = 2 
         elif state.lower() == 'overload':
             res = 4
