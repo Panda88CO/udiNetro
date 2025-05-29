@@ -167,7 +167,7 @@ class netroStart(udi_interface.Node):
                 if  isinstance(self.customParameters['EVENTDAYS'], int):
                     self.EVENTDAYS = self.customParameters['EVENTDAYS']
             else:
-                self.EVENTDAYS = 5
+                self.EVENTDAYS = -5
     
             if 'SCH_DAYS' in userParams:
                 if  isinstance(self.customParameters['SCH_DAYS'], int):
@@ -178,7 +178,7 @@ class netroStart(udi_interface.Node):
                 if  isinstance(self.customParameters['MOIST_DAYS'], int):
                     self.MOIST_DAYS = self.customParameters['MOIST_DAYS']
             else:
-                 self.MOIST_DAYS = 3
+                 self.MOIST_DAYS = -3
             self.customParam_done = True
 
             logging.debug('customParamsHandler finish ')
