@@ -46,6 +46,7 @@ StartStop-0=Stop
 StartStop-1=Start
 CMD-nlsirrctrl-SkipDays-NAME=Days to Skip Watering 
 CMD-nlsirrctrl-Enable-NAME=Controller State
+CMD-nlsirrctrl-StopWater-NAME=Stop Watering
 
 ND-zone-NAME=Irrigation Zone
 ND-zone-ICON=Irrigation
