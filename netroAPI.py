@@ -265,7 +265,7 @@ class netroAccess(object):
                     self.netro['active_zones'][zone]['next_end'] = sch_end_time
                     self.netro['active_zones'][zone]['type'] = sch_type
                     self.netro['active_zones'][zone]['status'] = sch_status  
-
+            logging.debug(f'after process schedules {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')
 
