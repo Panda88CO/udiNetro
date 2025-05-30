@@ -320,7 +320,7 @@ class netroAccess(object):
         
     def _process_event_data(self, data):
         try:            
-            logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
+            #logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
             for indx, e_data in enumerate(data):
                 zone_nbr = None
                 time = self.daytimestr2epocTime(e_data['time'])
@@ -356,7 +356,7 @@ class netroAccess(object):
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
                 else:
                     logging.error(f'ERROR - unsupported event {e_data} ')
-            logging.debug(f'after parsing event data {self.netro}')
+            #logging.debug(f'after parsing event data {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing event data {e}')
 

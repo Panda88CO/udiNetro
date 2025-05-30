@@ -61,6 +61,7 @@ class netroZone(udi_interface.Node):
             logging.info(f'Irrigation Contrller  updateISYdrivers {self.zone_nbr}: {self.drivers}')
             
            #self.update_time()
+           logging.debug(f'Zone {self.zone_nbr} {self.netro_api.zone_status(self.zone_nbr)}')
             self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.zone_status(self.zone_nbr)))
             self.CO_setDriver('GV0', self.zone_nbr)
 
@@ -69,8 +70,8 @@ class netroZone(udi_interface.Node):
             self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
             self.CO_setDriver('GV4', self.netro_api.last_sch_start(self.zone_nbr))
             self.CO_setDriver('GV5', self.netro_api.last_sch_end(self.zone_nbr))
-            self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr))
-            self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr))
+            self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr), 151)
+            self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr), 151)
           
 
             #self.CO_setDriver('GV10', 0, 25)
@@ -128,10 +129,10 @@ class netroZone(udi_interface.Node):
             {'driver': 'GV1', 'value': 99, 'uom': 25},  #Zone config
             {'driver': 'GV2', 'value': 0, 'uom': 70},  #Moisture
             {'driver': 'GV3', 'value': 0, 'uom': 70},  #moisture slope 
-            {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
+            {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous Start Time
             {'driver': 'GV5', 'value': 0, 'uom': 151},  #Previous End Time
-            {'driver': 'GV6', 'value': 0, 'uom': 151},  #Previous End Time
-            {'driver': 'GV7', 'value': 0, 'uom': 151},  #Previous End Time
+            {'driver': 'GV6', 'value': 0, 'uom': 151},  #Next Start Time
+            {'driver': 'GV7', 'value': 0, 'uom': 151},  #Next End Time
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
             #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
