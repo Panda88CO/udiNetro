@@ -172,7 +172,7 @@ class netroAccess(object):
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
                         if zone['enabled']:
                             self.netro['active_zones'][zone['ith']] = zone
-                            self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' 
+                            self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
                 elif 'sensor_data' in res['data']: #sensor
                     self.netro['type'] ='sensor'
                     self.netro['name'] = res['data']['sensor']['name']
