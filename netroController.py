@@ -11,7 +11,7 @@ import time
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
-    from  udiLib import node_queue, ctrl_status2ISY, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroController, self).__init__(polyglot, primary, address, name)
@@ -66,11 +66,22 @@ class netroController(udi_interface.Node):
     
 
 
-    def systemPoll(self):
-        logging.debug('systemPoll')
+    def systemPoll(self, pollList):
+        logging.debug(f'systemPoll - {pollList}')
+    
+        if 'longPoll' in pollList: 
+            self.longPoll()
+            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                self.heartbeat()
+        if 'shortPoll' in pollList:
+            self.shortPoll()
 
 
-    def poll(self):
+    def longPoll(self):
+        pass
+
+
+    def shortPoll(self):
         pass
 
 

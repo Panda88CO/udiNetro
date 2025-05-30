@@ -53,27 +53,6 @@ class netroZone(udi_interface.Node):
     def stop(self):
         logging.debug('stop - Cleaning up')
     
-    #def climateNodeReady (self):
-    #    return(self.nodeReady )
-    
-
-    def poll(self):
-        pass
-        #logging.debug(f'Climate node {self.EVid}')
-        #try:
-        #    if self.TEVcloud.carState != 'Offline':
-        #        self.updateISYdrivers()
-        #    else:
-        #        logging.info('Car appears off-line/sleeping - not updating data')
-
-        #except Exception as e:
-        #    logging.error(f'Climate Poll exception : {e}')
-
-    #def forceUpdateISYdrivers(self):
-    #   logging.debug(f'forceUpdateISYdrivers: {self.EVid}')
-    #    time.sleep(1)
-    #    self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-    #    self.updateISYdrivers()
 
    
     def updateISYdrivers(self):
@@ -103,14 +82,9 @@ class netroZone(udi_interface.Node):
             logging.error(f'updateISYdrivers Netro Irrigation Controller  failed: Nodes may not be 100% ready {e}')
 
 
-    #def ISYupdate (self, command):
-    #    logging.info('ISY-update called')
-        #super(teslaEV_ClimateNode, self).ISYupdate()
-        #code, state = self.TEVcloud.teslaEV_update_connection_status(self.EVid)
-        #code, res = self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-        #super(teslaEV_ClimateNode, self).update_all_drivers(code)
-        #super(teslaEV_ClimateNode, self).display_update()
-        #self.CO_setDriver('GV21', self.command_res2ISY(code), 25)
+    def ISYupdate (self, command):
+        logging.info('ISY-update called')
+
 
     def node_ready(self):
         return(self.nodeReady)
