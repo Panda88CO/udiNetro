@@ -22,7 +22,7 @@
      <range  uom="25" subset="0,1,2,99" nls="Sch_Source" />
   </editor>
   <editor id="Sch_Status" > 
-     <range  uom="25" subset="0,1,2,99" nls="Sch_Status" />
+     <range  uom="25" subset="0,1,2,98,99" nls="Sch_Status" />
   </editor>
 
    <editor id="StartStop" > 

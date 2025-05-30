@@ -97,7 +97,10 @@ class netroAccess(object):
     def zone_status(self, zone_nbr):
         try:
             logging.debug(f'zone_status {zone_nbr} {self.netro}')
-            return(self.netro['active_zones'][zone_nbr]['status'])
+            if 'status' in self.netro['active_zones'][zone_nbr]:
+                return(self.netro['active_zones'][zone_nbr]['status'])
+            else:
+                return('NO SCHEDULE')
 
         except KeyError as e:
             logging.error(f'ERROR - zone_config {e} ')
