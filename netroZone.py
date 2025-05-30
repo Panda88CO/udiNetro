@@ -48,7 +48,7 @@ class netroZone(udi_interface.Node):
         self.nodeReady = True
         self.updateISYdrivers()
         #self.update_time()
-        #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()
+  
 
     def stop(self):
         logging.debug('stop - Cleaning up')

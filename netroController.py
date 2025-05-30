@@ -56,7 +56,7 @@ class netroController(udi_interface.Node):
         self.netro_api.update_controller_data()
         self.updateISYdrivers()
         #self.update_time()
-        #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()
+    
 
     def stop(self):
         logging.debug('stop - Cleaning up')
@@ -86,10 +86,6 @@ class netroController(udi_interface.Node):
 
 
     #def forceUpdateISYdrivers(self):
-    #   logging.debug(f'forceUpdateISYdrivers: {self.EVid}')
-    #    time.sleep(1)
-    #    self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-    #    self.updateISYdrivers()
 
 
 

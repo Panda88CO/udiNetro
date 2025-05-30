@@ -44,7 +44,7 @@ class netroSensor(udi_interface.Node):
         
         #self.updateISYdrivers()
         #self.update_time()
-        #self.tempUnit = self.TEVcloud.teslaEV_GetTempUnit()
+  
 
     def stop(self):
         logging.debug('stop - Cleaning up')
@@ -56,79 +56,9 @@ class netroSensor(udi_interface.Node):
 
     def poll(self):
         pass
-        #logging.debug(f'Climate node {self.EVid}')
-        #try:
-        #    if self.TEVcloud.carState != 'Offline':
-        #        self.updateISYdrivers()
-        #    else:
-        #        logging.info('Car appears off-line/sleeping - not updating data')
-
-        #except Exception as e:
-        #    logging.error(f'Climate Poll exception : {e}')
-
-    #def forceUpdateISYdrivers(self):
-    #   logging.debug(f'forceUpdateISYdrivers: {self.EVid}')
-    #    time.sleep(1)
-    #    self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-    #    self.updateISYdrivers()
+   
 
 
-        '''
-        try:
-            temp = round(float(self.TEVcloud.teslaEV_GetTimeSinceLastStatusUpdate(self.EVid)/60), 0)
-            self.CO_setDriver('GV20', temp, 44)
-        except ValueError:
-            self.CO_setDriver('GV20', None, 25)
-        
-
-    def updateISYdrivers(self):
-        try:
-
-            logging.info(f'Climate updateISYdrivers: {self.drivers}')
-            
-            self.update_time()
-            self.setDriverTemp('ST', self.TEVcloud.teslaEV_GetCabinTemp(self.EVid))
-            self.setDriverTemp('GV2', self.TEVcloud.teslaEV_GetOutdoorTemp(self.EVid))
-            self.setDriverTemp('GV3', self.TEVcloud.teslaEV_GetLeftTemp(self.EVid))
-            self.setDriverTemp('GV4', self.TEVcloud.teslaEV_GetRightTemp(self.EVid))
-                
-
-            
-            #self.setDriverTemp('GV12', self.TEVcloud.teslaEV_MaxCabinTempCtrl(self.EVid))
-            #self.setDriverTemp('GV13', self.TEVcloud.teslaEV_MinCabinTempCtrl(self.EVid))
-            
-            self.CO_setDriver('GV14', self.bool2ISY(self.TEVcloud.teslaEV_SteeringWheelHeatOn(self.EVid)), 25) #need to be implemented        
-        except Exception as e:
-            logging.error(f'updateISYdrivers climate node  failed: Nodes may not be 100% ready {e}')
-
-
-    #def ISYupdate (self, command):
-    #    logging.info('ISY-update called')
-        #super(teslaEV_ClimateNode, self).ISYupdate()
-        #code, state = self.TEVcloud.teslaEV_update_connection_status(self.EVid)
-        #code, res = self.TEVcloud.teslaEV_UpdateCloudInfo(self.EVid)
-        #super(teslaEV_ClimateNode, self).update_all_drivers(code)
-        #super(teslaEV_ClimateNode, self).display_update()
-        #self.CO_setDriver('GV21', self.command_res2ISY(code), 25)
-
-    def node_ready(self):
-        return(self.nodeReady)
-
-
-
-    def ISYupdate (self, command):
-        logging.info('evSetSeat5Heat called') 
-        seatTemp = int(command.get('value'))  
-        code, res = self.TEVcloud.teslaEV_SetSeatHeating(self.EVid, 5, seatTemp)
-                
-        if code in ['ok']:
-            self.CO_setDriver('GV21', self.command_res2ISY(res), 25)
-            self.CO_setDriver('GV9', seatTemp, 25)
-        else:
-            logging.info('Not able to send command - EV is not online')
-            self.CO_setDriver('GV21', self.code2ISY(code), 25)
-            self.CO_setDriver('GV9', None, 25)            
-        '''
 
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 

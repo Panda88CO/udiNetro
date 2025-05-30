@@ -15,13 +15,13 @@ import time
 
 from netroAPI import netroAccess
 from datetime import timedelta, datetime
-from tzlocal import get_localzone
+#from tzlocal import get_localzone
 from netroController import netroController
 from netroSensor import netroSensor
 VERSION = '0.0.3'
 
 class netroStart(udi_interface.Node):
-    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done,tempUnitAdjust, display2ISY, sentry2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done , sentry2ISY,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
@@ -251,6 +251,7 @@ class netroStart(udi_interface.Node):
         sys.exit() # kill running threads
 
 
+    '''
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
     
@@ -263,6 +264,7 @@ class netroStart(udi_interface.Node):
 
     
     def shortPoll(self):
+        pass:
         try:
             logging.info('Netro Controller shortPoll(HeartBeat)')
             self.heartbeat()
@@ -274,12 +276,11 @@ class netroStart(udi_interface.Node):
 
     def longPoll(self):
         try:
-            logging.info('Netro  Controller longPoll - connected = {}'.format(self.tesla_api.authenticated()))
             logging.debug(f'long poll list - checking for token update required')
 
         except Exception:
             logging.info(f'Not all nodes ready:')
-
+    '''
 
    
 
@@ -297,27 +298,9 @@ class netroStart(udi_interface.Node):
 
     def ISYupdate (self, command=None):
         logging.info(f'ISY-update status node  called')
-        #code, state = self.TEVcloud.teslaEV_update_connection_status(self.EVid)
-        #self.update_all_drivers()
-        #self.display_update()
 
 
 
-
-    #def updateISYdrivers(self):
-    #    logging.debug('System updateISYdrivers - Controller')       
-    #    value = self.TEVcloud.authenticated()
-    #    self.CO_setDriver('GV0', self.bool2ISY(value), 25)
-    #    #self.CO_setDriver('GV1', self.GV1, 56)
-    #    self.CO_setDriver('GV2', self.distUnit, 25)
-    #    self.CO_setDriver('GV3', self.tempUnit, 25)
-
-
-
-    #def ISYupdate (self, command):
-    #    logging.debug('ISY-update main node called')
-    #    if self.TEVcloud.authenticated():
-    #        self.longPoll()
 
 
     
