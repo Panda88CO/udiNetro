@@ -109,7 +109,7 @@ class netroController(udi_interface.Node):
             #self.CO_setDriver('GV18',0)
             self.CO_setDriver('GV19', self.netro_api.last_API)
         except Exception as e:
-            logging.error(f'updateISYdrivers climate node  failed: Nodes may not be 100% ready {e}')
+            logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
 
 
     #def ISYupdate (self, command):

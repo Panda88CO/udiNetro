@@ -73,7 +73,10 @@ class netroAccess(object):
     def status(self):
         logging.debug('status : {}'.format(self.netro['info']))
         try:
-            return(self.netro['info']['status'])
+            if 'status' in self.netro['info']:
+                return(self.netro['info']['status'])
+            else:
+                return(None)
         except KeyError as e:
             logging.error(f'ERROR - no key found {e}')
             return(None)
@@ -240,6 +243,7 @@ class netroAccess(object):
             return(self.netro['active_zones'][zone_nbr]['moisture'][1])
         except KeyError as e:
             logging.error(f'ERROR - moisture {e}')
+            return (None)
 
 
     def moisture_slope(self, zone_nbr) -> int:
@@ -247,7 +251,8 @@ class netroAccess(object):
         try:
             return(self.netro['active_zones'][zone_nbr]['polyfit'][0])
         except KeyError as e:
-            logging.error(f'ERROR - moisture {e}')
+            logging.error(f'ERROR - moisture_slope {e}')
+            return(None)
 
     def _process_schedule_info(self, data):
         try:
