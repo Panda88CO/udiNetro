@@ -11,7 +11,7 @@ import time
 import re        
                
 class netroZone(udi_interface.Node):
-    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done,  latch2ISY,  cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroZone, self).__init__(polyglot, primary, address, name)
@@ -65,12 +65,12 @@ class netroZone(udi_interface.Node):
             self.CO_setDriver('GV0', self.zone_nbr)
 
             self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.zone_config(self.zone_nbr)))        
-            self.setDriverTemp('GV2', self.netro_api.moisture(self.zone_nbr) )
-            self.setDriverTemp('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
-            self.setDriverTemp('GV4', self.netro_api.last_sch_start(self.zone_nbr))
-            self.setDriverTemp('GV5', self.netro_api.last_sch_end(self.zone_nbr))
-            self.setDriverTemp('GV6', self.netro_api.next_sch_start(self.zone_nbr))
-            self.setDriverTemp('GV7', self.netro_api.next_sch_end(self.zone_nbr))
+            self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr) )
+            self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
+            self.CO_setDriver('GV4', self.netro_api.last_sch_start(self.zone_nbr))
+            self.CO_setDriver('GV5', self.netro_api.last_sch_end(self.zone_nbr))
+            self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr))
+            self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr))
           
 
             #self.CO_setDriver('GV10', 0, 25)

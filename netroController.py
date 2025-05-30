@@ -97,10 +97,7 @@ class netroController(udi_interface.Node):
             
             #self.update_time()
             self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.status()))
-
-            #self.setDriverTemp('GV0', 0)
             self.CO_setDriver('GV1',len(self.netro_api.zone_list()))        
-            #elf.setDriverTemp('GV2', 0)
             self.CO_setDriver('GV3',self.netro_api.last_end_time())
             self.CO_setDriver('GV4',self.netro_api.next_start_time())
             self.CO_setDriver('GV5',self.netro_api.last_offline_event())

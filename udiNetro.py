@@ -21,7 +21,7 @@ from netroSensor import netroSensor
 VERSION = '0.0.3'
 
 class netroStart(udi_interface.Node):
-    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done , sentry2ISY,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
