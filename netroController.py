@@ -11,7 +11,7 @@ import time
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
-    from  udiLib import node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import node_queue, ctrl_status2ISY, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroController, self).__init__(polyglot, primary, address, name)
@@ -86,10 +86,10 @@ class netroController(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Contrller  updateISYdrivers {self.drivers}')
+            logging.info(f'Irrigation Contrller  updateISYdrivers')
             
             #self.update_time()
-            self.CO_setDriver('ST', self.netro_api.get_status())
+            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.status()))
 
             #self.setDriverTemp('GV0', 0)
             self.CO_setDriver('GV1',len(self.netro_api.zone_list()))        
