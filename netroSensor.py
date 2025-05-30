@@ -11,7 +11,7 @@ import time
         
                
 class netroSensor(udi_interface.Node):
-    from  udiLib import node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import node_queue, command_res2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroSensor, self).__init__(polyglot, primary, address, name)

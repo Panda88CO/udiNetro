@@ -11,7 +11,7 @@ import time
 import re        
                
 class netroZone(udi_interface.Node):
-    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done, tempUnitAdjust, latch2ISY, chargeState2ISY, setDriverTemp, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done,  latch2ISY,  cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroZone, self).__init__(polyglot, primary, address, name)
