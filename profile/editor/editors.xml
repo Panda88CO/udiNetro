@@ -50,12 +50,12 @@
   </editor>
 
     <editor id="Moisture" > 
-     <range  uom="72" min="0" max="100" />
+     <range  uom="70" min="0" max="100" />
      <range  uom="25" subset="99" nls="unknown" />
   </editor>
 
     <editor id="slope" > 
-      <range  uom="72" min="-100" max="100" prec="1" />
+      <range  uom="70" min="-100" max="100" prec="1" />
       <range  uom="25" subset="99" nls="unknown" />
   </editor>
 
@@ -63,8 +63,8 @@
      <range  uom="36" min="0" max="10000" prec="1" />
   </editor>
     <editor id="battery" > 
-     <range  uom="72" min="0" max="100" />
-      <range  uom="25" subset="98,99" nls="unknown" />
+     <range  uom="70" min="0" max="100" />
+      <range  uom="25" subset="98,99" nls="battery" />
   </editor>
 
    <editor id="Status" > 

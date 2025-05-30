@@ -194,6 +194,7 @@ class netroAccess(object):
                 for indx, m_data in enumerate(data):
                     mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
                     days_ago = (now_obj - mois_date_obj).days
+                    logging.debug(f'Moisture days {days_ago}')
                     if 'moisture' not in self.netro['active_zones'][m_data['zone']]:
                         self.netro['active_zones'][m_data['zone']]['moisture'] = {}
                     self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
@@ -201,7 +202,7 @@ class netroAccess(object):
                     d_list = []
                     m_list = []
                     for day in self.netro['active_zones'][zone]['moisture']:
-                        d_list.append(day)
+                        d_list.append(-day)
                         m_list.append(self.netro['active_zones'][zone]['moisture'][day])
                     x=np.array(d_list)
                     y=np.array(m_list)
@@ -250,7 +251,7 @@ class netroAccess(object):
     def moisture_slope(self, zone_nbr) -> int:
         logging.debug(f'moisture_slope {zone_nbr}')
         try:
-            return(self.netro['active_zones'][zone_nbr]['polyfit'][0])
+            return(round(float(self.netro['active_zones'][zone_nbr]['polyfit'][0]),1))
         except KeyError as e:
             logging.error(f'ERROR - moisture_slope {e}')
             return(None)

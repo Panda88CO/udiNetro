@@ -126,8 +126,8 @@ class netroZone(udi_interface.Node):
             {'driver': 'ST', 'value': 99, 'uom': 25},  #Zone Status
             {'driver': 'GV0', 'value': 0, 'uom': 0},  #Zone Number
             {'driver': 'GV1', 'value': 99, 'uom': 25},  #Zone config
-            {'driver': 'GV2', 'value': 0, 'uom': 72},  #Moisture
-            {'driver': 'GV3', 'value': 0, 'uom': 72},  #moisture slope 
+            {'driver': 'GV2', 'value': 0, 'uom': 70},  #Moisture
+            {'driver': 'GV3', 'value': 0, 'uom': 70},  #moisture slope 
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
             {'driver': 'GV5', 'value': 0, 'uom': 151},  #Previous End Time
             {'driver': 'GV6', 'value': 0, 'uom': 151},  #Previous End Time

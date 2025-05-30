@@ -18,6 +18,7 @@ IrrState-5=Sleeping
 IrrState-6=Power Off
 IrrState-99=Unknown
 
+
 ND-irrctrl-NAME=Netro Irrigation Controller
 ND-irrctrl-ICON=Irrigation
 ST-nlsirrctrl-GV1-NAME=Number Active Zones
@@ -53,16 +54,21 @@ CMD-nlsirrctrl-SkipDays-NAME=Days to Skip Watering
 CMD-nlsirrctrl-Enable-NAME=Controller State
 CMD-nlsirrctrl-StopWater-NAME=Stop Watering
 
+battery-98=No battery
+battery-99=Unknown
+
+unknown-99=Unknown
+
 ND-zone-NAME=Irrigation Zone
 ND-zone-ICON=Irrigation
 ST-nlszone-ST-NAME=Zone Status
 ST-nlszone-GV0-NAME=Zone Number
 ST-nlszone-GV1-NAME=Zone Type
 ST-nlszone-GV2-NAME=Moisture Level (0-100)
-ST-nlszone-GV3-NAME=Zone Type
-ZoneType-0=SMART
-ZoneType-1=ASSISTANT
-ZoneType-2=TIMER
+ST-nlszone-GV3-NAME=Moisture Slope
+ZoneType-0=Smart
+ZoneType-1=Smart Basic
+ZoneType-2=Timer
 ZoneType-99=Unknown
 ST-nlszone-GV4-NAME=Previous Start Time
 ST-nlszone-GV5-NAME=Previous End Time 
