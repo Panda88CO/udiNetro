@@ -266,16 +266,17 @@ class netroAccess(object):
                 zone = sch_data['zone']
                 sch_type = sch_data['source']
                 sch_status = sch_data['status']
-                if 'next_start' not in self.netro['active_zones'][zone]:
+                if 'next_start' not in self.netro['active_zones'][zone] and sch_status in ['VALID']:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
                     self.netro['active_zones'][zone]['next_end'] = sch_end_time
                     self.netro['active_zones'][zone]['type'] = sch_type
                     self.netro['active_zones'][zone]['status'] = sch_status                    
-                elif sch_start_time < self.netro['active_zones'][zone]['next_start']:
+                elif sch_start_time < self.netro['active_zones'][zone]['next_start'] and sch_status in ['VALID']:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
                     self.netro['active_zones'][zone]['next_end'] = sch_end_time
                     self.netro['active_zones'][zone]['type'] = sch_type
                     self.netro['active_zones'][zone]['status'] = sch_status  
+                    logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
             logging.debug(f'after process schedules {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')

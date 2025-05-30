@@ -27,13 +27,13 @@ serial3 = 'c82e1881d038'
 netro3 = netroAccess(serial3, -3, -2, 3)
 #test1 = netro1.update_info()
 zone_type = netro3.zone_config(1)
-moisture = netro3.update_moisture_info(-3)
+#moisture = netro3.update_moisture_info(-3)
 
 #event1 = netro1.update_events(-5)
 #print(test1)
 #print(netro1.netro)
 #test2 = netro2.update_info()
-#sch1=netro3.update_schedules()
+sch1=netro3.update_schedules()
 
 #moisture = netro1.update_moisture_info(-5)
 moisture1 = netro3.moisture(6)
