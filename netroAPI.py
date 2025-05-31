@@ -325,8 +325,10 @@ class netroAccess(object):
         try:
             if self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
                 return('NO SCHEDULE')
-            else:
+            elif 'next_start' in self.netro['active_zones'][zone_nbr]:
                 return(self.netro['active_zones'][zone_nbr]['next_start'])
+            else:
+                return('NO SCHEDULE')
         except KeyError:
             return(None)
 
@@ -335,8 +337,11 @@ class netroAccess(object):
         try:
             if self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
                 return('NO SCHEDULE')
-            else:            
+            elif 'next_end' in self.netro['active_zones'][zone_nbr]:            
                 return(self.netro['active_zones'][zone_nbr]['next_end'])
+            else:
+                return('NO SCHEDULE')
+
         except KeyError:
             return(None)
 

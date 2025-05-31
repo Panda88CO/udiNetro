@@ -79,8 +79,9 @@ class netroController(udi_interface.Node):
         self.updateISYdrivers()
         
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
-        for indx, nde  in enumerate(self.nodes_in_db):
-            node = self.nodes_in_db[nde]
+        
+
+        for indx, node  in enumerate(self.nodes_in_db):
             logging.debug(f'Scanning db for node : {node}')
             if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
