@@ -14,7 +14,7 @@ from netroZone import netroZone
 class netroController(udi_interface.Node):
     from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name):
+    def __init__(self, polyglot,  primary, address, name, eventdays=-3, moistdays=-3, schdays=7):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
@@ -23,6 +23,10 @@ class netroController(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
+        self.EVENTDAYS = eventdays
+        self.MOIST_DAYS = moistdays
+        self.SCH_DAYS = schdays
+
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
@@ -31,7 +35,6 @@ class netroController(udi_interface.Node):
         self.nodes_in_db = None
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler1)
         self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
@@ -50,38 +53,12 @@ class netroController(udi_interface.Node):
         self.config_done= True
 
 
-    def customParamsHandler1(self, userParams):
-        self.customParameters.load(userParams)
-        logging.debug(f'customParamsHandler1 called {userParams}')
-
-        try: 
  
-            if 'EVENTDAYS' in userParams:
-                if  isinstance(self.customParameters['EVENTDAYS'], int):
-                    self.EVENTDAYS = self.customParameters['EVENTDAYS']
-            else:
-                self.EVENTDAYS = -5
-    
-            if 'SCH_DAYS' in userParams:
-                if  isinstance(self.customParameters['SCH_DAYS'], int):
-                    self.SCH_DAYS = self.customParameters['SCH_DAYS']
-            else:
-                self.SCH_DAYS = 7
-            if 'MOIST_DAYS' in userParams:
-                if  isinstance(self.customParameters['MOIST_DAYS'], int):
-                    self.MOIST_DAYS = self.customParameters['MOIST_DAYS']
-            else:
-                 self.MOIST_DAYS = -3
-            self.customParam_done = True
-
-            logging.debug('customParamsHandler finish ')
-        except Exception as e:
-            logging.error(f'Error detected during custome Param parsing {e}')
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
 
-        while not self.customParam_done and not self.config_done:
+        while not self.config_done:
             time.sleep(1)
             logging.info(f'Waiting for system to initialize {self.customParam_done} {self.config_done}')
         #self.CO_setDriver('ST', 1)

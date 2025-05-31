@@ -30,9 +30,9 @@ class netroStart(udi_interface.Node):
         logging.debug('Init Message system')
         self.poly = polyglot
         self.node = None
-        self.EVENT_DAYS = -7
+        self.EVENT_DAYS = -3
         self.SCH_DAYS = 7
-        self.MOIST_DAYS = -5
+        self.MOIST_DAYS = -4
         self.paramsProcessed = False
         self.customParameters = Custom(self.poly, 'customparams')
         #self.portalData = Custom(self.poly, 'customNSdata')
@@ -60,8 +60,6 @@ class netroStart(udi_interface.Node):
         self.poly.updateProfile()
         self.poly.ready()
         self.node = self.poly.getNode(address)
-        self.tempUnit = 0 # C
-        self.distUnit = 0 # KM
         self.customParam_done = False
         self.config_done = False
 
@@ -95,7 +93,7 @@ class netroStart(udi_interface.Node):
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_id] = netroController(self.poly, serial_id, serial_id, name)
+                self.node_dict[serial_id] = netroController(self.poly, serial_id, serial_id, name, self.EVENT_DAYS, self.MOIST_DAYS, self.S)
                 assigned_primary_addresses.append(serial_id)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
@@ -159,12 +157,32 @@ class netroStart(udi_interface.Node):
                 logging.warning('No serialID found')
                 self.customParameters['SERIALID'] = 'Input list of serial numbers (space separated)'
                 self.poly.Notices['SERIALID'] = 'SerialID(s) not specified'
+            
+            if 'EVENT_DAYS' in userParams:
+                if  isinstance(self.customParameters['EVENT_DAYS'], int):
+                    self.EVENT_DAYS = self.customParameters['EVENT_DAYS']
+            else:
+                self.EVENT_DAYS = -5
     
+            if 'SCH_DAYS' in userParams:
+                if  isinstance(self.customParameters['SCH_DAYS'], int):
+                    self.SCH_DAYS = self.customParameters['SCH_DAYS']
+            else:
+                self.SCH_DAYS = 7
+            if 'MOIST_DAYS' in userParams:
+                if  isinstance(self.customParameters['MOIST_DAYS'], int):
+                    self.MOIST_DAYS = self.customParameters['MOIST_DAYS']
+            else:
+                 self.MOIST_DAYS = -3
+            self.customParam_done = True
+
+            logging.debug('customParamsHandler finish ')
         except Exception as e:
             logging.error(f'Error detected during custome Param parsing {e}')
         
    
 
+    '''
     def start(self):
         logging.info('start main node')
         self.poly.Notices.clear()
@@ -211,7 +229,7 @@ class netroStart(udi_interface.Node):
         self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
-
+    '''
 
     def validate_params(self):
         logging.debug('validate_params: {}'.format(self.Parameters.dump()))
