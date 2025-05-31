@@ -21,9 +21,9 @@ except ImportError:
 def netroType(self, serial_nbr):
     self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     url = self.yourApiEndpoint + '/info.json'
-    header = {}
+    headers = {}
     payload = {'key': serial_nbr}
-    response = requests.get(url, header, payload)
+    response = requests.get(url, headers=headers, params=payload)
     if response.status_code == 200:
         try:
             res = response.json()
