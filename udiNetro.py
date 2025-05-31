@@ -93,7 +93,7 @@ class netroStart(udi_interface.Node):
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_id] = netroController(self.poly, serial_id, serial_id, name, self.EVENT_DAYS, self.MOIST_DAYS, self.S)
+                self.node_dict[serial_id] = netroController(self.poly, serial_id, serial_id, name, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
                 assigned_primary_addresses.append(serial_id)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
