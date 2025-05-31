@@ -280,7 +280,10 @@ class netroAccess(object):
     def moisture(self, zone_nbr) -> int:
         logging.debug(f'moisture {zone_nbr}')
         try:
-            return(self.netro['active_zones'][zone_nbr]['moisture'][1])
+            if ['moisture'] in self.netro['active_zones'][zone_nbr]:
+                return(self.netro['active_zones'][zone_nbr]['moisture'][1])
+            else:
+                return(None)
         except KeyError as e:
             logging.error(f'ERROR - moisture {e}')
             return (None)
@@ -289,7 +292,10 @@ class netroAccess(object):
     def moisture_slope(self, zone_nbr) -> int:
         logging.debug(f'moisture_slope {zone_nbr}')
         try:
-            return(round(float(self.netro['active_zones'][zone_nbr]['polyfit'][0]),1))
+            if 'polyfit' in self.netro['active_zones'][zone_nbr]:
+                return(round(float(self.netro['active_zones'][zone_nbr]['polyfit'][0]),1))
+            else:
+                return (None)
         except KeyError as e:
             logging.error(f'ERROR - moisture_slope {e}')
             return(None)
@@ -304,17 +310,18 @@ class netroAccess(object):
                 zone = sch_data['zone']
                 sch_source = sch_data['source']
                 sch_status = sch_data['status']
-                if 'next_start' not in self.netro['active_zones'][zone] and sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
-                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
-                    self.netro['active_zones'][zone]['next_end'] = sch_end_time
-                    self.netro['active_zones'][zone]['source'] = sch_source
-                    self.netro['active_zones'][zone]['status'] = sch_status                    
-                elif sch_start_time < self.netro['active_zones'][zone]['next_start'] and sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
-                    self.netro['active_zones'][zone]['next_start'] = sch_start_time
-                    self.netro['active_zones'][zone]['next_end'] = sch_end_time
-                    self.netro['active_zones'][zone]['source'] = sch_source
-                    self.netro['active_zones'][zone]['status'] = sch_status  
-                    logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
+                if sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
+                    if 'next_start' not in self.netro['active_zones'][zone]:
+                        self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                        self.netro['active_zones'][zone]['next_end'] = sch_end_time
+                        self.netro['active_zones'][zone]['source'] = sch_source
+                        self.netro['active_zones'][zone]['status'] = sch_status                    
+                    elif  sch_start_time < self.netro['active_zones'][zone]['next_start']:
+                        self.netro['active_zones'][zone]['next_start'] = sch_start_time
+                        self.netro['active_zones'][zone]['next_end'] = sch_end_time
+                        self.netro['active_zones'][zone]['source'] = sch_source
+                        self.netro['active_zones'][zone]['status'] = sch_status  
+                        logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
             logging.debug(f'after process schedules {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')
