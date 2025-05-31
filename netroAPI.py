@@ -2,7 +2,7 @@
 import requests
 import time
 import json
-from threading import Lock
+#from threading import Lock
 from datetime import timedelta, datetime, timezone
 
 import numpy as np
@@ -15,6 +15,29 @@ try:
 except ImportError:
     import logging
     logging.basicConfig(level=30)
+
+
+
+def netroType(self, serial_nbr):
+    self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+    url = self.yourApiEndpoint + '/info.json'
+    header = {}
+    payload = {'key': serial_nbr}
+    response = requests.get(url, header, payload)
+    if response.status_code == 200:
+        try:
+            res = response.json()
+            if 'device' in res['data']:
+                return ('controller',  res['data']['device']['name'])
+            elif 'sensor_data' in res['data']:
+                return('sensor',  res['data']['sensor']['name'])
+            else:
+                return('unknown', 'unknown')
+        except KeyError as e:
+            logging.error(f'Exception - keyerro : {e}')
+
+
+    
 
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}

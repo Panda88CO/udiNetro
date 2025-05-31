@@ -8,28 +8,31 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 import time
+from netroAPI import netroAccess
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
     from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name, api):
+    def __init__(self, polyglot,  primary, address, name):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
-  
+        self.serial_id = address
         self.ISYforced = False
-        self.netro_api = api
         self.primary = primary
         self.address = address
         self.name = name
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
+        self.customParam_done = False
+        self.config_done= False        
+        self.nodes_in_db = None
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        #polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
-        #polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
+        self.poly.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler)
+        self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
@@ -39,11 +42,52 @@ class netroController(udi_interface.Node):
         logging.info('_init_ Netro Irrigation Controller Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
         
+    def configDoneHandler(self):
+        logging.debug('configDoneHandler - config_done')
+        # We use this to discover devices, or ask to authenticate if user has not already done so
+        self.poly.Notices.clear()
+        self.nodes_in_db = self.poly.getNodesFromDb()
+        self.config_done= True
+
+
+    def customParamsHandler(self, userParams):
+        self.customParameters.load(userParams)
+        logging.debug(f'customParamsHandler called {userParams}')
+
+        try: 
+ 
+            if 'EVENTDAYS' in userParams:
+                if  isinstance(self.customParameters['EVENTDAYS'], int):
+                    self.EVENTDAYS = self.customParameters['EVENTDAYS']
+            else:
+                self.EVENTDAYS = -5
+    
+            if 'SCH_DAYS' in userParams:
+                if  isinstance(self.customParameters['SCH_DAYS'], int):
+                    self.SCH_DAYS = self.customParameters['SCH_DAYS']
+            else:
+                self.SCH_DAYS = 7
+            if 'MOIST_DAYS' in userParams:
+                if  isinstance(self.customParameters['MOIST_DAYS'], int):
+                    self.MOIST_DAYS = self.customParameters['MOIST_DAYS']
+            else:
+                 self.MOIST_DAYS = -3
+            self.customParam_done = True
+
+            logging.debug('customParamsHandler finish ')
+        except Exception as e:
+            logging.error(f'Error detected during custome Param parsing {e}')
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
+
+        while not self.customParam_done and not self.config_done:
+            time.sleep(1)
+            logging.info(f'Waiting for system to initialize {self.customParam_done} {self.config_done}')
         #self.CO_setDriver('ST', 1)
+        self.netro_api = netroAccess(self.serial_id, self.EVENTDAYS, self.MOIST_DAYS, self.SCH_DAYS)
         self.zone_nodes = {}
+        zone_addresses = []
         active_zones = self.netro_api.zone_list()
         logging.debug(f'Adding   {len(active_zones)} {active_zones}')
         for key, tmp_zone in active_zones.items():
@@ -51,13 +95,20 @@ class netroController(udi_interface.Node):
             name = self.poly.getValidName(tmp_zone['name'])
 
             address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
+            zone_addresses.append(address)
             self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
         self.nodeReady = True
         self.netro_api.update_controller_data()
         self.updateISYdrivers()
-        #self.update_time()
-    
-
+        
+        logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
+        for indx, nde  in enumerate(self.nodes_in_db):
+            node = self.nodes_in_db[nde]
+            logging.debug(f'Scanning db for node : {node}')
+            if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
+                logging.debug('Removing node : {} {}'.format(node['name'], node))
+                self.poly.delNode(node['address'])
+            
     def stop(self):
         logging.debug('stop - Cleaning up')
     
