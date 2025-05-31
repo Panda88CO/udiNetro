@@ -28,6 +28,7 @@ class netroAccess(object):
         self.MOIST_DAYS = moist_days
         self.SCH_DAYS = sch_days
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+        self.data_ready = False
         self.netro= {}
         self.update_info() #Get latest API data
         if self.netro['device_type'] == 'controller':
@@ -36,6 +37,7 @@ class netroAccess(object):
             self.update_schedules(self.SCH_DAYS)
         elif self.netro['device_type'] == 'sensor':
             self.update_sensor_data()
+        self.data_ready = True
 
     def device_type(self) -> str:
         return(self.netro['device_type'])
@@ -207,7 +209,7 @@ class netroAccess(object):
                 for indx, m_data in enumerate(data):
                     mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
                     days_ago = (now_obj - mois_date_obj).days
-                    logging.debug(f'Moisture days {days_ago}')
+                    #logging.debug(f'Moisture days {days_ago}')
                     if 'moisture' not in self.netro['active_zones'][m_data['zone']]:
                         self.netro['active_zones'][m_data['zone']]['moisture'] = {}
                     self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']

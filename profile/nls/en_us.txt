@@ -77,7 +77,7 @@ ST-nlszone-GV7-NAME=Next End Time
 ST-nlszone-GV19-NAME=Last Update
 
 
-CMD-nlszone-Water-NAME=Water All Zones
+CMD-nlszone-Water-NAME=Water Zone
 CMDP-StartStop-NAME=Watering
 CMDP-Duration-NAME=Water Run Time 
 CMDP-Delay-NAME=Start Delay 
