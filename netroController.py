@@ -31,7 +31,7 @@ class netroController(udi_interface.Node):
         self.nodes_in_db = None
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler)
+        self.poly.subscribe(polyglot.CUSTOMPARAMS, self.customParamsHandler1)
         self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
@@ -50,9 +50,9 @@ class netroController(udi_interface.Node):
         self.config_done= True
 
 
-    def customParamsHandler(self, userParams):
+    def customParamsHandler1(self, userParams):
         self.customParameters.load(userParams)
-        logging.debug(f'customParamsHandler called {userParams}')
+        logging.debug(f'customParamsHandler1 called {userParams}')
 
         try: 
  

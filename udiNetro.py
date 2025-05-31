@@ -79,7 +79,6 @@ class netroStart(udi_interface.Node):
         while not self.customParam_done  or not self.config_done :
         #while not self.config_done and not self.portalReady :
             logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
-            #logging.debug(f' 1 2 3: {} {} {} {}'.format(self.customParam_done, , self.config_done))
             time.sleep(1)
         
         logging.debug(f'Detected devices : {self.serialID_list}')
