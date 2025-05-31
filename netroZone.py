@@ -68,11 +68,16 @@ class netroZone(udi_interface.Node):
             self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.zone_config(self.zone_nbr)))        
             self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr) )
             self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
-            self.CO_setDriver('GV4', self.netro_api.last_sch_start(self.zone_nbr))
-            self.CO_setDriver('GV5', self.netro_api.last_sch_end(self.zone_nbr))
-            self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr), 151)
-            self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr), 151)
-          
+            if self.netro_api.zone_config(self.zone_nbr) in ['ASSISTANT', 'TIMER']:
+                self.CO_setDriver('GV4', self.netro_api.last_sch_start(self.zone_nbr), 151)
+                self.CO_setDriver('GV5', self.netro_api.last_sch_end(self.zone_nbr), 151)
+                self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr), 151)
+                self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr), 151)
+            else:
+                self.CO_setDriver('GV4', 98, 25)
+                self.CO_setDriver('GV5', 98, 25)
+                self.CO_setDriver('GV6', 98, 25)
+                self.CO_setDriver('GV7', 98, 25)
 
             #self.CO_setDriver('GV10', 0, 25)
             #self.CO_setDriver('GV11',0, 25)

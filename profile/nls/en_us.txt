@@ -85,7 +85,8 @@ StartStop-0=Stop
 StartStop-1=Start
 CMD-nlszone-SkipDays-NAME=Days to Skip Watering 
 CMD-nlszone-Enable-NAME=Controller State
-
+smart-98=Smart Zone Enabled
+smart-99=Unknown
 
 
 
@@ -94,7 +95,7 @@ ND-sensor-ICON=Irrigation
 ST-nlssensor-ST-NAME=Sensor Online
 Status-0=Offline
 Status-1=Online
-Status-98=98
+Status-98=Smart Schedule Enabled
 Status-99=Unknown
 ST-nlssensor-GV1-NAME=Moisture Level (0-100)
 ST-nlssensor-GV2-NAME=Sun Light 

@@ -22,9 +22,9 @@ except:
 serial1 = 'd48afce15210'
 serial2 = 'c82e18810de8'
 serial3 = 'c82e1881d038'
-#netro1 = netroAccess(serial1, -3, -3, 3)
-#netro2 = netroAccess(serial2, -3, -2, 3)
-netro3 = netroAccess(serial3, -3, -2, 3)
+#netro1 = netroAccess(serial1, -3, -3, 7)
+#netro2 = netroAccess(serial2, -3, -2, 7)
+netro3 = netroAccess(serial3, -3, -2, 7)
 #test1 = netro1.update_info()
 zone_type = netro3.zone_config(1)
 #moisture = netro3.update_moisture_info(-3)
@@ -33,7 +33,19 @@ zone_type = netro3.zone_config(1)
 #print(test1)
 #print(netro1.netro)
 #test2 = netro2.update_info()
-sch1=netro3.update_schedules()
+sch1=netro3.update_schedules(5)
+for zone_info in netro3.netro['active_zones']:
+    test = zone_info
+    tst1= netro3.zone_status(zone_info)
+    tst1a= netro3.zone_source(zone_info)
+    tst1b= netro3.zone_config(zone_info)
+    tst2= netro3.moisture(zone_info)
+    tst3= netro3.moisture_slope(zone_info)
+    tst3a= netro3.last_sch_start(zone_info)
+    tst4= netro3.last_sch_end(zone_info)
+    tst5= netro3.next_sch_start(zone_info)
+    tst6= netro3.next_sch_end(zone_info)
+    print(test, tst1, tst1a, tst1b, tst2, tst3, tst3a, tst4, tst5, tst6 )
 
 #moisture = netro1.update_moisture_info(-5)
 moisture1 = netro3.moisture(6)

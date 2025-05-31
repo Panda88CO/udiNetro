@@ -30,11 +30,11 @@ class netroAccess(object):
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.netro= {}
         self.update_info() #Get latest API data
-        if self.netro['type'] == 'controller':
+        if self.netro['device_type'] == 'controller':
             self.update_events( self.EVENT_DAYS)
             self.update_moisture_info(self.MOIST_DAYS )
             self.update_schedules(self.SCH_DAYS)
-        elif self.netro['type'] == 'sensor':
+        elif self.netro['device_type'] == 'sensor':
             self.update_sensor_data()
 
     def device_type(self) -> str:
@@ -90,13 +90,26 @@ class netroAccess(object):
         try:
             logging.debug('update_zone_info')
 
-            if self.netro['type'] == 'controller':
+            if self.netro['device_type'] == 'controller':
                 return(self.netro['active_zones'][zone_nbr])
                                             
         except KeyError as e:
             logging.error(f'Error: update_zone_info - zone may not be enabled {e}')
             return(None)
-        
+
+
+    def zone_source(self, zone_nbr):
+        try:
+            logging.debug(f'zone_source {zone_nbr} {self.netro}')
+            if 'status' in self.netro['active_zones'][zone_nbr]:
+                return(self.netro['active_zones'][zone_nbr]['status'])
+            else:
+                return('NO SCHEDULE')
+
+        except KeyError as e:
+            logging.error(f'ERROR - zone_config {e} ')
+ 
+
     def zone_status(self, zone_nbr):
         try:
             logging.debug(f'zone_status {zone_nbr} {self.netro}')
@@ -119,9 +132,9 @@ class netroAccess(object):
     def device_name(self):
         try:
             logging.debug('device_name')
-            if self.netro['type'] == 'controller':
+            if self.netro['device_type'] == 'controller':
                 return(self.netro['info']['device']['name'])
-            elif self.netro['type'] == 'sensor':
+            elif self.netro['device_type'] == 'sensor':
                return(self.netro['name'])
             
             else:
@@ -165,7 +178,7 @@ class netroAccess(object):
                 self.extractAPIinfo(res)
                 logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))                
                 if 'device' in res['data']: # controller
-                    self.netro['type'] = 'controller'
+                    self.netro['device_type'] = 'controller'
                     self.netro['name'] = res['data']['device']['name']
                     self.netro['info'] = res['data'] 
                     self.netro['active_zones'] = {}
@@ -174,7 +187,7 @@ class netroAccess(object):
                             self.netro['active_zones'][zone['ith']] = zone
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
                 elif 'sensor_data' in res['data']: #sensor
-                    self.netro['type'] ='sensor'
+                    self.netro['device_type'] ='sensor'
                     self.netro['name'] = res['data']['sensor']['name']
                     self.netro['info'] = res['data']
                 logging.debug(f'self.netro {self.netro}')
@@ -264,17 +277,17 @@ class netroAccess(object):
                 sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
 
                 zone = sch_data['zone']
-                sch_type = sch_data['source']
+                sch_source = sch_data['source']
                 sch_status = sch_data['status']
-                if 'next_start' not in self.netro['active_zones'][zone] and sch_status in ['VALID']:
+                if 'next_start' not in self.netro['active_zones'][zone] and sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
                     self.netro['active_zones'][zone]['next_end'] = sch_end_time
-                    self.netro['active_zones'][zone]['type'] = sch_type
+                    self.netro['active_zones'][zone]['source'] = sch_source
                     self.netro['active_zones'][zone]['status'] = sch_status                    
-                elif sch_start_time < self.netro['active_zones'][zone]['next_start'] and sch_status in ['VALID']:
+                elif sch_start_time < self.netro['active_zones'][zone]['next_start'] and sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
                     self.netro['active_zones'][zone]['next_start'] = sch_start_time
                     self.netro['active_zones'][zone]['next_end'] = sch_end_time
-                    self.netro['active_zones'][zone]['type'] = sch_type
+                    self.netro['active_zones'][zone]['source'] = sch_source
                     self.netro['active_zones'][zone]['status'] = sch_status  
                     logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
             logging.debug(f'after process schedules {self.netro}')
@@ -285,14 +298,20 @@ class netroAccess(object):
     def next_sch_start(self, zone_nbr) -> int:
         logging.debug(f'next_sch_start {zone_nbr}')
         try:
-            return(self.netro['active_zones'][zone_nbr]['next_start'])
+            if self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
+                return('NO SCHEDULE')
+            else:
+                return(self.netro['active_zones'][zone_nbr]['next_start'])
         except KeyError:
             return(None)
 
     def next_sch_end(self, zone_nbr) -> int:
         logging.debug(f'next_sch_end {zone_nbr}')
         try:
-            return(self.netro['active_zones'][zone_nbr]['next_end'])
+            if self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
+                return('NO SCHEDULE')
+            else:            
+                return(self.netro['active_zones'][zone_nbr]['next_end'])
         except KeyError:
             return(None)
 

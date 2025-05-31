@@ -75,7 +75,7 @@
   </editor> 
     <editor id="unixtime" > 
       <range  uom="151" min="1748387733" max="102063945730" />
-      <range  uom="25" subset="99" nls="unknown" />
+      <range  uom="25" subset="98,99" nls="smart" />
   </editor>
 
 </editors> 
