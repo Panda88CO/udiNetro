@@ -38,7 +38,7 @@ class netroAccess(object):
             self.update_sensor_data()
 
     def device_type(self) -> str:
-        return(self.netro['type'])
+        return(self.netro['device_type'])
 
     def daytimestr2epocTime(self, date_time_str) -> int:
         date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%dT%H:%M:%S')
