@@ -194,6 +194,76 @@ class netroAccess(object):
         self.update_schedules(self.SCH_DAYS)
 
 
+    def last_end_time(self):
+        logging.debug(f'last_end_time {self.netro}')
+        try:
+            return(self.netro['last_end'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+        
+    def last_start_time(self):
+        logging.debug(f'last_strart_time {self.netro}')
+        try:
+            return(self.netro['last_start'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+ 
+    def next_end_time(self):
+        logging.debug(f'next_end_time {self.netro}')
+        try:
+            return(self.netro['next_end'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+    def next_start_time(self):
+        logging.debug(f'next_start_time {self.netro}')
+        try:
+            return(self.netro['next_start'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+
+    def last_offline_event(self):
+        logging.debug(f'last_offline_event {self.netro}')
+        try:
+            return(self.netro['offline_event'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+        
+    def last_online_event(self):
+        logging.debug(f'last_online_event {self.netro}')
+        try:
+            return(self.netro['online_event'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - {e}')
+            return(None)
+        
+
+    def get_battery_level(self):
+        logging.debug('get_battery_level {}'.format(self.netro['info']))
+        if 'battery_level' in self.netro['info']:
+            return(round(self.netro['info']*100,1))
+        else:
+            return(None)
+
+    def apicalls_reamaining(self):
+        logging.debug('apicalls_reamaining {}'.format(self.netro))
+        if 'calls_remaining' in self.netro:
+            return(self.netro['info']['calls_remaining'])
+        else:
+            return(None)
+        
+    def last_API(self):
+        logging.debug('last_API {}'.format(self.netro))
+        if 'last_API' in self.netro:
+            return(self.netro['info']['last_API'])
+        else:
+            return(None)     
+
+
     def update_info(self) -> str:
         try:
             logging.debug(f'get info ')
@@ -206,6 +276,13 @@ class netroAccess(object):
                     self.netro['device_type'] = 'controller'
                     self.netro['name'] = res['data']['device']['name']
                     self.netro['info'] = res['data'] 
+                    self.netro['last_stat'] = None
+                    self.netro['last_end'] = None
+                    self.netro['next_start'] = None
+                    self.netro['next_end'] = None
+                    self.netro['offline_event'] = None
+                    self.netro['online_event'] = None                    
+
                     self.netro['active_zones'] = {}
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
                         if zone['enabled']:
@@ -280,7 +357,7 @@ class netroAccess(object):
     def moisture(self, zone_nbr) -> int:
         logging.debug(f'moisture {zone_nbr}')
         try:
-            if ['moisture'] in self.netro['active_zones'][zone_nbr]:
+            if 'moisture' in self.netro['active_zones'][zone_nbr]:
                 return(self.netro['active_zones'][zone_nbr]['moisture'][1])
             else:
                 return(None)
@@ -315,13 +392,23 @@ class netroAccess(object):
                         self.netro['active_zones'][zone]['next_start'] = sch_start_time
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
                         self.netro['active_zones'][zone]['source'] = sch_source
-                        self.netro['active_zones'][zone]['status'] = sch_status                    
+                        self.netro['active_zones'][zone]['status'] = sch_status
                     elif  sch_start_time < self.netro['active_zones'][zone]['next_start']:
                         self.netro['active_zones'][zone]['next_start'] = sch_start_time
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
                         self.netro['active_zones'][zone]['source'] = sch_source
                         self.netro['active_zones'][zone]['status'] = sch_status  
                         logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
+                if self.netro['next_start'] == None:
+                    self.netro['next_start'] = sch_start_time
+                elif sch_start_time < self.netro['next_start']:
+                    self.netro['next_start'] = sch_start_time 
+                if self.netro['next_end'] == None:
+                    self.netro['next_end'] = sch_end_time
+                elif sch_end_time < self.netro['next_end']:
+                    self.netro['next_end'] = sch_end_time 
+
+                
             logging.debug(f'after process schedules {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')
@@ -373,7 +460,8 @@ class netroAccess(object):
         except Exception as e:
             logging.debug(f'Exception update_schedules {e} ')
             return(None)
-        
+   
+
     def _process_event_data(self, data):
         try:            
             #logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
@@ -381,13 +469,13 @@ class netroAccess(object):
                 zone_nbr = None
                 time = self.daytimestr2epocTime(e_data['time'])
                 if e_data['event'] == 1:
-                    if 'offline_event' not in self.netro:
+                    if self.netro['offline_event'] is None:
                         self.netro['offline_event'] = time
                     elif time > self.netro['offline_event']:
                         self.netro['offline_event'] = time
                 elif e_data['event'] == 2:
-                    if 'online_event' not in self.netro:
-                        self.netro['oline_event'] = time
+                    if self.netro['online_event'] is None:
+                        self.netro['online_event'] = time
                     elif time > self.netro['online_event']:
                         self.netro['online_event'] = time
                 elif e_data['event'] == 3:
@@ -400,6 +488,10 @@ class netroAccess(object):
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
                         elif time > self.netro['active_zones'][zone_nbr]['last_start']:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
+                        if self.netro['last_start'] is None:
+                            self.netro['last_start'] = self.netro['active_zones'][zone_nbr]['last_start' ] 
+                        elif self.netro['last_start'] < self.netro['active_zones'][zone_nbr]['last_start' ]:
+                            self.netro['last_start'] = self.netro['active_zones'][zone_nbr]['last_start' ] 
                 elif e_data['event'] == 4:
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
@@ -410,6 +502,10 @@ class netroAccess(object):
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
                         elif time > self.netro['active_zones'][zone_nbr]['last_end' ]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
+                        if self.netro['last_end'] is None:
+                            self.netro['last_end'] = self.netro['active_zones'][zone_nbr]['last_end' ] 
+                        elif self.netro['last_end'] < self.netro['active_zones'][zone_nbr]['last_end']:
+                            self.netro['last_end'] = self.netro['active_zones'][zone_nbr]['last_end' ]                             
                 else:
                     logging.error(f'ERROR - unsupported event {e_data} ')
             #logging.debug(f'after parsing event data {self.netro}')
