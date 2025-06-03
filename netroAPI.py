@@ -276,7 +276,7 @@ class netroAccess(object):
                     self.netro['device_type'] = 'controller'
                     self.netro['name'] = res['data']['device']['name']
                     self.netro['info'] = res['data'] 
-                    self.netro['last_stat'] = None
+                    self.netro['last_start'] = None
                     self.netro['last_end'] = None
                     self.netro['next_start'] = None
                     self.netro['next_end'] = None
