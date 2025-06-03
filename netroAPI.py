@@ -183,8 +183,6 @@ class netroAccess(object):
     def api_last_update(self) -> int:
         return(self.netro['last_api_time'])
     
-    def api_calls_remaining(self) -> int:
-        return(self.netro['calls_remaining'])
     
     def update_controller_data(self):
         logging.debug('update_controller')
@@ -249,7 +247,7 @@ class netroAccess(object):
         else:
             return(None)
 
-    def apicalls_reamaining(self):
+    def apicalls_remaining(self):
         logging.debug('apicalls_reamaining {}'.format(self.netro))
         if 'calls_remaining' in self.netro:
             return(self.netro['info']['calls_remaining'])
