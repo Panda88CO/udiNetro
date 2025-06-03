@@ -18,6 +18,7 @@ class netroController(udi_interface.Node):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
+        self.hb = 0
         self.serial_id = address
         self.ISYforced = False
         self.primary = primary
@@ -51,9 +52,6 @@ class netroController(udi_interface.Node):
         self.poly.Notices.clear()
         self.nodes_in_db = self.poly.getNodesFromDb()
         self.config_done= True
-
-
- 
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
@@ -101,16 +99,19 @@ class netroController(udi_interface.Node):
         if 'longPoll' in pollList: 
             self.longPoll()
             if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
-                self.heartbeat()
+                self.shortPoll()
         if 'shortPoll' in pollList:
             self.shortPoll()
 
 
     def longPoll(self):
-        pass
+        self.netro_api.update_controller_data()
+        self.updateISYdrivers()
+        #pass
 
 
     def shortPoll(self):
+        self.heartbeat()
         pass
 
 
