@@ -250,7 +250,7 @@ class netroAccess(object):
     def apicalls_remaining(self):
         logging.debug('apicalls_remaining {}'.format(self.netro))
         if 'calls_remaining' in self.netro:
-            return(self.netro['info']['calls_remaining'])
+            return(self.netro['calls_remaining'])
         else:
             return(None)
         
