@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -27,7 +28,9 @@ class netroController(udi_interface.Node):
         self.EVENTDAYS = eventdays
         self.MOIST_DAYS = moistdays
         self.SCH_DAYS = schdays
-
+        self._stop_thread = threading.Event()
+        self._thread = threading.Thread(target=self._background_task, daemon=True)
+        self._thread.start()
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
@@ -52,6 +55,29 @@ class netroController(udi_interface.Node):
         self.poly.Notices.clear()
         self.nodes_in_db = self.poly.getNodesFromDb()
         self.config_done= True
+
+    def _background_task(self):
+        while not self._stop_thread.is_set():
+            try:
+                # Call the function you want to run every 30 seconds
+                self.check_for_planned_schedules()
+            except Exception as e:
+                logging.error(f"Error in background thread: {e}")
+            self._stop_thread.wait(30)  # Wait 30 seconds or until stopped
+
+    def check_for_planned_schedules(self):
+        # Place the code you want to run every 30 seconds here
+        logging.debug("check_for_planned_schedules  executed.")
+        time_now = int(time.time())
+        if time_now >= self.netro_api.next_start_time() or time_now >= self.netro_api.last_end_time():
+            logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
+            self.netro_api.update_controller_data()
+            # Update ISY drivers with the latest data
+            self.updateISYdrivers()
+        
+        
+
+
 
     def start(self):                
         logging.debug('Start Netro Irrigation Node')  
@@ -87,7 +113,9 @@ class netroController(udi_interface.Node):
             
     def stop(self):
         logging.debug('stop - Cleaning up')
-    
+        self._stop_thread.set()
+        if self._thread.is_alive():
+            self._thread.join()
     #def climateNodeReady (self):
     #    return(self.nodeReady )
     
@@ -107,6 +135,9 @@ class netroController(udi_interface.Node):
     def longPoll(self):
         self.netro_api.update_controller_data()
         self.updateISYdrivers()
+        for node in self.zone_nodes.values():
+            if node.node_ready():
+                node.updateISYdrivers()
         #pass
 
 
