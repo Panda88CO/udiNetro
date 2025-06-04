@@ -137,7 +137,8 @@ class netroController(udi_interface.Node):
         self.netro_api.update_controller_data()
         self.updateISYdrivers()
         for node in self.zone_nodes.values():
-            if node.node_ready():
+            logging.debug(f'longPoll - updating zone node {node}')
+            if node.node_ready:
                 node.updateISYdrivers()
         #pass
 
