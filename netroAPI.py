@@ -145,7 +145,18 @@ class netroAccess(object):
 
         except KeyError as e:
             logging.error(f'ERROR - zone_config {e} ')
- 
+    
+    def system_status(self):
+        try:
+            logging.debug('system_status')
+            if 'status' in self.netro['info']:
+                return(self.netro['info']['status'])
+            else:
+                return(None)
+        except KeyError as e:
+            logging.error(f'ERROR - system_status {e} ')
+            return(None)
+
     def zone_config(self, zone_nbr) -> str:
         try:
             logging.debug(f'zone_config {zone_nbr}')
@@ -215,6 +226,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - {e}')
             return(None)
+        
     def next_start_time(self):
         logging.debug(f'next_start_time {self.netro}')
         try:

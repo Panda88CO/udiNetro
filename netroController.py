@@ -69,11 +69,12 @@ class netroController(udi_interface.Node):
         # Place the code you want to run every 30 seconds here
         logging.debug("check_for_planned_schedules  executed.")
         time_now = int(time.time())
-        if time_now >= self.netro_api.next_start_time() or time_now >= self.netro_api.last_end_time():
+        if time_now >= self.netro_api.next_start_time() or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.last_end_time()): #:
             logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
             self.netro_api.update_controller_data()
             # Update ISY drivers with the latest data
             self.updateISYdrivers()
+
         
         
 
