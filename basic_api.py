@@ -17,9 +17,8 @@ def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     if isinstance(serial_nbr, str): 
         url = 'https://api.netrohome.com/npa/v1/info.json'
-        headers = {}
         payload = {'key': serial_nbr}
-        status, response = _callApi(url, headers=headers, params=payload)
+        status, response = _callApi(url, payload)
         logging.debug(f'netroType response:{status} {response}')
         if response.status_code == 200:
             try:
