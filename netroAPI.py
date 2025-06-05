@@ -18,7 +18,7 @@ except ImportError:
 
 
 
-def netroType(serial_nbr):
+def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     url = 'https://api.netrohome.com/npa/v1/info.json'
     headers = {}
