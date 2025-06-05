@@ -57,7 +57,7 @@ def callNetroApi(self, method='GET',url=None, body=None):
         except KeyError as e:
             return ('error', e)
 
-def _callApi(self, method='GET', url=None, payload=None):
+def _callApi(method='GET', url=None, payload=None):
     # When calling an API, get the access token (it will be refreshed if necessary)
     #self.apiLock.acquire()
     yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
