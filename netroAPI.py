@@ -20,11 +20,12 @@ except ImportError:
 
 def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
-    if isinstance(serial_nbr, str): 
+    if isinstance(serial_nbr): 
         url = 'https://api.netrohome.com/npa/v1/info.json'
         headers = {}
         payload = {'key': serial_nbr}
         response = requests.get(url, headers=headers, params=payload)
+        logging.debug(f'netroType response: {response}')
         if response.status_code == 200:
             try:
                 res = response.json()
@@ -34,9 +35,10 @@ def netroType(self, serial_nbr):
                 elif 'sensor_data' in res['data']:
                     return('sensor',  res['data']['sensor']['name'])
                 else:
-                    return('unknown', 'unknown')
+                    
             except KeyError as e:
                 logging.error(f'Exception - keyerro : {e}')
+                return('unknown', 'unknown')
     else:
         logging.error(f'netroType - serial number {serial_nbr} is not a string but {type(serial_nbr)}')
         return('unknown', 'unknown')
