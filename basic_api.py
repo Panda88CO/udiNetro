@@ -12,11 +12,12 @@ except ImportError:
     logging.basicConfig(level=30)
 
 
-yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+
+
 def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     if isinstance(serial_nbr, str): 
-        url = 'https://api.netrohome.com/npa/v1/info.json'
+        url = '/info.json'
         payload = {'key': serial_nbr}
         status, response = _callApi(url, payload)
         logging.debug(f'netroType response:{status} {response}')
@@ -59,7 +60,7 @@ def callNetroApi(self, method='GET',url=None, body=None):
 def _callApi(self, method='GET', url=None, payload=None):
     # When calling an API, get the access token (it will be refreshed if necessary)
     #self.apiLock.acquire()
-
+    yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     response = None
     #payload = body
     completeUrl = yourApiEndpoint + url
