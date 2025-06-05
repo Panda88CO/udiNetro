@@ -8,17 +8,17 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 import time
-        
+from netroAPI import netroAccess
                
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name, api):
+    def __init__(self, polyglot,  primary, address, name):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Tesla ClimateNode Status Node')
         self.poly = polyglot
         self.ISYforced = False
-        self.netro_api = api
+        self.serial_id = address
         self.primary = primary
         self.address = address
         self.name = name
@@ -27,7 +27,7 @@ class netroSensor(udi_interface.Node):
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-
+        self.poly.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -38,19 +38,35 @@ class netroSensor(udi_interface.Node):
         logging.debug(f'drivers ; {self.drivers}')
 
     def start(self):                
-        logging.debug('Start TeslaEV Climate Node')  
+        logging.debug('Start Netro Sensor Node')  
+
         #self.CO_setDriver('ST', 1)
+        self.netro_api = netroAccess(self.serial_id)
+        self.zone_nodes = {}
+        zone_addresses = [self.primary]
+
+
         self.nodeReady = True
+        self.netro_api.update_sensor_data()
+        self.updateISYdrivers()
         
-        #self.updateISYdrivers()
-        #self.update_time()
-  
+        logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
+        
+
+        for indx, node  in enumerate(self.nodes_in_db):
+            logging.debug(f'Scanning db for node : {node}')
+            if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
+                logging.debug('Removing node : {} {}'.format(node['name'], node))
+                self.poly.delNode(node['address'])
+        self.system_ready = True
+            
+    def stop(self):
+        logging.debug('stop - Cleaning up')
+
 
     def stop(self):
         logging.debug('stop - Cleaning up')
-    
-    #def climateNodeReady (self):
-    #    return(self.nodeReady )
+
     def ISYupdate (self, command):
         logging.info('ISY-update called')
 

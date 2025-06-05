@@ -42,7 +42,7 @@ def netroType(self, serial_nbr):
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
-    def __init__(self,  serial_nbr, event_days, moist_days, sch_days):
+    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
         #super().__init__(polyglot)
         logging.info(f'Netro API initializing')
         #self.poly = polyglot
