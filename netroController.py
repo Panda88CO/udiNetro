@@ -148,8 +148,7 @@ class netroController(udi_interface.Node):
 
     def shortPoll(self):
         self.heartbeat()
-        pass
-
+    
 
     #def forceUpdateISYdrivers(self):
 
