@@ -39,24 +39,6 @@ def netroType(self, serial_nbr):
         logging.error(f'Exception - keyerror : {e}')
         return('unknown', 'unknown')
 
-def callNetroApi(self, method='GET',url=None, body=None):
-        try:
-            logging.debug(f'callNetroApi {url} {body}')
-            payload = {}
-            if body is None:
-                payload['key'] = self.serialID
-            else:
-                payload = body
-                payload['key'] = self.serialID
-            status, res = self._callApi(method, url, payload)
-            response = res
-            if status == 'ok':
-                if 'errors' in res and len(res['errors']>0):
-                    status = 'error'
-                    response = res['errors']
-            return(status, response)
-        except KeyError as e:
-            return ('error', e)
 
 def _callApi(method='GET', url=None, payload=None):
     # When calling an API, get the access token (it will be refreshed if necessary)

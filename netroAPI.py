@@ -103,7 +103,7 @@ def _callApi(self, method='GET', url=None, payload=None):
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
-    from basic_api import callNetroApi, netroType
+    from basic_api import _callApi, netroType
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
         
         #super().__init__(polyglot)
@@ -124,6 +124,26 @@ class netroAccess(object):
         elif self.netro['device_type'] == 'sensor':
             self.update_sensor_data()
         self.data_ready = True
+
+    def callNetroApi(self, method='GET',url=None, body=None):
+        try:
+            logging.debug(f'callNetroApi {url} {body}')
+            payload = {}
+            if body is None:
+                payload['key'] = self.serialID
+            else:
+                payload = body
+                payload['key'] = self.serialID
+            status, res = self._callApi(method, url, payload)
+            response = res
+            if status == 'ok':
+                if 'errors' in res and len(res['errors']>0):
+                    status = 'error'
+                    response = res['errors']
+            return(status, response)
+        except KeyError as e:
+            return ('error', e)
+        
 
     def device_type(self) -> str:
         return(self.netro['device_type'])
