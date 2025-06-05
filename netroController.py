@@ -91,7 +91,7 @@ class netroController(udi_interface.Node):
         #self.CO_setDriver('ST', 1)
         self.netro_api = netroAccess(self.serial_id, self.EVENTDAYS, self.MOIST_DAYS, self.SCH_DAYS)
         self.zone_nodes = {}
-        zone_addresses = []
+        zone_addresses = [self.primary]
         active_zones = self.netro_api.zone_list()
         logging.debug(f'Adding   {len(active_zones)} {active_zones}')
         for key, tmp_zone in active_zones.items():

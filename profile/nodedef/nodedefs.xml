@@ -6,9 +6,7 @@
          <st id="ST" editor="Enabled" />
       </sts>
       <cmds>
-         <sends>
-            <cmd id="DON" /> 
-            <cmd id="DOF" />          
+         <sends>    
          </sends>
          <accepts>
          </accepts>

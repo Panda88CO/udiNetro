@@ -100,12 +100,12 @@ class netroStart(udi_interface.Node):
                 self.node_dict[serial_id] = netroSensor(self.poly, serial_id, serial_id, name )
                 assigned_primary_addresses.append(serial_id)
         
-           
+        time.sleep(10)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
         for indx, node  in enumerate(self.nodes_in_db):
             #node = self.nodes_in_db[nde]
-            logging.debug(f'Scanning db for node : {node}')
+            logging.debug(f'Scanning db for unused primary nodes  : {node}')
             if node['primaryNode'] not in assigned_primary_addresses:
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
                 self.poly.delNode(node['address'])
