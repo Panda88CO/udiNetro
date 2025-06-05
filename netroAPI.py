@@ -103,8 +103,9 @@ def _callApi(self, method='GET', url=None, payload=None):
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
+    from basic_api import callNetroApi, netroType
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
-        from basic_api import callNetroApi, netroType
+        
         #super().__init__(polyglot)
         logging.info(f'Netro API initializing')
         #self.poly = polyglot
@@ -112,7 +113,7 @@ class netroAccess(object):
         self.EVENT_DAYS = event_days
         self.MOIST_DAYS = moist_days
         self.SCH_DAYS = sch_days
-        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+        #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
         self.netro= {}
         self.update_info() #Get latest API data
@@ -732,7 +733,7 @@ class netroAccess(object):
             return(status, response)
         except KeyError as e:
             return ('error', e)
-
+    
     def _callApi(self, method='GET', url=None, payload=None):
         # When calling an API, get the access token (it will be refreshed if necessary)
         #self.apiLock.acquire()
