@@ -87,18 +87,18 @@ class netroStart(udi_interface.Node):
             sys.exit()
    
         api = {}
-        for indx, serial_id in enumerate(self.serialID_list):
-            logging.debug(f'Instanciating nodes for {serial_id}')
-            dev_type, name  = self.netroType(str(serial_id))
+        for indx, serial_nbr in enumerate(self.serialID_list):
+            logging.debug(f'Instanciating nodes for {serial_nbr}')
+            dev_type, name  = self.netroType(serial_nbr)
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_id] = netroController(self.poly, serial_id, serial_id, name, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
-                assigned_primary_addresses.append(serial_id)
+                self.node_dict[serial_nbr] = netroController(self.poly, serial_nbr, seserial_nbrrial_id, name, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
+                assigned_primary_addresses.append(seriaserial_nbrl_id)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_id] = netroSensor(self.poly, serial_id, serial_id, name )
-                assigned_primary_addresses.append(serial_id)
+                self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name )
+                assigned_primary_addresses.append(serial_nbr)
         
         time.sleep(10)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
