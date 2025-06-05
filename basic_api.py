@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import requests
-
+import json
 import re
 try:
     #import udi_interface
@@ -19,7 +19,7 @@ def netroType(self, serial_nbr):
     if isinstance(serial_nbr, str): 
         url = '/info.json'
         payload = {'key': serial_nbr}
-        status, response = _callApi(url, payload)
+        status, response = _callApi('GET', url, payload)
         logging.debug(f'netroType response:{status} {response}')
         if response.status_code == 200:
             try:
@@ -62,6 +62,7 @@ def _callApi(self, method='GET', url=None, payload=None):
     #self.apiLock.acquire()
     yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     response = None
+    logging.debug(f'{yourApiEndpoint} + {url}')
     #payload = body
     completeUrl = yourApiEndpoint + url
 
