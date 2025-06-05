@@ -32,6 +32,7 @@ class netroController(udi_interface.Node):
         self._thread = threading.Thread(target=self._background_task, daemon=True)
         self._thread.start()
         self.nodeReady = False
+        self.system_ready = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
         self.customParam_done = False
@@ -59,8 +60,8 @@ class netroController(udi_interface.Node):
     def _background_task(self):
         while not self._stop_thread.is_set():
             try:
-                # Call the function you want to run every 30 seconds
-                self.check_for_planned_schedules()
+                if self.system_ready:# Call the function you want to run every 30 seconds
+                    self.check_for_planned_schedules()
             except Exception as e:
                 logging.error(f"Error in background thread: {e}")
             self._stop_thread.wait(30)  # Wait 30 seconds or until stopped
@@ -111,6 +112,7 @@ class netroController(udi_interface.Node):
             if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
                 self.poly.delNode(node['address'])
+        self.system_ready = True
             
     def stop(self):
         logging.debug('stop - Cleaning up')
@@ -138,7 +140,7 @@ class netroController(udi_interface.Node):
         self.updateISYdrivers()
         for node in self.zone_nodes.values():
             logging.debug(f'longPoll - updating zone node {node}')
-            if node.node_ready:
+            if node.node_ready():
                 node.updateISYdrivers()
         #pass
 
