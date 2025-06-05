@@ -27,6 +27,7 @@ def netroType(self, serial_nbr):
     if response.status_code == 200:
         try:
             res = response.json()
+            logging.debug(f'netroType response: {res}')
             if 'device' in res['data']:
                 return ('controller',  res['data']['device']['name'])
             elif 'sensor_data' in res['data']:
