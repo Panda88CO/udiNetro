@@ -28,11 +28,12 @@ class netroController(udi_interface.Node):
         self.EVENTDAYS = eventdays
         self.MOIST_DAYS = moistdays
         self.SCH_DAYS = schdays
+        self.nodeReady = False
+        self.system_ready = False
         self._stop_thread = threading.Event()
         self._thread = threading.Thread(target=self._background_task, daemon=True)
         self._thread.start()
-        self.nodeReady = False
-        self.system_ready = False
+
         #self.node = self.poly.getNode(address)
         self.n_queue = []
         self.customParam_done = False
