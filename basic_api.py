@@ -12,7 +12,7 @@ except ImportError:
     logging.basicConfig(level=30)
 
 
-
+yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
 def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     if isinstance(serial_nbr, str): 
@@ -62,7 +62,7 @@ def _callApi(self, method='GET', url=None, payload=None):
 
     response = None
     #payload = body
-    completeUrl = self.yourApiEndpoint + url
+    completeUrl = yourApiEndpoint + url
 
     headers = {}
     if method in [ 'PATCH', 'POST']:
