@@ -87,7 +87,7 @@ class netroStart(udi_interface.Node):
             sys.exit()
    
         api = {}
-        for indx, serial_id in enumerate (self.serialID_list):
+        for serial_id in self.serialID_list.values():
             logging.debug(f'Instanciating nodes for {serial_id}')
             dev_type, name  = self.netroType(serial_id)
             logging.debug(f'Name : {name}, {dev_type }')
