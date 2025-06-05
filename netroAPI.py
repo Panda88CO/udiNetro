@@ -35,7 +35,7 @@ def netroType(self, serial_nbr):
                 elif 'sensor_data' in res['data']:
                     return('sensor',  res['data']['sensor']['name'])
                 else:
-                    
+                    return('unknown', 'unknown')
             except KeyError as e:
                 logging.error(f'Exception - keyerro : {e}')
                 return('unknown', 'unknown')
