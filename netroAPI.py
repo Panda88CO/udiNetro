@@ -18,6 +18,7 @@ except ImportError:
 
 
 
+'''
 def netroType(self, serial_nbr):
     #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
     if isinstance(serial_nbr, str): 
@@ -43,12 +44,67 @@ def netroType(self, serial_nbr):
         logging.error(f'netroType - serial number {serial_nbr} is not a string but {type(serial_nbr)}')
         return('unknown', 'unknown')
 
-    
+def _callApi(self, method='GET', url=None, payload=None):
+        # When calling an API, get the access token (it will be refreshed if necessary)
+        #self.apiLock.acquire()
 
+        response = None
+        #payload = body
+        completeUrl = self.yourApiEndpoint + url
+
+        headers = {}
+        if method in [ 'PATCH', 'POST']:
+            headers = {
+                'Content-Type'  : 'application/json',
+                'Accept'        : 'application/json',
+            }
+        #if payload is not None:
+        #    payload = json.dumps(payload)
+        logging.debug(f' call info url={completeUrl}, header {headers}, params ={payload}')
+
+        try:
+            if method == 'GET':
+                response = requests.get(completeUrl, headers=headers, params=payload)
+            elif method == 'DELETE':
+                response = requests.delete(completeUrl, headers=headers)
+            elif method == 'PATCH':
+                response = requests.patch(completeUrl, headers=headers, json=payload)
+            elif method == 'POST':
+                response = requests.post(completeUrl, headers=headers, json=payload)
+            elif method == 'PUT':
+                response = requests.put(completeUrl, headers=headers)
+            logging.debug(f'request response: {response}')
+
+            
+            
+            response.raise_for_status()
+            if response.status_code == 200:
+                try:
+                    return 'ok', response.json()
+                except requests.exceptions.JSONDecodeError:
+                    return 'error', response.text
+            elif response.status_code == 400:
+                return 'error', response.text
+            elif response.status_code == 408:
+                return 'offline', response.text
+            elif response.status_code == 429:
+                return 'overload', response.text
+            else:
+                return 'unknown', response.text
+
+        except requests.exceptions.HTTPError as error:
+            logging.error(f"Call { method } { completeUrl } failed: { error }")
+            #self.apiLock.release()
+            if response.status_code == 400:
+                return('error', response.text)
+            else:
+                return ('unknown', response.text)    
+'''
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(object):
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
+        from basic_api import callNetroApi, netroType
         #super().__init__(polyglot)
         logging.info(f'Netro API initializing')
         #self.poly = polyglot
@@ -657,6 +713,7 @@ class netroAccess(object):
             logging.debug(f'Exception update_sensor_data {self.serialID} {e} ')
             return(None)
 
+    '''
     def callNetroApi(self, method='GET',url=None, body=None):
         try:
             logging.debug(f'callNetroApi {url} {body}')
@@ -731,3 +788,4 @@ class netroAccess(object):
                 return('error', response.text)
             else:
                 return ('unknown', response.text)
+    '''
