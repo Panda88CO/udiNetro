@@ -89,7 +89,7 @@ class netroStart(udi_interface.Node):
         api = {}
         for indx, serial_id in enumerate(self.serialID_list):
             logging.debug(f'Instanciating nodes for {serial_id}')
-            dev_type, name  = self.netroType(serial_id)
+            dev_type, name  = self.netroType(str(serial_id))
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
