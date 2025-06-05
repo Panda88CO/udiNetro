@@ -21,12 +21,11 @@ def netroType(self, serial_nbr):
             url = '/info.json'
             payload = {'key': serial_nbr}
             status, res = _callApi('GET', url, payload)
-            logging.debug(f'netroType response:{status} {response}')
+            logging.debug(f'netroType response:{status} {res}')
             if status == 'ok':
                 if 'errors' in res and len(res['errors']>0):
                     status = 'error'
-                    response = res['errors']
-                    return(status, response)
+                    return(status, res['errors'])
                 elif 'device' in res['data']:
                     return ('controller',  res['data']['device']['name'])
                 elif 'sensor_data' in res['data']:
