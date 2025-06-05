@@ -22,7 +22,7 @@ VERSION = '0.0.6'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
-    from netroAPI import netroType
+    from basic_api import netroType
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
         logging.info(f'_init_ Netro Controller {VERSION}')
@@ -99,7 +99,8 @@ class netroStart(udi_interface.Node):
                 name = self.poly.getValidName(name)
                 self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name )
                 assigned_primary_addresses.append(serial_nbr)
-        
+            time.sleep(1)
+
         time.sleep(10)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
