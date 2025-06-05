@@ -170,7 +170,7 @@ class netroController(udi_interface.Node):
             self.CO_setDriver('GV16', self.netro_api.get_battery_level())
             self.CO_setDriver('GV17', self.netro_api.apicalls_remaining())
             #self.CO_setDriver('GV18',0)
-            self.CO_setDriver('GV19', self.netro_api.last_API)
+            self.CO_setDriver('GV19', self.netro_api.last_API())
         except Exception as e:
             logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
 
