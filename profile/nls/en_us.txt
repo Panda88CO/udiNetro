@@ -16,6 +16,7 @@ IrrState-3=Watering
 IrrState-4=Offline
 IrrState-5=Sleeping
 IrrState-6=Power Off
+IrrState-7=Vave Error
 IrrState-99=Unknown
 
 
