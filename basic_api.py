@@ -16,6 +16,7 @@ class basic_api(object):
     def __init__(self,  serial_nbr):
         self.serial_nbr = serial_nbr
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+        logging.debug(f'Basic API init for serial number {self.serial_nbr}, {self.yourApiEndpoint}')
 
     def netroType(self):
         #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'

@@ -22,9 +22,11 @@ except:
 serial1 = 'd48afce15210'
 serial2 = 'c82e18810de8'
 serial3 = 'c82e1881d038'
+serial4 = 'bcddc252a82a'
 dev_type, name  = netroType(serial1)
 dev_type, name  = netroType(serial2)
 dev_type, name  = netroType(serial3)
+dev_type, name  = netroType(serial4)
 #netro1 = netroAccess(serial1, -3, -3, 7)
 #netro2 = netroAccess(serial2, -3, -2, 7)
 netro3 = netroAccess(serial3, -3, -2, 7)

@@ -31,7 +31,7 @@ class netroAccess(NetroType):
         self.EVENT_DAYS = event_days
         self.MOIST_DAYS = moist_days
         self.SCH_DAYS = sch_days
-        #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
         self.netro= {}
         self.update_info() #Get latest API data
