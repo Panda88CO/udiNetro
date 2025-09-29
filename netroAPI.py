@@ -259,7 +259,7 @@ class netroAccess(NetroType):
 
     def update_info(self) -> str:
         try:
-            logging.debug(f'get info ')
+            logging.debug(f'get info {self.yourApiEndpoint}')
             status, res = self.callNetroApi('GET', '/info.json')
 
             if status == 'ok':
@@ -660,7 +660,7 @@ class netroAccess(NetroType):
 
         response = None
         #payload = body
-        completeUrl = self.yourApiEndpoint + url
+        completeUrl = selfyourApiEndpoint. + url
 
         headers = {}
         if method in [ 'PATCH', 'POST']:
