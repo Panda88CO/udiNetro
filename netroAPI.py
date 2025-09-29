@@ -4,7 +4,7 @@ import time
 import json
 #from threading import Lock
 from datetime import timedelta, datetime, timezone
-from basic_api import basic_api
+#from basic_api import basic_api
 import numpy as np
 import re
 try:
@@ -21,7 +21,7 @@ except ImportError:
 
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
-class netroAccess(basic_api):
+class netroAccess(object):
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
         
         #super().__init__(polyglot)
@@ -43,7 +43,29 @@ class netroAccess(basic_api):
             self.update_sensor_data()
         self.data_ready = True
 
+    def netroType(self):
+        #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
+        try:
+            if isinstance(self.serial_nbr, str): 
         
+                status, res = self.callNetroApi('GET', '/info.json')
+                logging.debug(f'netroType response:{status} {res}')
+                if status == 'ok':
+                    if 'errors' in res and len(res['errors']>0):
+                        status = 'error'
+                        return(status, res['errors'])
+                    elif 'device' in res['data']:
+                        return ('controller',  res['data']['device']['name'])
+                    elif 'sensor_data' in res['data']:
+                        return('sensor',  res['data']['sensor']['name'])
+                    else:
+                        return('unknown', 'unknown')
+            else:
+                logging.error(f'netroType - serial number {self.serial_nbr} is not a string but {type(self.serial_nbr)}')
+                return('unknown', 'unknown')
+        except KeyError as e:
+            logging.error(f'Exception - keyerror : {e}')
+            return('unknown', 'unknown')
 
     def device_type(self) -> str:
         return(self.netro['device_type'])

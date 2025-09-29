@@ -13,17 +13,17 @@ import json
 import re
 import time
 
-#from netroAPI import netroType
+from netroAPI import netroAccess
 from datetime import timedelta, datetime
 #from tzlocal import get_localzone
 from netroController import netroController
 from netroSensor import netroSensor
-from basic_api import basic_api
+
 VERSION = '0.0.7'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
-    from basic_api import netroType
+    #
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
         logging.info(f'_init_ Netro Controller {VERSION}')
@@ -90,7 +90,7 @@ class netroStart(udi_interface.Node):
         logging.debug(f'Instanciating nodes for {self.serialID_list}')
         for indx, serial_nbr in enumerate(self.serialID_list):
             logging.debug(f'Instanciating nodes for {serial_nbr}')
-            access  = basic_api(serial_nbr)
+            access  = netroAccess.netroType(serial_nbr)
             dev_type, name = access.netroType()
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
