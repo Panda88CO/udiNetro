@@ -90,7 +90,7 @@ class netroStart(udi_interface.Node):
         logging.debug(f'Instanciating nodes for {self.serialID_list}')
         for indx, serial_nbr in enumerate(self.serialID_list):
             logging.debug(f'Instanciating nodes for {serial_nbr}')
-            #access  = netroAccess.netroType(serial_nbr)
+
             dev_type, name = netroAccess.netroType(serial_nbr)
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
