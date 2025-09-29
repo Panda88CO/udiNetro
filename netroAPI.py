@@ -21,7 +21,7 @@ except ImportError:
 
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
-class netroAccess(object):
+class netroAccess(basic_api):
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
         
         #super().__init__(polyglot)
@@ -635,6 +635,7 @@ class netroAccess(object):
             return(None)
 
     
+    '''
     def callNetroApi(self, method='GET',url=None, body=None):
         try:
             logging.debug(f'callNetroApi {url} {body}')
@@ -653,6 +654,7 @@ class netroAccess(object):
             return(status, response)
         except KeyError as e:
             return ('error', e)
+    
     
     def _callApi(self, method='GET', url=None, payload=None):
         # When calling an API, get the access token (it will be refreshed if necessary)
@@ -709,4 +711,4 @@ class netroAccess(object):
                 return('error', response.text)
             else:
                 return ('unknown', response.text)
-    
+    '''
