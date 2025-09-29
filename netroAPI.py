@@ -657,7 +657,7 @@ class netroAccess(object):
             return(None)
 
     
-    '''
+    
     def callNetroApi(self, method='GET',url=None, body=None):
         try:
             logging.debug(f'callNetroApi {url} {body}')
@@ -733,4 +733,4 @@ class netroAccess(object):
                 return('error', response.text)
             else:
                 return ('unknown', response.text)
-    '''
+    
