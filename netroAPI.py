@@ -34,14 +34,19 @@ class netroAccess(object):
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
         self.netro= {}
-        self.update_info() #Get latest API data
-        if self.netro['device_type'] == 'controller':
-            self.update_events( self.EVENT_DAYS)
-            self.update_moisture_info(self.MOIST_DAYS )
-            self.update_schedules(self.SCH_DAYS)
-        elif self.netro['device_type'] == 'sensor':
-            self.update_sensor_data()
-        self.data_ready = True
+        #if 'ok' in self.update_info() #Get latest API data
+        logging.debug(f'self.nero: {self.netro}')
+        if 'device_type' in self.netro:
+            if self.netro['device_type'] == 'controller':
+                self.update_events( self.EVENT_DAYS)
+                self.update_moisture_info(self.MOIST_DAYS )
+                self.update_schedules(self.SCH_DAYS)
+            elif self.netro['device_type'] == 'sensor':
+                self.update_sensor_data()
+            self.data_ready = True
+        else:
+            logging.error(f'NO DATA from sensor {self.netro}')
+            self.data_ready = False
 
     def netroType(self):
         #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
@@ -306,7 +311,11 @@ class netroAccess(object):
                     self.netro['device_type'] ='sensor'
                     self.netro['name'] = res['data']['sensor']['name']
                     self.netro['info'] = res['data']
+                else:
+                    self.netro['device_type'] = 'Unknown'
+                    return('error')
                 logging.debug(f'self.netro {self.netro}')
+
                 return(status)
             else:
                 return(None)
