@@ -660,7 +660,7 @@ class netroAccess(NetroType):
 
         response = None
         #payload = body
-        completeUrl = selfyourApiEndpoint. + url
+        completeUrl = self.yourApiEndpoint + url
 
         headers = {}
         if method in [ 'PATCH', 'POST']:
