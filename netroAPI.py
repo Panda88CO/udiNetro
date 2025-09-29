@@ -43,11 +43,10 @@ class netroAccess(object):
             self.update_sensor_data()
         self.data_ready = True
 
-    def netroType(self, serial_nbr):
+    def netroType(self):
         #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         try:
-            if isinstance(serial_nbr, str): 
-        
+            if isinstance(self.serialID, str):         
                 status, res = self.callNetroApi('GET', '/info.json')
                 logging.debug(f'netroType response:{status} {res}')
                 if status == 'ok':
@@ -61,7 +60,7 @@ class netroAccess(object):
                     else:
                         return('unknown', 'unknown')
             else:
-                logging.error(f'netroType - serial number {serial_nbr} is not a string but {type(serial_nbr)}')
+                logging.error(f'netroType - serial number {self.serialID} is not a string but {type(self.serialID)}')
                 return('unknown', 'unknown')
         except KeyError as e:
             logging.error(f'Exception - keyerror : {e}')
