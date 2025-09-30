@@ -34,7 +34,7 @@ class netroAccess(object):
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
         self.netro= {}
-        #if 'ok' in self.update_info() #Get latest API data
+        self.update_info() #Get latest API data
         logging.debug(f'self.nero: {self.netro}')
         if 'device_type' in self.netro:
             if self.netro['device_type'] == 'controller':
