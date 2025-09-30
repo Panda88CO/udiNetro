@@ -8,6 +8,10 @@
       <editor id="Status" > 
      <range  uom="25" subset="0,1,99"  nls='Status'/>
   </editor>
+    </editor>
+      <editor id="con_status" > 
+     <range  uom="25" subset="0-3,99"  nls='con_status'/>
+  </editor>
   <editor id="Nbr_Zones" > 
      <range  uom="72" min="0" max="16" />
   </editor>
@@ -63,7 +67,7 @@
      <range  uom="36" min="0" max="10000" prec="1" />
   </editor>
     <editor id="battery" > 
-     <range  uom="70" min="0" max="100" />
+     <range  uom="51" min="0" max="100" />
       <range  uom="25" subset="98,99" nls="battery" />
   </editor>
 

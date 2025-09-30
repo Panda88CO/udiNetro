@@ -237,7 +237,7 @@ class netroController(udi_interface.Node):
 
 
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
-            #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
+            {'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
             {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event

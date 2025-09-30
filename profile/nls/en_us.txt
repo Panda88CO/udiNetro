@@ -40,6 +40,7 @@ Sch_Status-1=Schedule Ececuting
 Sch_Status-2=Schedule Executed
 Sch_Status-98=No Schedule Defined
 Sch_Status-99=Unknown/Error
+ST-nlsirrctrl-GV15-NAME=Connection Status
 ST-nlsirrctrl-GV16-NAME=Battery Level
 ST-nlsirrctrl-GV17-NAME=Remaing API calls
 ST-nlsirrctrl-GV18-NAME=Last Activity
@@ -59,6 +60,11 @@ battery-98=No battery
 battery-99=Unknown
 
 unknown-99=Unknown
+
+con_status-0=Offline
+con_status-1=Online
+con_status-2=Sleeping
+con_status-99=Unknown
 
 ND-zone-NAME=Irrigation Zone
 ND-zone-ICON=Irrigation
@@ -101,6 +107,7 @@ Status-99=Unknown
 ST-nlssensor-GV1-NAME=Moisture Level (0-100)
 ST-nlssensor-GV2-NAME=Sun Light 
 ST-nlssensor-GV3-NAME=Temperature
-ST-nlssensor-GV4-NAME=Battery Level (0-100)
+ST-nlsirrctrl-GV15-NAME=Connection Status
+ST-nlsirrctrl-GV16-NAME=Battery Level
 CMD-nls_ctrl-Update-NAME=Update Data
 

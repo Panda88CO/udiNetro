@@ -53,12 +53,6 @@ class netroSensor(udi_interface.Node):
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
         
 
-        for indx, node  in enumerate(self.nodes_in_db):
-            logging.debug(f'Scanning db for node : {node}')
-            if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
-                logging.debug('Removing node : {} {}'.format(node['name'], node))
-                self.poly.delNode(node['address'])
-        self.system_ready = True
             
     def stop(self):
         logging.debug('stop - Cleaning up')
@@ -82,22 +76,11 @@ class netroSensor(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 4},  #inside_temp
-            {'driver': 'GV2', 'value': 0, 'uom': 4},  #outside_temp
-            {'driver': 'GV3', 'value': 0, 'uom': 4},  #driver_temp_setting
-            {'driver': 'GV4', 'value': 0, 'uom': 4},  #passenger_temp_setting
-            {'driver': 'GV5', 'value': 0, 'uom': 25},  #seat_heater_left
-            {'driver': 'GV6', 'value': 0, 'uom': 25},  #seat_heater_right
-            {'driver': 'GV7', 'value': 0, 'uom': 25},  #seat_heater_rear_left
-            {'driver': 'GV8', 'value': 0, 'uom': 25},  #seat_heater_rear_center
-            {'driver': 'GV9', 'value': 0, 'uom': 25},  #seat_heater_rear_right
-            {'driver': 'GV15', 'value': 0, 'uom': 25},  #seat_heater_third_left
-            {'driver': 'GV16', 'value': 0, 'uom': 25},  #seat_heater_third_right
-            {'driver': 'GV10', 'value': 0, 'uom': 25}, #is_preconditioning
-            {'driver': 'GV11', 'value': 0, 'uom': 25}, #is_preconditioning
-            {'driver': 'GV14', 'value': 99, 'uom': 25}, #Steering Wheel Heat
-            {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last combined update Hours           
-            {'driver': 'GV21', 'value': 99, 'uom': 25}, #Last Command status
+            {'driver': 'ST', 'value': 0, 'uom': 70},  #Moisture 0-100
+            {'driver': 'TEMP', 'value': 0, 'uom': 4},  #outside_temp
+            {'driver': 'GV3', 'value': 0, 'uom': 36},  #driver_temp_setting
+            {'driver': 'GV14', 'value': 0, 'uom': 51},  #passenger_temp_setting
+            {'driver': 'GV15', 'value': 0, 'uom': 25},  #seat_heater_left
             ]
 
 
