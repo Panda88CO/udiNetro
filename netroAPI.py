@@ -115,6 +115,9 @@ class netroAccess(object):
             logging.error(f'ERROR - no key found {e}')
             return(None)
     
+    def total_zones(self):
+        logging.debug('total_zones')
+        return(self.netro['total_zones'])
     
     def zone_list(self):
         logging.debug('zone_list')
@@ -143,7 +146,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'ERROR - zone_config {e} ')
  
-
+    
     def zone_status(self, zone_nbr):
         try:
             logging.debug(f'zone_status {zone_nbr} {self.netro}')
@@ -304,6 +307,7 @@ class netroAccess(object):
 
                     self.netro['active_zones'] = {}
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
+                        self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
                         if zone['enabled']:
                             self.netro['active_zones'][zone['ith']] = zone
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
