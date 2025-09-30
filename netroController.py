@@ -86,7 +86,6 @@ class netroController(udi_interface.Node):
             time.sleep(1)
             logging.info(f'Waiting for system to initialize {self.customParam_done} {self.config_done}')
         #self.CO_setDriver('ST', 1)
-
         self.netro_api = netroAccess(self.serial_id, self.EVENTDAYS, self.MOIST_DAYS, self.SCH_DAYS)
         self.zone_nodes = {}
         zone_addresses = [self.primary]
