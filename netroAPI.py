@@ -33,7 +33,7 @@ class netroAccess(object):
         self.SCH_DAYS = sch_days
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
-        self.netro = None
+        self.netro = {}
         self.update_info() #Get latest API data
         logging.debug(f'self.nero: {self.netro}')
         if 'device_type' in self.netro:
