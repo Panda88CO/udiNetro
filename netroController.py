@@ -90,7 +90,7 @@ class netroController(udi_interface.Node):
         self.netro_api = netroAccess(self.serial_id, self.EVENTDAYS, self.MOIST_DAYS, self.SCH_DAYS)
         self.zone_nodes = {}
         zone_addresses = [self.primary]
-        if self.netro_api.total_zone() == 1:
+        if self.netro_api.total_zones() == 1:
             name = 'hosecontroller'
             address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
             self.zone_nodes[1] = netroZone(self.poly, self.address, address, name , self.netro_api )
