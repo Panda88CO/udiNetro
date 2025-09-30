@@ -31,6 +31,7 @@ class netroAccess(object):
         self.EVENT_DAYS = event_days
         self.MOIST_DAYS = moist_days
         self.SCH_DAYS = sch_days
+        self.defined_schedules = 0
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
         self.netro = {}
@@ -481,7 +482,8 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/schedules.json', params)
             if status == 'ok':
                 self.extractAPIinfo(res)
-                self._process_schedule_info(res['data']['schedules'])
+                self.defined_schedules =  len(self._process_schedule_info(res['data']['schedules']))
+                    
 
             return(status)
 
