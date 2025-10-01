@@ -68,7 +68,7 @@ class netroSensor(udi_interface.Node):
 
     def ISYupdate (self, command):
         logging.info('ISY-update called')
-        self.retrieve_sensor_data()
+        self.sensor_data = self.retrieve_sensor_data()
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
@@ -89,10 +89,10 @@ class netroSensor(udi_interface.Node):
     def updateISYdrivers(self):
         logging.debug(f'updateISYdrivers {self.sensor_data}')
         self.CO_setDriver('ST', self.sensor_data['moisture'])
-        self.CO_setDriver('TEMP', self.sensor_data['temperature'])
-        self.CO_setDriver('GV2', self.sensor_data['temperature'])
-        self.CO_setDriver('GV14', self.sensor_data['temperature'])
-        self.CO_setDriver('GV15', self.sensor_data['temperature'])
+        self.CO_setDriver('TEMP', self.sensor_data['celsius'])
+        self.CO_setDriver('GV2', self.sensor_data['sunlight'])
+        self.CO_setDriver('GV14', self.sensor_data['battery_level'])
+        self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 
               
