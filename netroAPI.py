@@ -325,7 +325,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception update_info {e} ')
+            logging.error(f'Exception update_info {e} ')
             return(None)
         
 
@@ -379,7 +379,7 @@ class netroAccess(object):
                     self._process_moisture_info(res['data']['moistures'])
             return(status)
         except Exception as e:
-            logging.debug(f'Exception update_moisture {self.serialID} {e} ')
+            logging.error(f'Exception update_moisture {self.serialID} {e} ')
             return(None)
 
     def moisture(self, zone_nbr) -> int:
@@ -488,7 +488,7 @@ class netroAccess(object):
             return(status)
 
         except Exception as e:
-            logging.debug(f'Exception update_schedules {e} ')
+            logging.error(f'Exception update_schedules {e} ')
             return(None)
    
 
@@ -561,7 +561,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception update_events {self.serialID} {e} ')
+            logging.error(f'Exception update_events {self.serialID} {e} ')
             return(None)
         
     def last_sch_start(self, zone_nbr) -> int:
@@ -596,7 +596,7 @@ class netroAccess(object):
                     return(None)
             return(None)
         except Exception as e:
-            logging.debug(f'Exception set_status {self.serialID} {e} ')
+            logging.error(f'Exception set_status {self.serialID} {e} ')
             return(None)
         
     def set_watering(self, duration=1, delay=0, zone = None) -> str:
@@ -620,7 +620,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception set_status {self.serialID} {e} ')
+            logging.error(f'Exception set_status {self.serialID} {e} ')
             return(None)
 
     def stop_watering(self)  -> str:
@@ -634,7 +634,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception stop_watering {self.serialID} {e} ')
+            logging.error(f'Exception stop_watering {self.serialID} {e} ')
             return(None)
         
     def set_skip_water_days(self, skip_days=None) -> str:
@@ -649,7 +649,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception set_skip_water_days {self.serialID} {e} ')
+            logging.error(f'Exception set_skip_water_days {self.serialID} {e} ')
             return(None)        
     ####################
 
@@ -663,7 +663,9 @@ class netroAccess(object):
             params['start_date']=start_str
             params['end_date']=stop_str
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
+            logging.debug(f'status {status}  tmp_res{tmp_res}')
             if status == 'ok':
+                logging.debug('status {} '.format(tmp_res['data']))
                 res= tmp_res['data'][0]
                 dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
                 res['meas_time']  = int(dt_object.timestamp()) 
@@ -674,7 +676,7 @@ class netroAccess(object):
             else:
                 return(None)
         except Exception as e:
-            logging.debug(f'Exception update_sensor_data {self.serialID} {e} ')
+            logging.error(f'Exception update_sensor_data {self.serialID} {e} ')
             return(None)
 
     
