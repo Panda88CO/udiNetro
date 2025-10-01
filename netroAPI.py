@@ -482,7 +482,10 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/schedules.json', params)
             if status == 'ok':
                 self.extractAPIinfo(res)
-                self.defined_schedules =  len(self._process_schedule_info(res['data']['schedules']))
+                if 'schedules' in res['data']:
+                    self.defined_schedules =  len(self._process_schedule_info(res['data']['schedules']))
+                else:
+                    self.defined_schedules = 0
                     
 
             return(status)
@@ -667,6 +670,7 @@ class netroAccess(object):
             if status == 'ok':
                 logging.debug('status {} '.format(tmp_res['data']))
                 res= tmp_res['data'][0]
+                logging.debug('res {} '.format(res))
                 dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
                 res['meas_time']  = int(dt_object.timestamp()) 
                 logging.debug(f'res = {json.dumps(res, indent=4)}')
