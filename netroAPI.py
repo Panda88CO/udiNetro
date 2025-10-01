@@ -659,9 +659,14 @@ class netroAccess(object):
             params = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
+            start_str, stop_str = self.start_stop_dates(-1)
+            params['start_date']=start_str
+            params['end_date']=stop_str
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             if status == 'ok':
-                res= tmp_res['data']
+                res= tmp_res['data'][0]
+                dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
+                res['meas_time']  = int(dt_object.timestamp()) 
                 logging.debug(f'res = {json.dumps(res, indent=4)}')
                 res['online'] = True
                 self.extractAPIinfo(tmp_res)

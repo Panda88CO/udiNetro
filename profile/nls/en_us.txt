@@ -107,7 +107,9 @@ Status-99=Unknown
 ST-nlssensor-GV1-NAME=Moisture Level (0-100)
 ST-nlssensor-GV2-NAME=Sun Light 
 ST-nlssensor-GV3-NAME=Temperature
-ST-nlsirrctrl-GV15-NAME=Connection Status
-ST-nlsirrctrl-GV16-NAME=Battery Level
+ST-nlssensor-GV18-NAME=Data Report Time
+ST-nlssensor-GV15-NAME=Battery Level
+ST-nlssensor-GV15-NAME=Connection Status
+ST-nlssensor-GV19-NAME=Last Update
 CMD-nls_ctrl-Update-NAME=Update Data
 

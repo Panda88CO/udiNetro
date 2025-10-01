@@ -89,8 +89,12 @@
          <st id="ST" editor="Moisture" /> 
          <st id="TEMP" editor="TEMP"/>
          <st id="GV2" editor="Sunlight" />
+         <st id="GV18" editor="unixtime" />
          <st id="GV14" editor="battery" />
          <st id="GV15" editor="con_status" />   
+         <st id="GV19" editor="unixtime" />
+
+
       </sts>
       <cmds>
          <sends>
