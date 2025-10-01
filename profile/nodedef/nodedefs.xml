@@ -87,9 +87,8 @@
       <editors />
       <sts>
          <st id="ST" editor="Moisture" /> 
-         <st id="GV1" editor="TEMP"/>
+         <st id="TEMP" editor="TEMP"/>
          <st id="GV2" editor="Sunlight" />
-         <st id="GV3" editor="TEMP" />
          <st id="GV14" editor="battery" />
          <st id="GV15" editor="con_status" />   
       </sts>

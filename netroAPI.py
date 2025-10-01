@@ -61,7 +61,7 @@ class netroAccess(object):
                         return(status, res['errors'])
                     elif 'device' in res['data']:
                         return ('controller',  res['data']['device']['name'])
-                    elif 'sensor_data' in res['data']:
+                    elif 'sensor' in res['data']:
                         return('sensor',  res['data']['sensor']['name'])
                     else:
                         return('unknown', 'unknown')

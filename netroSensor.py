@@ -15,7 +15,7 @@ class netroSensor(udi_interface.Node):
 
     def __init__(self, polyglot,  primary, address, name):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
-        logging.info('_init_ Tesla ClimateNode Status Node')
+        logging.info('_init_ TNetro Sensor Node')
         self.poly = polyglot
         self.ISYforced = False
         self.serial_id = address
@@ -34,8 +34,9 @@ class netroSensor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.nodeReady = True
         self.netro_api.get_info()
-        logging.info('_init_ Netro Sensor NOde  COMPLETE')
+        logging.info('_init_ Netro Sensor Node  COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
+        self.sensor_data = None
 
     def start(self):                
         logging.debug('Start Netro Sensor Node')  
@@ -47,7 +48,7 @@ class netroSensor(udi_interface.Node):
 
 
         self.nodeReady = True
-        self.netro_api.update_sensor_data()
+        self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
         
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
@@ -61,15 +62,28 @@ class netroSensor(udi_interface.Node):
     def stop(self):
         logging.debug('stop - Cleaning up')
 
+    def retrieve_sensor_data(self):
+        self.sensor_data = self.netro_api.update_sensor_data()
+        self.updateISYdrivers()
+
     def ISYupdate (self, command):
         logging.info('ISY-update called')
+        self.retrieve_sensor_data()
+
 
     def poll(self):
-        pass
+        self.netro_api.update_sensor_data()
+        self.updateISYdrivers()
+        self.sensor_data = self.retrieve_sensor_data()
    
 
-
-
+    def updateISYdrivers(self):
+        logging.debug(f'updateISYdrivers {self.sensor_data}')
+        self.CO_setDriver('ST', self.sensor_data['moisture'])
+        self.CO_setDriver('TEMP', self.sensor_data['temperature'])
+        self.CO_setDriver('GV2', self.sensor_data['temperature'])
+        self.CO_setDriver('GV14', self.sensor_data['temperature'])
+        self.CO_setDriver('GV15', self.sensor_data['temperature'])
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 
               
@@ -78,9 +92,9 @@ class netroSensor(udi_interface.Node):
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 70},  #Moisture 0-100
             {'driver': 'TEMP', 'value': 0, 'uom': 4},  #outside_temp
-            {'driver': 'GV3', 'value': 0, 'uom': 36},  #driver_temp_setting
-            {'driver': 'GV14', 'value': 0, 'uom': 51},  #passenger_temp_setting
-            {'driver': 'GV15', 'value': 0, 'uom': 25},  #seat_heater_left
+            {'driver': 'GV2', 'value': 0, 'uom': 36},  #sunlight (LUX)
+            {'driver': 'GV14', 'value': 0, 'uom': 51},  #battery
+            {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
             ]
 
 
