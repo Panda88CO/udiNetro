@@ -27,7 +27,7 @@ class netroSensor(udi_interface.Node):
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(polyglot.POLL, self.poll)
+        self.poly.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -70,6 +70,15 @@ class netroSensor(udi_interface.Node):
         logging.info('ISY-update called')
         self.retrieve_sensor_data()
 
+    def systemPoll(self, pollList):
+        logging.debug(f'systemPoll - {pollList}')
+    
+        if 'longPoll' in pollList: 
+            self.poll()
+            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                self.poll()
+        if 'shortPoll' in pollList:
+            self.poll()
 
     def poll(self):
         self.netro_api.update_sensor_data()
