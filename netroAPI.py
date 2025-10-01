@@ -662,7 +662,7 @@ class netroAccess(object):
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             if status == 'ok':
                 res= tmp_res['data']
-                logging.debug(f'res = {res}')
+                logging.debug(f'res = {json.dumps(res, indent=4)}')
                 res['online'] = True
                 self.extractAPIinfo(tmp_res)
                 return(res)
