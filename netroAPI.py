@@ -659,11 +659,12 @@ class netroAccess(object):
             params = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
-            status, res = self.callNetroApi('GET', '/sensor_data.json', params)
+            status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             if status == 'ok':
+                res= tmp_res['data']
                 logging.debug(f'res = {res}')
                 res['online'] = True
-                self.extractAPIinfo(res['data'])
+                self.extractAPIinfo(tmp_res)
                 return(res)
             else:
                 return(None)
