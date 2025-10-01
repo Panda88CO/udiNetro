@@ -94,6 +94,7 @@ class netroController(udi_interface.Node):
         if self.netro_api.total_zones() == 1:
             name = 'Hose Zone'
             address = self.poly.getValidAddress(self.address[-10:]+'_z1')
+            zone_addresses.append(address)
             self.zone_nodes[1] = netroZone(self.poly, self.address, address, name , self.netro_api )
         else:
             active_zones = self.netro_api.zone_list()
