@@ -482,7 +482,7 @@ class netroAccess(object):
             status, res = self.callNetroApi('GET', '/schedules.json', params)
             if status == 'ok':
                 self.extractAPIinfo(res)
-                if 'schedules' in res['data']:
+                if 'schedules' in res['data'] and res['data']['schedules'] is not None:
                     self.defined_schedules =  len(self._process_schedule_info(res['data']['schedules']))
                 else:
                     self.defined_schedules = 0
