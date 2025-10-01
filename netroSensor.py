@@ -13,7 +13,7 @@ from netroAPI import netroAccess
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name):
+    def __init__(self, polyglot,  primary, address, name, temp_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
@@ -22,6 +22,7 @@ class netroSensor(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
+        self.temp_unit = temp_unit
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
@@ -81,18 +82,23 @@ class netroSensor(udi_interface.Node):
             self.poll()
 
     def poll(self):
-        self.netro_api.update_sensor_data()
+        self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
-        self.sensor_data = self.retrieve_sensor_data()
-   
+
 
     def updateISYdrivers(self):
         logging.debug(f'updateISYdrivers {self.sensor_data}')
-        self.CO_setDriver('ST', self.sensor_data['moisture'])
-        self.CO_setDriver('TEMP', self.sensor_data['celsius'])
-        self.CO_setDriver('GV2', self.sensor_data['sunlight'])
-        self.CO_setDriver('GV14', self.sensor_data['battery_level'])
-        self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))
+        if self.sensor_data is not None:
+            self.CO_setDriver('ST', self.sensor_data['moisture'])
+            if self.temp_unit == 'C':
+                self.CO_setDriver('TEMP', self.sensor_data['celsius'], 4)
+            else:
+                self.CO_setDriver('TEMP', self.sensor_data['fahrenheit'], 16)
+            self.CO_setDriver('GV2', self.sensor_data['sunlight'])
+            self.CO_setDriver('GV14', self.sensor_data['battery_level'])
+            self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))
+
+
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 
               

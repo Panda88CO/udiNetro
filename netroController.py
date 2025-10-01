@@ -15,7 +15,7 @@ from netroZone import netroZone
 class netroController(udi_interface.Node):
     from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name, eventdays=-7, moistdays=-3, schdays=7):
+    def __init__(self, polyglot,  primary, address, name, temp_unit='F', eventdays=-7, moistdays=-3, schdays=7):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
@@ -25,6 +25,7 @@ class netroController(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
+        self.temp_unit = temp_unit
         self.EVENTDAYS = eventdays
         self.MOIST_DAYS = moistdays
         self.SCH_DAYS = schdays

@@ -96,11 +96,11 @@ class netroStart(udi_interface.Node):
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_nbr] = netroController(self.poly, serial_nbr, serial_nbr, name, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
+                self.node_dict[serial_nbr] = netroController(self.poly, serial_nbr, serial_nbr, name, self.Temp_unit,   self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
                 assigned_primary_addresses.append(serial_nbr)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
-                self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name )
+                self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name, self.Temp_unit, )
                 assigned_primary_addresses.append(serial_nbr)
             time.sleep(1)
 
@@ -114,13 +114,14 @@ class netroStart(udi_interface.Node):
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
                 self.poly.delNode(node['address'])
             
-
+    
         self.update_all_drivers()
 
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
+
 
 
 
@@ -179,7 +180,14 @@ class netroStart(udi_interface.Node):
             else:
                  self.MOIST_DAYS = -3
             self.customParam_done = True
-
+            if 'TEMP' in userParams:
+                if  self.customParameters['MOIST_DAYS'][0] in ['c', 'C']:
+                    self.Temp_unit = 'C'
+                else:
+                    self.Temp_unit = 'F'
+            else:
+                self.Temp_unit = 'F'
+            self.customParam_done = True
             logging.debug('customParamsHandler finish ')
         except Exception as e:
             logging.error(f'Error detected during custome Param parsing {e}')
