@@ -102,6 +102,10 @@ class netroStart(udi_interface.Node):
                 name = self.poly.getValidName(name)
                 self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name, self.Temp_unit, )
                 assigned_primary_addresses.append(serial_nbr)
+            elif dev_type == 'error':
+                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated ERROR {name}'
+            else:
+                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated  ERROR'
             time.sleep(1)
 
         time.sleep(10)

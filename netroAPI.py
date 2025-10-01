@@ -65,6 +65,8 @@ class netroAccess(object):
                         return('sensor',  res['data']['sensor']['name'])
                     else:
                         return('unknown', 'unknown')
+                else:
+                    return('error', 'Check device online or if daily Tokens used') 
             else:
                 logging.error(f'netroType - serial number {self.serialID} is not a string but {type(self.serialID)}')
                 return('unknown', 'unknown')
@@ -438,7 +440,7 @@ class netroAccess(object):
                 logging.debug(f'next_start {self.netro["next_start"]} next_end {self.netro["next_end"]}')
 
                 
-            logging.debug(f'after process schedules {self.netro}')
+            logging.debug(f'after _process_schedule_info {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing schedule data {e}')
 
@@ -483,7 +485,8 @@ class netroAccess(object):
             if status == 'ok':
                 self.extractAPIinfo(res)
                 if 'schedules' in res['data'] and res['data']['schedules'] is not None:
-                    self.defined_schedules =  len(self._process_schedule_info(res['data']['schedules']))
+                    self._process_schedule_info(res['data']['schedules'])
+                    self.defined_schedules =  len(res['data']['schedules'])
                 else:
                     self.defined_schedules = 0
                     
