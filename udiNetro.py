@@ -108,7 +108,7 @@ class netroStart(udi_interface.Node):
                 self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated  ERROR'
             time.sleep(1)
 
-        time.sleep(10)
+        time.sleep(5)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
         for indx, node  in enumerate(self.nodes_in_db):

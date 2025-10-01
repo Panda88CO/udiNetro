@@ -113,11 +113,11 @@ class netroController(udi_interface.Node):
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
         
 
-        for indx, node  in enumerate(self.nodes_in_db):
-            logging.debug(f'Scanning db for node : {node}')
-            if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
-                logging.debug('Removing node : {} {}'.format(node['name'], node))
-                self.poly.delNode(node['address'])
+        #for indx, node  in enumerate(self.nodes_in_db):
+        #    logging.debug(f'Scanning db for node : {node}')
+        #    if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
+        #       logging.debug('Removing node : {} {}'.format(node['name'], node))
+        #       self.poly.delNode(node['address'])
         self.system_ready = True
             
     def stop(self):

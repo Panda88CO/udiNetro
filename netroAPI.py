@@ -671,8 +671,8 @@ class netroAccess(object):
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             logging.debug(f'status {status}  tmp_res{tmp_res}')
             if status == 'ok':
-                logging.debug('status {} '.format(tmp_res['data']))
-                res= tmp_res['data'][0]
+                logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
+                res = tmp_res['data']['sensor_data'][0]
                 logging.debug('res {} '.format(res))
                 dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
                 res['meas_time']  = int(dt_object.timestamp()) 
