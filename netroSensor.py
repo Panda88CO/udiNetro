@@ -15,7 +15,7 @@ class netroSensor(udi_interface.Node):
 
     def __init__(self, polyglot,  primary, address, name):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
-        logging.info('_init_ TNetro Sensor Node')
+        logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
         self.ISYforced = False
         self.serial_id = address
@@ -33,7 +33,7 @@ class netroSensor(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.nodeReady = True
-        self.netro_api.get_info()
+        
         logging.info('_init_ Netro Sensor Node  COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
         self.sensor_data = None
@@ -43,6 +43,7 @@ class netroSensor(udi_interface.Node):
 
         #self.CO_setDriver('ST', 1)
         self.netro_api = netroAccess(self.serial_id)
+        self.netro_api.get_info()
         self.zone_nodes = {}
         zone_addresses = [self.primary]
 
@@ -50,8 +51,7 @@ class netroSensor(udi_interface.Node):
         self.nodeReady = True
         self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
-        
-        logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
+
         
 
             
