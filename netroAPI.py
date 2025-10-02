@@ -668,6 +668,7 @@ class netroAccess(object):
         try:
             logging.debug(f'update_sensor_data {self.serialID}')
             params = {}
+            res = {}
             if zone_list is not None:
                 params['zones'] = zone_list 
             start_str, stop_str = self.start_stop_dates(-1)
@@ -676,6 +677,7 @@ class netroAccess(object):
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             logging.debug(f'status {status}  tmp_res{tmp_res}')
             self.extractAPIinfo(tmp_res)
+            res['connection'] = self.netro['status']
             if status == 'ok':
                 logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
                 if len(tmp_res['data']['sensor_data']) > 0:
@@ -685,7 +687,7 @@ class netroAccess(object):
                     #dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
                     #res['meas_time']  = int(dt_object.timestamp()) 
                     logging.debug(f'res = {json.dumps(res, indent=4)}')
-                    res['online'] = True
+                    
                 
                 return(res)
             else:
