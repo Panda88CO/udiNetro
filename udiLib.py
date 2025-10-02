@@ -25,6 +25,7 @@ STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'S
 ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 
 def ctrl_status2ISY(self, status_str) -> int:
+    logging.debug(f'ctrl_status2ISY : {status_str}')
     return(STATUS_CODE[status_str])
 
 def zoneconfig2ISY(self,config_str) -> int:

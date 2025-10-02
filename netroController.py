@@ -212,7 +212,7 @@ class netroController(udi_interface.Node):
             res = self.netro_api.set_status(status)
             if res == 'ok':
                 time.sleep(1)
-                self.CO_setDriver('ST', self.netro_api.get_status())
+                self.CO_setDriver('ST', self.netro_api.get_status(), 25)
 
     def stop_water (self, command=None):
         logging.info('stop_water called')
@@ -234,7 +234,7 @@ class netroController(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},   #Controller state
+            {'driver': 'ST', 'value': 99, 'uom': 25},   #Controller state
             {'driver': 'GV1', 'value': 0, 'uom': 72},   #Nmber of enabled zones
 
             #{'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate

@@ -34,6 +34,7 @@ class netroAccess(object):
         self.defined_schedules = 0
         self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         self.data_ready = False
+        self.DEV_TYPE = None
         self.netro = {}
         self.update_info() #Get latest API data
         logging.debug(f'self.nero: {self.netro}')
@@ -108,10 +109,10 @@ class netroAccess(object):
     
 
     def status(self):
-        logging.debug('status : {}'.format(self.netro['info']))
+        logging.debug('status : {}'.format(self.netro['info'][self.DEV_TYPE]))
         try:
-            if 'status' in self.netro['info']:
-                return(self.netro['info']['status'])
+            if 'status' in self.netro['info'][self.DEV_TYPE]:
+                return(self.netro['info'][self.DEV_TYPE]['status'])
             else:
                 return(None)
         except KeyError as e:
@@ -164,8 +165,8 @@ class netroAccess(object):
     def system_status(self):
         try:
             logging.debug('system_status')
-            if 'status' in self.netro['info']:
-                return(self.netro['info']['status'])
+            if 'status' in self.netro['info'][self.DEV_TYPE]:
+                return(self.netro['info'][self.DEV_TYPE]['status'])
             else:
                 return(None)
         except KeyError as e:
@@ -183,13 +184,12 @@ class netroAccess(object):
     def device_name(self):
         try:
             logging.debug('device_name')
-            if self.netro['device_type'] == 'controller':
-                return(self.netro['info']['device']['name'])
-            elif self.netro['device_type'] == 'sensor':
-               return(self.netro['name'])
-            
-            else:
-                return('Unknown')
+            #if self.netro['device_type'] == 'controller':
+            return(self.netro['info'][self.DEV_TYPE]['name'])
+            #elif self.netro['device_type'] == 'sensor':
+            #   return(self.netro['name'])            
+            #else:
+            #    return('Unknown')
         except KeyError as e:
             logging.error(f'Error: device_name {e}')
             return(None)
@@ -268,9 +268,9 @@ class netroAccess(object):
         
 
     def get_battery_level(self):
-        logging.debug('get_battery_level {}'.format(self.netro['info']))
-        if 'battery_level' in self.netro['info']:
-            return(round(self.netro['info']*100,1))
+        logging.debug('get_battery_level {}'.format(self.netro['info'][self.DEV_TYPE]))
+        if 'battery_level' in self.netro['info'][self.DEV_TYPE]:
+            return(round(self.netro['info'][self.DEV_TYPE]['battery_level']*100,1))
         else:
             return(None)
 
@@ -284,7 +284,7 @@ class netroAccess(object):
     def last_API(self):
         logging.debug('last_API {}'.format(self.netro))
         if 'last_API' in self.netro:
-            return(self.netro['info']['last_API'])
+            return(self.netro['info'][self.DEV_TYPE]['last_API'])
         else:
             return(None)     
 
@@ -299,7 +299,8 @@ class netroAccess(object):
                 logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))                
                 if 'device' in res['data']: # controller
                     self.netro['device_type'] = 'controller'
-                    self.netro['name'] = res['data']['device']['name']
+                    self.DEV_TYPE = 'device'
+                    self.netro['name'] = res['data'][self.DEV_TYPE ]['name']
                     self.netro['info'] = res['data'] 
                     self.netro['last_start'] = None
                     self.netro['last_end'] = None
@@ -316,10 +317,12 @@ class netroAccess(object):
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
                 elif 'sensor_data' in res['data']: #sensor
                     self.netro['device_type'] ='sensor'
-                    self.netro['name'] = res['data']['sensor']['name']
+                    self.DEV_TYPE = 'sensor'
+                    self.netro['name'] = res['data'][self.DEV_TYPE]['name']
                     self.netro['info'] = res['data']
                 else:
                     self.netro['device_type'] = 'Unknown'
+                    self.DEV_TYPE = 'unknown'
                     return('error')
                 logging.debug(f'self.netro {self.netro}')
 
