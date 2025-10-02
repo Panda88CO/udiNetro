@@ -11,7 +11,7 @@ import time
 from netroAPI import netroAccess
                
 class netroSensor(udi_interface.Node):
-    from  udiLib import node_queue, command_res2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
     def __init__(self, polyglot,  primary, address, name, temp_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
@@ -86,17 +86,17 @@ class netroSensor(udi_interface.Node):
 
 
     def updateISYdrivers(self):
-        logging.debug(f'updateISYdrivers {self.sensor_data}')
+        logging.debug(f'updateISYdrivers')
         if self.sensor_data is not None:
-            self.CO_setDriver('ST', self.sensor_data['moisture'])
+            self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),72)
             if self.temp_unit == 'C':
-                self.CO_setDriver('TEMP', round(self.sensor_data['celsius'],1), 4)
+                self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
             else:
-                self.CO_setDriver('TEMP', round(self.sensor_data['fahrenheit'],1), 17)
-            self.CO_setDriver('GV2', self.sensor_data['sunlight'],36)
-            self.CO_setDriver('GV14', self.sensor_data['battery_level'], 51)
-            self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']),25)
-            self.CO_setDriver('GV18', self.sensor_data['meas_time'],151)    
+                self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
+            self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight'),36)
+            self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level'), 51)
+            self.CO_setDriver('GV15', self.ctrl_status2ISY(self.netro_api.get_sensor_data('status')),25)
+            self.CO_setDriver('GV18', self.netro_api.get_sensor_data('time'),151)    
             self.CO_setDriver('GV19', self.netro_api.last_API(), 151)
 
     id = 'sensor'

@@ -296,12 +296,28 @@ class netroAccess(object):
 
             if status == 'ok':
                 self.extractAPIinfo(res)
-                logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))                
+                logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))    
+                if 'battery_level' in res['data']:
+                    self.netro['battery_level'] = res['data']['battery_level']
+                else:
+                    self.netro['battery_level'] = None
+                if 'last_active' in res['data']:
+                    self.netro['last_active'] = self.daytimestr2epocTime(res['data']['last_active'])
+                else:
+                    self.netro['last_active'] = None
+                if 'status' in res['data']:
+                    self.netro['status'] = res['data']['status']
+                else:
+                    self.netro['status'] = None
+
                 if 'device' in res['data']: # controller
                     self.netro['device_type'] = 'controller'
                     self.DEV_TYPE = 'device'
                     self.netro['name'] = res['data'][self.DEV_TYPE ]['name']
                     self.netro['info'] = res['data'] 
+                    self.netro['status'] = res['data']['status']
+                    self.netro['total_zones'] = res['data']['zone_num']
+
                     self.netro['last_start'] = None
                     self.netro['last_end'] = None
                     self.netro['next_start'] = None
@@ -311,9 +327,9 @@ class netroAccess(object):
 
                     self.netro['active_zones'] = {}
                     for indx, zone in enumerate( self.netro['info']['device']['zones']):
-                        self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
+                        #self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
                         if zone['enabled']:
-                            self.netro['active_zones'][zone['ith']] = zone
+                            self.netro['active_zones'][zone['ith']] = zone # includes name, smart, enabled etc
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
                 elif 'sensor_data' in res['data']: #sensor
                     self.netro['device_type'] ='sensor'
@@ -664,30 +680,29 @@ class netroAccess(object):
             return(None)        
     ####################
 
-    def update_sensor_data(self, zone_list=None ) -> dict:
+    def update_sensor_data(self) -> dict:
         try:
             logging.debug(f'update_sensor_data {self.serialID}')
             params = {}
             res = {}
-            if zone_list is not None:
-                params['zones'] = zone_list 
-            start_str, stop_str = self.start_stop_dates(-1)
-            params['start_date']=start_str
-            params['end_date']=stop_str
-            status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
-            logging.debug(f'status {status}  tmp_res{tmp_res}')
-            self.extractAPIinfo(tmp_res)
-            res['connection'] = self.netro['status']
-            if status == 'ok':
-                logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
-                if len(tmp_res['data']['sensor_data']) > 0:
-                    res = tmp_res['data']['sensor_data'][0]
-                    logging.debug('res {} '.format(res))
-                    res['meas_time'] = self.daytimestr2epocTime(res['time'])
-                    #dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
-                    #res['meas_time']  = int(dt_object.timestamp()) 
-                    logging.debug(f'res = {json.dumps(res, indent=4)}')
-                    
+            status = self.update_info()
+
+            if status == 'ok' and self.netro['status'] in ['ONLINE']:
+                start_str, stop_str = self.start_stop_dates(-1)
+                params['start_date']=start_str
+                params['end_date']=stop_str
+                status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
+                logging.debug(f'status {status}  tmp_res{tmp_res}')
+                self.extractAPIinfo(tmp_res)                
+                if status == 'ok':
+                    logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
+                    if len(tmp_res['data']['sensor_data']) > 0:
+                        res = tmp_res['data']['sensor_data'][0]
+                        logging.debug('res {} '.format(res))
+                        self.netro['sensor_data'] = res
+                        self.netro['sensor_data']['time'] = self.daytimestr2epocTime(res['time'])
+                        logging.debug(f'res = {json.dumps(res, indent=4)}')
+                        
                 
                 return(res)
             else:
@@ -696,7 +711,15 @@ class netroAccess(object):
             logging.error(f'Exception update_sensor_data {self.serialID} {e} ')
             return(None)
 
-    
+    def get_sensor_data(self, key):
+        try:
+
+            logging.debug(f'get Sensor Data for {key} = {self.netro[key]}')
+            return(self.netro['sensor_data'][key])
+        except KeyError as e:
+            logging.error(f'Exception {key} not in data {self.netro} ')
+            return(None)
+
     
     def callNetroApi(self, method='GET',url=None, body=None):
         try:
