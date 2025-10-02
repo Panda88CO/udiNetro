@@ -219,7 +219,7 @@ class netroAccess(object):
 
 
     def last_end_time(self):
-        logging.debug(f'last_end_time {self.netro}')
+        logging.debug('last_end_time {}'.format(self.netro['last_end']))
         try:
             return(self.netro['last_end'])
         except KeyError as e:
@@ -227,7 +227,7 @@ class netroAccess(object):
             return(None)
         
     def last_start_time(self):
-        logging.debug(f'last_strart_time {self.netro}')
+        logging.debug('last_strart_time {}'.format(self.netro['last_start']))
         try:
             return(self.netro['last_start'])
         except KeyError as e:
@@ -235,7 +235,7 @@ class netroAccess(object):
             return(None)
  
     def next_end_time(self):
-        logging.debug(f'next_end_time {self.netro}')
+        logging.debug('next_end_time {}'.format(self.netro['next_end']))
         try:
             return(self.netro['next_end'])
         except KeyError as e:
@@ -243,7 +243,7 @@ class netroAccess(object):
             return(None)
         
     def next_start_time(self):
-        logging.debug(f'next_start_time {self.netro}')
+        logging.debug('next_start_time {}'.format(self.netro['next_start']))
         try:
             return(self.netro['next_start'])
         except KeyError as e:
@@ -440,7 +440,7 @@ class netroAccess(object):
                     self.netro['next_end'] = sch_end_time
                 elif sch_end_time < self.netro['next_end']:
                     self.netro['next_end'] = sch_end_time 
-                logging.debug(f'next_start {self.netro["next_start"]} next_end {self.netro["next_end"]}')
+            logging.debug(f'next_start {self.netro["next_start"]} next_end {self.netro["next_end"]}')
 
                 
             logging.debug(f'after _process_schedule_info {self.netro}')
