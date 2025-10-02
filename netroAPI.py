@@ -217,7 +217,7 @@ class netroAccess(object):
         self.update_events(self.EVENT_DAYS)
         self.update_schedules(self.SCH_DAYS)
 
-
+    """
     def last_end_time(self):
         logging.debug('last_end_time {}'.format(self.netro['last_end']))
         try:
@@ -265,7 +265,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - {e}')
             return(None)
-        
+    """    
 
     def get_battery_level(self):
         logging.debug('get_battery_level {}'.format(self.netro['info'][self.DEV_TYPE]))
@@ -288,6 +288,20 @@ class netroAccess(object):
         else:
             return(None)     
 
+    def get_controller_info(self, key):
+        try:
+            logging.debug(f'get_controller_info; {key} = {self.netro[key]}')
+            return(self.netro[key])
+        except KeyError as e:
+            logging.error(f'Excaption get_controller_info {key} : {e}  - {self.netro}')      
+            return(None)
+
+    def get_zone_info(self, zone_nbr, key):
+        try:
+            logging.debug(f"get_zone_info for zone {zone_nbr}-{key}: {self.netro['active_zones'][zone_nbr][key]}")
+            return(self.netro['active_zones'][zone_nbr][key])
+        except KeyError as e:
+            logging.error(f"Exception get_zone_info {e}")
 
     def update_info(self) -> str:
         try:
@@ -331,6 +345,7 @@ class netroAccess(object):
                         if zone['enabled']:
                             self.netro['active_zones'][zone['ith']] = zone # includes name, smart, enabled etc
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
+                    self.netro['nbr_active_zones'] = len(self.netro['active_zones'])
                 elif 'sensor_data' in res['data']: #sensor
                     self.netro['device_type'] ='sensor'
                     self.DEV_TYPE = 'sensor'

@@ -169,18 +169,18 @@ class netroController(udi_interface.Node):
             #self.update_time()
             logging.debug(f'ST {self.netro_api.status()} {self.ctrl_status2ISY(self.netro_api.status())}')
             self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.status()),25)
-            self.CO_setDriver('GV1',len(self.netro_api.zone_list()),70)        
-            self.CO_setDriver('GV3',self.netro_api.last_end_time(),151)
-            self.CO_setDriver('GV4',self.netro_api.next_start_time(),151)
-            self.CO_setDriver('GV5',self.netro_api.last_offline_event(),151)
-            self.CO_setDriver('GV6',self.netro_api.last_online_event(),151)
-            bat_lvl = self.netro_api.get_battery_level()
+            self.CO_setDriver('GV1',self.netro_api.get_controller_info('nbr_active_zones'),70)        
+            self.CO_setDriver('GV3',self.netro_api.get_controller_info('last_end'),151)
+            self.CO_setDriver('GV4',self.netro_api.get_controller_info('next_start'),151)
+            self.CO_setDriver('GV5',self.netro_api.get_controller_info('offline_event'),151)
+            self.CO_setDriver('GV6',self.netro_api.get_controller_info('online_event'),151)
+            bat_lvl = self.netro_api.get_controller_info('battery_level')
             if bat_lvl is None:
                 self.CO_setDriver('GV16', 98, 25)
             else:
                 self.CO_setDriver('GV16', bat_lvl , 52)
-            self.CO_setDriver('GV17', self.netro_api.apicalls_remaining(),70)
-            self.CO_setDriver('GV19', self.netro_api.last_API(),151)
+            self.CO_setDriver('GV17', self.netro_api.get_controller_info('calls_remaining'),70)
+            self.CO_setDriver('GV19', self.netro_api.get_controller_info('last_api_time'),151)
         except Exception as e:
             logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
 

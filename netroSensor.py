@@ -82,11 +82,12 @@ class netroSensor(udi_interface.Node):
 
     def longpoll(self):
         self.netro_api.update_info()
+        self.netro_api.update_sensor_data()
         self.updateISYdrivers()
 
     def shortpoll(self):
-        self.netro_api.update_sensor_data()
-        self.updateISYdrivers()
+        pass # heartbeat 
+    
 
     def updateISYdrivers(self):
         logging.debug(f'updateISYdrivers')
