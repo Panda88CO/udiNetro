@@ -685,7 +685,7 @@ class netroAccess(object):
             logging.debug(f'update_sensor_data {self.serialID}')
             params = {}
             res = {}
-            status = self.update_info()
+            #status = self.update_info()
 
             if status == 'ok' and self.netro['status'] in ['ONLINE']:
                 start_str, stop_str = self.start_stop_dates(-1)
