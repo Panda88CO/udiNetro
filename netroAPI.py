@@ -673,15 +673,17 @@ class netroAccess(object):
             params['end_date']=stop_str
             status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
             logging.debug(f'status {status}  tmp_res{tmp_res}')
+            self.extractAPIinfo(tmp_res)
             if status == 'ok':
                 logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
                 res = tmp_res['data']['sensor_data'][0]
                 logging.debug('res {} '.format(res))
-                dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
-                res['meas_time']  = int(dt_object.timestamp()) 
+                res['meas_time'] = self.daytimestr2epocTime(res['time'])
+                #dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
+                #res['meas_time']  = int(dt_object.timestamp()) 
                 logging.debug(f'res = {json.dumps(res, indent=4)}')
                 res['online'] = True
-                self.extractAPIinfo(tmp_res)
+                
                 return(res)
             else:
                 return(None)
