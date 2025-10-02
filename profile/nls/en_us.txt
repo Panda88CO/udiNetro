@@ -95,7 +95,8 @@ CMD-nlszone-Enable-NAME=Controller State
 smart-98=Smart Zone Enabled
 smart-99=Unknown
 
-
+temp-98=No data
+temp-99=Unknown
 
 ND-sensor-NAME=Irrigation Sensor
 ND-sensor-ICON=Irrigation

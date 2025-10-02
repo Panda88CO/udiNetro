@@ -90,9 +90,9 @@ class netroSensor(udi_interface.Node):
         if self.sensor_data is not None:
             self.CO_setDriver('ST', self.sensor_data['moisture'])
             if self.temp_unit == 'C':
-                self.CO_setDriver('TEMP', self.sensor_data['celsius'], 4)
+                self.CO_setDriver('TEMP', round(self.sensor_data['celsius'],1), 4)
             else:
-                self.CO_setDriver('TEMP', self.sensor_data['fahrenheit'], 16)
+                self.CO_setDriver('TEMP', round(self.sensor_data['fahrenheit'],1), 17)
             self.CO_setDriver('GV2', self.sensor_data['sunlight'])
             self.CO_setDriver('GV14', self.sensor_data['battery_level'], 51)
             self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))

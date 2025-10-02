@@ -17,7 +17,11 @@
   <editor id="count" > 
      <range  uom="70" min="0" max="2000" />
   </editor>
-
+<editor id="temp"> 
+        <range uom="4" min="-40" max="105" prec="1" />
+        <range uom="17" min="-40" max="221" prec="1" />        
+        <range uom="25" subset="98,99" nls="temp" />
+  </editor>
     <editor id="setEnable" > 
      <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>
