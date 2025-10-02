@@ -413,7 +413,7 @@ class netroAccess(object):
     def _process_schedule_info(self, data):
         try:
             logging.debug(f'_process_schedule_info data {json.dumps(data, indent=4)}')   
-            logging.debug(f'_process_schedule_info self.netro {json.dumps(self.netro, indent=4)}')   
+            logging.debug(f'_process_schedule_info self.netro {self.netro)}')   
             for indx, sch_data in enumerate(data):
                 sch_start_time = self.daytimestr2epocTime(sch_data['start_time'])
                 sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
