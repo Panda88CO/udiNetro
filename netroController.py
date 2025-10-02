@@ -174,10 +174,10 @@ class netroController(udi_interface.Node):
             self.CO_setDriver('GV5',self.netro_api.last_offline_event())
             self.CO_setDriver('GV6',self.netro_api.last_online_event())
             bat_lvl = self.netro_api.get_battery_level()
-            if bat_lvl in None:
+            if bat_lvl is None:
                 self.CO_setDriver('GV16', 98, 25)
             else:
-                self.CO_setDriver('GV16', self.netro_api.get_battery_level(), 52)
+                self.CO_setDriver('GV16', bat_lvl , 52)
             self.CO_setDriver('GV17', self.netro_api.apicalls_remaining())
             self.CO_setDriver('GV19', self.netro_api.last_API())
         except Exception as e:
