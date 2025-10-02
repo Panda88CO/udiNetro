@@ -678,13 +678,14 @@ class netroAccess(object):
             self.extractAPIinfo(tmp_res)
             if status == 'ok':
                 logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
-                res = tmp_res['data']['sensor_data'][0]
-                logging.debug('res {} '.format(res))
-                res['meas_time'] = self.daytimestr2epocTime(res['time'])
-                #dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
-                #res['meas_time']  = int(dt_object.timestamp()) 
-                logging.debug(f'res = {json.dumps(res, indent=4)}')
-                res['online'] = True
+                if len(tmp_res['data']['sensor_data']) > 0:
+                    res = tmp_res['data']['sensor_data'][0]
+                    logging.debug('res {} '.format(res))
+                    res['meas_time'] = self.daytimestr2epocTime(res['time'])
+                    #dt_object = datetime.strptime(res['time'], "%Y-%m-%dT%H:%M:%S")
+                    #res['meas_time']  = int(dt_object.timestamp()) 
+                    logging.debug(f'res = {json.dumps(res, indent=4)}')
+                    res['online'] = True
                 
                 return(res)
             else:
