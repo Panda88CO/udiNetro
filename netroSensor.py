@@ -94,7 +94,7 @@ class netroSensor(udi_interface.Node):
             else:
                 self.CO_setDriver('TEMP', self.sensor_data['fahrenheit'], 16)
             self.CO_setDriver('GV2', self.sensor_data['sunlight'])
-            self.CO_setDriver('GV14', self.sensor_data['battery_level'])
+            self.CO_setDriver('GV14', self.sensor_data['battery_level'], 51)
             self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))
             self.CO_setDriver('GV18', self.sensor_data['meas_time'])    
             self.CO_setDriver('GV19', self.netro_api.last_API())

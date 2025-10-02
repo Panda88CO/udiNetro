@@ -8,8 +8,7 @@
       <editor id="Status" > 
      <range  uom="25" subset="0,1,99"  nls='Status'/>
   </editor>
-    </editor>
-      <editor id="con_status" > 
+  <editor id="con_status" > 
      <range  uom="25" subset="0-3,99"  nls='con_status'/>
   </editor>
   <editor id="Nbr_Zones" > 
