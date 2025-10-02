@@ -93,11 +93,11 @@ class netroSensor(udi_interface.Node):
                 self.CO_setDriver('TEMP', round(self.sensor_data['celsius'],1), 4)
             else:
                 self.CO_setDriver('TEMP', round(self.sensor_data['fahrenheit'],1), 17)
-            self.CO_setDriver('GV2', self.sensor_data['sunlight'])
+            self.CO_setDriver('GV2', self.sensor_data['sunlight'],36)
             self.CO_setDriver('GV14', self.sensor_data['battery_level'], 51)
-            self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']))
-            self.CO_setDriver('GV18', self.sensor_data['meas_time'])    
-            self.CO_setDriver('GV19', self.netro_api.last_API())
+            self.CO_setDriver('GV15', self.bool2ISY(self.sensor_data['online']),25)
+            self.CO_setDriver('GV18', self.sensor_data['meas_time'],151)    
+            self.CO_setDriver('GV19', self.netro_api.last_API(), 151)
 
     id = 'sensor'
     commands = { 'UPDATE' : ISYupdate, 
@@ -105,7 +105,7 @@ class netroSensor(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 70},  #Moisture 0-100
+            {'driver': 'ST', 'value': 0, 'uom': 72},  #Moisture 0-100
             {'driver': 'TEMP', 'value': 0, 'uom': 4},  #outside_temp
             {'driver': 'GV2', 'value': 0, 'uom': 36},  #sunlight (LUX)
             {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
