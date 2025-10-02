@@ -41,8 +41,9 @@ class netroSensor(udi_interface.Node):
 
     def start(self):                
         logging.debug('Start Netro Sensor Node')  
-
-        #self.CO_setDriver('ST', 1)
+        while not self.nodeReady:
+            time.sleep(1)
+        #self.CO_setDriver('ST' , 1)
         self.netro_api = netroAccess(self.serial_id)
         #self.netro_api.get_info()
         #self.zone_nodes = {}
