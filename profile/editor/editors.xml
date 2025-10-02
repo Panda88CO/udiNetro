@@ -13,10 +13,10 @@
      <range  uom="25" subset="0-3,99"  nls='con_status'/>
   </editor>
   <editor id="Nbr_Zones" > 
-     <range  uom="72" min="0" max="16" />
+     <range  uom="70" min="0" max="16" />
   </editor>
   <editor id="count" > 
-     <range  uom="72" min="0" max="2000" />
+     <range  uom="70" min="0" max="2000" />
   </editor>
 
     <editor id="setEnable" > 

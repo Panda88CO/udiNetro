@@ -172,10 +172,13 @@ class netroController(udi_interface.Node):
             self.CO_setDriver('GV3',self.netro_api.last_end_time())
             self.CO_setDriver('GV4',self.netro_api.next_start_time())
             self.CO_setDriver('GV5',self.netro_api.last_offline_event())
-            self.CO_setDriver('GV6',self.netro_api.last_online_event())                  
-            self.CO_setDriver('GV16', self.netro_api.get_battery_level())
+            self.CO_setDriver('GV6',self.netro_api.last_online_event())
+            bat_lvl = self.netro_api.get_battery_level()
+            if bat_lvl in None:
+                self.CO_setDriver('GV16', 98, 25)
+            else:
+                self.CO_setDriver('GV16', self.netro_api.get_battery_level(), 52)
             self.CO_setDriver('GV17', self.netro_api.apicalls_remaining())
-            #self.CO_setDriver('GV18',0)
             self.CO_setDriver('GV19', self.netro_api.last_API())
         except Exception as e:
             logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
@@ -235,7 +238,7 @@ class netroController(udi_interface.Node):
 
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},   #Controller state
-            {'driver': 'GV1', 'value': 0, 'uom': 72},   #Nmber of enabled zones
+            {'driver': 'GV1', 'value': 0, 'uom': 70},   #Nmber of enabled zones
 
             #{'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Next Start Time
@@ -248,7 +251,7 @@ class netroController(udi_interface.Node):
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
             {'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
             {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
-            {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
+            {'driver': 'GV17', 'value': 0, 'uom': 70},  #Nmber of api call remaining
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
 
