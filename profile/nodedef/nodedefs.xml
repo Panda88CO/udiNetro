@@ -24,10 +24,10 @@
          <st id="GV4" editor="unixtime" />
          <st id="GV5" editor="unixtime" />  
          <st id="GV6" editor="unixtime" />      
-         <st id="GV14" editor="battery" />
-         <st id="GV15" editor="con_status" />         
-         <!--<st id="GV10" editor="Sch_Source" />-->
-         <st id="GV16" editor="Sch_Status" />
+         <!--<st id="GV14" editor="battery" />
+         <st id="GV10" editor="Sch_Source" />-->
+         <st id="GV15" editor="con_status" />   
+         <st id="GV16" editor="battery" />
          <st id="GV17" editor="count" /> 
          <!--<st id="GV18" editor="unixtime" /> Last event-->
          <st id="GV19" editor="unixtime" /> <!--Last api-->

@@ -282,9 +282,9 @@ class netroAccess(object):
             return(None)
         
     def last_API(self):
-        logging.debug('last_API {}'.format(self.netro))
-        if 'last_API' in self.netro:
-            return(self.netro['info'][self.DEV_TYPE]['last_API'])
+        logging.debug('last_API {}'.format(self.netro['last_api_time']))
+        if 'last_api_time' in self.netro:
+            return(self.netro['last_api_time'])
         else:
             return(None)     
 
@@ -412,7 +412,8 @@ class netroAccess(object):
 
     def _process_schedule_info(self, data):
         try:
-            logging.debug(f'_process_schedule_info {json.dumps(data, indent=4)}')   
+            logging.debug(f'_process_schedule_info data {json.dumps(data, indent=4)}')   
+            logging.debug(f'_process_schedule_info self.netro {json.dumps(self.netro, indent=4)}')   
             for indx, sch_data in enumerate(data):
                 sch_start_time = self.daytimestr2epocTime(sch_data['start_time'])
                 sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
@@ -420,7 +421,8 @@ class netroAccess(object):
                 zone = sch_data['zone']
                 sch_source = sch_data['source']
                 sch_status = sch_data['status']
-                if sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
+                #if sch_status in ['VALID'] and sch_source == self.netro['active_zones'][zone]['smart']:
+                if sch_status in ['VALID'] :   
                     if 'next_start' not in self.netro['active_zones'][zone]:
                         self.netro['active_zones'][zone]['next_start'] = sch_start_time
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
