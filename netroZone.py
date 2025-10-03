@@ -63,7 +63,7 @@ class netroZone(udi_interface.Node):
             logging.info(f'Zone  {self.zone_nbr} updateISYdrivers : {self.drivers}')
             
            #self.update_time()
-            logging.debug(f'Zone {self.zone_nbr} {self.netro_api.get_zone_info(self.zone_nbr, 'status')}')
+            logging.debug(f"Zone {self.zone_nbr} {self.netro_api.get_zone_info(self.zone_nbr, 'status')}")
             self.CO_setDriver('GV0', self.zone_nbr,70)
 
             self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.get_zone_info(self.zone_nbr, 'smart'))) 
