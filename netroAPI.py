@@ -265,7 +265,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - {e}')
             return(None)
-    """    
+    
 
     def get_battery_level(self):
         logging.debug('get_battery_level {}'.format(self.netro['info'][self.DEV_TYPE]))
@@ -287,7 +287,7 @@ class netroAccess(object):
             return(self.netro['last_api_time'])
         else:
             return(None)     
-
+    """
     def get_controller_info(self, key):
         try:
             logging.debug(f'get_controller_info; {key} = {self.netro[key]}')
@@ -418,6 +418,7 @@ class netroAccess(object):
             logging.error(f'Exception update_moisture {self.serialID} {e} ')
             return(None)
 
+    '''
     def moisture(self, zone_nbr) -> int:
         logging.debug(f'moisture {zone_nbr}')
         try:
@@ -428,7 +429,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'ERROR - moisture {e}')
             return (None)
-
+    '''
 
     def moisture_slope(self, zone_nbr) -> int:
         logging.debug(f'moisture_slope {zone_nbr}')
