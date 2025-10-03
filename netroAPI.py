@@ -300,7 +300,7 @@ class netroAccess(object):
 
     def get_zone_info(self, zone_nbr, key):
         try:
-            logging.debug(f"get_zone_info for zone {zone_nbr}-{key}: {self.netro['active_zones'][zone_nbr][key]}")
+            logging.debug(f"get_zone_info for zone {zone_nbr}-{key}: {self.netro}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
             logging.error(f"Exception get_zone_info {e}")
