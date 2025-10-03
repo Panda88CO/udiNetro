@@ -352,7 +352,7 @@ class netroAccess(object):
                             self.netro['active_zones'][zone['ith']] = zone # includes name, smart, enabled etc
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
                     self.netro['nbr_active_zones'] = len(self.netro['active_zones'])
-                elif 'sensor_data' in res['data']: #sensor
+                elif 'sensor' in res['data']: #sensor
                     self.netro['device_type'] ='sensor'
                     self.DEV_TYPE = 'sensor'
                     if 'battery_level' in res['data'][self.DEV_TYPE]:
