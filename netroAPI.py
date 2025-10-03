@@ -309,6 +309,7 @@ class netroAccess(object):
         try:
             logging.debug(f'get info {self.yourApiEndpoint}')
             status, res = self.callNetroApi('GET', '/info.json')
+            logging.debug(f'update_info response:{status} {res}')
 
             if status == 'ok':
                 self.extractAPIinfo(res)
@@ -316,9 +317,10 @@ class netroAccess(object):
 
 
                 if 'device' in res['data']:
-                    logging.debug(f"Coltroller selected {res['data'][self.DEV_TYPE]['status']}") # controller
-                    self.netro['device_type'] = 'controller'
                     self.DEV_TYPE = 'device'
+                    logging.debug(f"Coltroller selected {res['data'][self.DEV_TYPE ]['status']}") # controller
+                    self.netro['device_type'] = 'controller'
+                    
                     if 'battery_level' in res['data'][self.DEV_TYPE]:
                         self.netro['battery_level'] = res['data'][self.DEV_TYPE]['battery_level']
                     else:
