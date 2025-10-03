@@ -315,7 +315,8 @@ class netroAccess(object):
                 logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))    
 
 
-                if 'device' in res['data']: # controller
+                if 'device' in res['data']:
+                    logging.debug(f"Coltroller selected {res['data'][self.DEV_TYPE]['status']}") # controller
                     self.netro['device_type'] = 'controller'
                     self.DEV_TYPE = 'device'
                     if 'battery_level' in res['data'][self.DEV_TYPE]:
@@ -713,7 +714,7 @@ class netroAccess(object):
 
     def update_sensor_data(self) -> dict:
         try:
-            logging.debug(f'update_sensor_data {self.serialID}')
+            logging.debug(f'update_sensor_data {self.serialID} {self.netro}')
             params = {}
             res = {}
             #status = self.update_info()
