@@ -108,6 +108,7 @@ class netroAccess(object):
         return(start_day, end_day)
     
 
+    """
     def status(self):
         logging.debug('status : {}'.format(self.netro['info'][self.DEV_TYPE]))
         try:
@@ -161,7 +162,7 @@ class netroAccess(object):
 
         except KeyError as e:
             logging.error(f'ERROR - zone_config {e} ')
-    
+    """
     def system_status(self):
         try:
             logging.debug('system_status')
@@ -173,6 +174,7 @@ class netroAccess(object):
             logging.error(f'ERROR - system_status {e} ')
             return(None)
 
+    """
     def zone_config(self, zone_nbr) -> str:
         try:
             logging.debug(f'zone_config {zone_nbr}')
@@ -180,7 +182,7 @@ class netroAccess(object):
 
         except KeyError as e:
             logging.error(f'ERROR - zone_config {e} ')
-
+    """
     def device_name(self):
         try:
             logging.debug('device_name')
@@ -311,26 +313,27 @@ class netroAccess(object):
             if status == 'ok':
                 self.extractAPIinfo(res)
                 logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))    
-                if 'battery_level' in res['data']:
-                    self.netro['battery_level'] = res['data']['battery_level']
-                else:
-                    self.netro['battery_level'] = None
-                if 'last_active' in res['data']:
-                    self.netro['last_active'] = self.daytimestr2epocTime(res['data']['last_active'])
-                else:
-                    self.netro['last_active'] = None
-                if 'status' in res['data']:
-                    self.netro['status'] = res['data']['status']
-                else:
-                    self.netro['status'] = None
+
 
                 if 'device' in res['data']: # controller
                     self.netro['device_type'] = 'controller'
                     self.DEV_TYPE = 'device'
+                    if 'battery_level' in res['data'][self.DEV_TYPE]:
+                        self.netro['battery_level'] = res['data'][self.DEV_TYPE]['battery_level']
+                    else:
+                        self.netro['battery_level'] = None
+                    if 'last_active' in res['data'][self.DEV_TYPE]:
+                        self.netro['last_active'] = self.daytimestr2epocTime(res['data'][self.DEV_TYPE]['last_active'])
+                    else:
+                        self.netro['last_active'] = None
+                    if 'status' in res['data']:
+                        self.netro['status'] = res['data'][self.DEV_TYPE]['status']
+                    else:
+                        self.netro['status'] = None
                     self.netro['name'] = res['data'][self.DEV_TYPE ]['name']
                     self.netro['info'] = res['data'] 
-                    self.netro['status'] = res['data']['status']
-                    self.netro['total_zones'] = res['data']['zone_num']
+                    #self.netro['status'] = res['data']['status']
+                    self.netro['total_zones'] = res['data'][self.DEV_TYPE]['zone_num']
 
                     self.netro['last_start'] = None
                     self.netro['last_end'] = None
@@ -340,7 +343,7 @@ class netroAccess(object):
                     self.netro['online_event'] = None                    
 
                     self.netro['active_zones'] = {}
-                    for indx, zone in enumerate( self.netro['info']['device']['zones']):
+                    for indx, zone in enumerate( self.netro['info'][self.DEV_TYPE]['zones']):
                         #self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
                         if zone['enabled']:
                             self.netro['active_zones'][zone['ith']] = zone # includes name, smart, enabled etc
@@ -349,6 +352,18 @@ class netroAccess(object):
                 elif 'sensor_data' in res['data']: #sensor
                     self.netro['device_type'] ='sensor'
                     self.DEV_TYPE = 'sensor'
+                    if 'battery_level' in res['data'][self.DEV_TYPE]:
+                        self.netro['battery_level'] = res['data'][self.DEV_TYPE]['battery_level']
+                    else:
+                        self.netro['battery_level'] = None
+                    if 'last_active' in res['data'][self.DEV_TYPE]:
+                        self.netro['last_active'] = self.daytimestr2epocTime(res['data'][self.DEV_TYPE]['last_active'])
+                    else:
+                        self.netro['last_active'] = None
+                    if 'status' in res['data']:
+                        self.netro['status'] = res['data'][self.DEV_TYPE]['status']
+                    else:
+                        self.netro['status'] = None
                     self.netro['name'] = res['data'][self.DEV_TYPE]['name']
                     self.netro['info'] = res['data']
                 else:
