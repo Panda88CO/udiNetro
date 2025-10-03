@@ -721,7 +721,7 @@ class netroAccess(object):
             res = {}
             #status = self.update_info()
 
-            if status == 'ok' and self.netro['status'] in ['ONLINE']:
+            if self.netro['status'] in ['ONLINE']:
                 start_str, stop_str = self.start_stop_dates(-1)
                 params['start_date']=start_str
                 params['end_date']=stop_str

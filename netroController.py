@@ -98,7 +98,7 @@ class netroController(udi_interface.Node):
             zone_addresses.append(address)
             self.zone_nodes[1] = netroZone(self.poly, self.address, address, name , self.netro_api )
         else:
-            active_zones = self.netro_api.zone_list()
+            active_zones = self.netro_api.get_controller_info('active_zones')
             logging.debug(f'Adding   {len(active_zones)} {active_zones}')
             for key, tmp_zone in active_zones.items():
                 logging.debug(f'Key {key} Selected Zone {tmp_zone}')
