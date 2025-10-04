@@ -330,7 +330,8 @@ class netroAccess(object):
                         self.netro['last_active'] = self.daytimestr2epocTime(res['data'][self.DEV_TYPE]['last_active'])
                     else:
                         self.netro['last_active'] = None
-                    if 'status' in res['data']:
+                    if 'status' in res['data'][self.DEV_TYPE]:
+                        logging.debug(f"STATUS {res['data'][self.DEV_TYPE]['status']}")
                         self.netro['status'] = res['data'][self.DEV_TYPE]['status']
                     else:
                         self.netro['status'] = None
@@ -364,7 +365,7 @@ class netroAccess(object):
                         self.netro['last_active'] = self.daytimestr2epocTime(res['data'][self.DEV_TYPE]['last_active'])
                     else:
                         self.netro['last_active'] = None
-                    if 'status' in res['data']:
+                    if 'status' in res['data'][self.DEV_TYPE]:
                         self.netro['status'] = res['data'][self.DEV_TYPE]['status']
                     else:
                         self.netro['status'] = None
