@@ -164,11 +164,11 @@ class netroController(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Contrller  updateISYdrivers')
+            logging.info(f'Irrigation Controller  updateISYdrivers')
             
             #self.update_time()
-            logging.debug(f'ST {self.netro_api.status()} {self.ctrl_status2ISY(self.netro_api.status())}')
-            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.status()),25)
+            logging.debug(f'ST {self.netro_api.get_controller_info('status')} {self.netro_api.get_controller_info('status'))}')
+            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.get_controller_info('status')),25)
             self.CO_setDriver('GV1',self.netro_api.get_controller_info('nbr_active_zones'),70)        
             self.CO_setDriver('GV3',self.netro_api.get_controller_info('last_end'),151)
             self.CO_setDriver('GV4',self.netro_api.get_controller_info('next_start'),151)
