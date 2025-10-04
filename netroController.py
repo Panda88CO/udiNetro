@@ -72,10 +72,10 @@ class netroController(udi_interface.Node):
         # Place the code you want to run every 30 seconds here
         logging.debug("check_for_planned_schedules  executed.")
         time_now = int(time.time())
-        if isinstance(self.netro_api.next_start_time(), int) and isinstance(self.netro_api.last_end_time(), int):
-            if time_now >= self.netro_api.next_start_time() or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.last_end_time()): #:                
+        if isinstance(self.netro_api.get_controller_info('next_start'), int) and isinstance(self.netro_api.get_controller_info('last_end'), int):
+            if time_now >= self.netro_api.get_controller_info('next_start')or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.get_controller_info('last_end')): #:                
                 logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
-                logging.debug(f'schedule dataBG {time_now} {self.netro_api.next_start_time()} {self.netro_api.system_status()} {self.netro_api.last_end_time()}')
+                logging.debug(f'schedule dataBG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}')
                 self.netro_api.update_controller_data()
                 # Update ISY drivers with the latest data
                 self.updateISYdrivers()
@@ -133,13 +133,13 @@ class netroController(udi_interface.Node):
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
-    
-        if 'longPoll' in pollList: 
-            self.longPoll()
-            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+        if self.nodeReady:
+            if 'longPoll' in pollList: 
+                self.longPoll()
+                if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                    self.shortPoll()
+            if 'shortPoll' in pollList:
                 self.shortPoll()
-        if 'shortPoll' in pollList:
-            self.shortPoll()
 
 
     def longPoll(self):

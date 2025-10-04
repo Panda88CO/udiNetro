@@ -300,7 +300,8 @@ class netroAccess(object):
 
     def get_zone_info(self, zone_nbr, key):
         try:
-            logging.debug(f"get_zone_info for zone {zone_nbr}-{key}: {self.netro}")
+            logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro}")
+            logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro['active_zones'][zone_nbr]}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
             logging.error(f"Exception get_zone_info {e}")
@@ -436,7 +437,7 @@ class netroAccess(object):
             logging.error(f'Exception update_moisture {self.serialID} {e} ')
             return(None)
 
-    '''
+    
     def moisture(self, zone_nbr) -> int:
         logging.debug(f'moisture {zone_nbr}')
         try:
@@ -447,8 +448,7 @@ class netroAccess(object):
         except KeyError as e:
             logging.error(f'ERROR - moisture {e}')
             return (None)
-    '''
-
+    
     def moisture_slope(self, zone_nbr) -> int:
         logging.debug(f'moisture_slope {zone_nbr}')
         try:

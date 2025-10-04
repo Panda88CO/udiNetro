@@ -67,8 +67,7 @@ class netroZone(udi_interface.Node):
             self.CO_setDriver('GV0', self.zone_nbr,70)
 
             self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.get_zone_info(self.zone_nbr, 'smart'))) 
-                  
-            self.CO_setDriver('GV2', self.netro_api.get_zone_info(self.zone_nbr, 'moisture') )
+            self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr), 70)
             self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr),70 )
             if self.netro_api.zone_config(self.zone_nbr) in ['ASSISTANT', 'TIMER', 'SMART']: #why not smart?
                 self.CO_setDriver('GV4', self.netro_api.get_zone_info(self.zone_nbr, 'last_start') , 151)

@@ -73,12 +73,13 @@ class netroSensor(udi_interface.Node):
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
     
-        if 'longPoll' in pollList: 
-            self.longpoll()
-            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+        if self.nodeReady:
+            if 'longPoll' in pollList: 
+                self.longpoll()
+                if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                    self.shortpoll()
+            if 'shortPoll' in pollList:
                 self.shortpoll()
-        if 'shortPoll' in pollList:
-            self.shortpoll()
 
     def longpoll(self):
         self.netro_api.update_info()
