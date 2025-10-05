@@ -302,6 +302,7 @@ class netroAccess(object):
         try:
             #logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro}")
             logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro['active_zones'][zone_nbr]}")
+            logging.debug(f"get_zone_info for zone - self.netro: {self.netro}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
             logging.error(f"Exception get_zone_info {zone_nbr} {key} -{e} : {self.netro['active_zones']}")
@@ -574,7 +575,7 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    #logging.debug('event 3 {} {}'.format(zone_nbr, json.dumps(self.netro['active_zones'], indent=4)))
+                    logging.debug('event 3 {} {}'.format(zone_nbr, json.dumps(self.netro['active_zones'], indent=4)))
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
@@ -588,7 +589,7 @@ class netroAccess(object):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    #logging.debug(f'event 4 {zone_nbr}')
+                    logging.debug(f'event 4 {zone_nbr} {json.dumps(self.netro["active_zones"], indent=4)}')
                     if isinstance(zone_nbr, int):
                         if 'last_end' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
@@ -600,7 +601,7 @@ class netroAccess(object):
                             self.netro['last_end'] = self.netro['active_zones'][zone_nbr]['last_end' ]                             
                 else:
                     logging.error(f'ERROR - unsupported event {e_data} ')
-            #logging.debug(f'after parsing event data {self.netro}')
+            logging.debug(f'after parsing event data {self.netro}')
         except KeyError as e:
             logging.error(f'ERROR parsing event data {e}')
 
@@ -629,7 +630,10 @@ class netroAccess(object):
     def last_sch_start(self, zone_nbr) -> int:
         logging.debug(f'last_sch_start {zone_nbr}')
         try:
-            return(self.netro['active_zones'][zone_nbr]['last_start'])
+            if self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
+                return('NO SCHEDULE')
+            else:
+                return(self.netro['active_zones'][zone_nbr]['last_start'])
         except KeyError:
             return(None)
         
@@ -734,8 +738,12 @@ class netroAccess(object):
                     if len(tmp_res['data']['sensor_data']) > 0:
                         res = tmp_res['data']['sensor_data'][0]
                         logging.debug('res {} '.format(res))
-                        self.netro['sensor_data'] = res
-                        self.netro['sensor_data']['time'] = self.daytimestr2epocTime(res['time'])
+                        for key in res:
+                            if key not in self.netro:
+                                self.netro[key] = res[key]
+                        res['time'] = self.daytimestr2epocTime(res['time'])
+                        #self.netro['sensor_data'] = res
+                        #self.netro['sensor_data']['time'] = self.daytimestr2epocTime(res['time'])
                         logging.debug(f'res = {json.dumps(res, indent=4)}')
                         
                 
@@ -750,7 +758,7 @@ class netroAccess(object):
         try:
 
             logging.debug(f'get Sensor Data for {key} = {self.netro[key]}')
-            return(self.netro['sensor_data'][key])
+            return(self.netro[key])
         except KeyError as e:
             logging.error(f'Exception get_sensor_data {key} not in data {self.netro} ')
             return(None)
