@@ -95,9 +95,17 @@ class netroSensor(udi_interface.Node):
         if self.sensor_data is not None:
             self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),72)
             if self.temp_unit == 'C':
-                self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
+                if self.netro_api.get_sensor_data('celsius') is None:
+                    logging.debug('No temperature data')
+                    self.CO_setDriver('TEMP',99, 25)
+                else:
+                    self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
             else:
-                self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
+                if self.netro_api.get_sensor_data('fahrenheit') is None:
+                    logging.debug('No temperature data')
+                    self.CO_setDriver('TEMP',99, 25)
+                else:
+                    self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
             self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight'),36)
             self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level'), 51)
             self.CO_setDriver('GV15', self.ctrl_status2ISY(self.netro_api.get_sensor_data('status')),25)
