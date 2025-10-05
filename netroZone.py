@@ -80,7 +80,7 @@ class netroZone(udi_interface.Node):
                 
                 
             elif str(self.netro_api.get_zone_info(self.zone_nbr, 'smart')) in ['ASSISTANT', 'TIMER', 'SMART']: #why not smart?
-                logging.debug(f"SCHEDULE DEFINED FOR {self.zone_nbr}")
+                logging.debug(f"SCHEDULE DEFINED FOR {self.zone_nbr}  {self.netro_api.netro}")
                 self.CO_setDriver('GV4', self.netro_api.get_zone_info(self.zone_nbr, 'last_start') , 151)
                 self.CO_setDriver('GV5', self.netro_api.get_zone_info(self.zone_nbr, 'last_end'), 151)
                 self.CO_setDriver('GV6', self.netro_api.get_zone_info(self.zone_nbr, 'next_start'), 151)
