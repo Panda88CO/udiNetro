@@ -556,7 +556,7 @@ class netroAccess(object):
 
     def _process_event_data(self, data):
         try:            
-            #logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
+            logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
             for indx, e_data in enumerate(data):
                 zone_nbr = None
                 time = self.daytimestr2epocTime(e_data['time'])
