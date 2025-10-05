@@ -107,10 +107,10 @@ class netroController(udi_interface.Node):
                 address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
                 zone_addresses.append(address)
                 self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
-        self.nodeReady = True
+        
         self.netro_api.update_controller_data()
         self.updateISYdrivers()
-        
+        self.nodeReady = True
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
         
 

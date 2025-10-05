@@ -47,11 +47,10 @@ class netroSensor(udi_interface.Node):
         self.netro_api = netroAccess(self.serial_id)
         #self.netro_api.get_info()
         #self.zone_nodes = {}
-        #zone_addresses = [self.primary]
-        self.nodeReady = True
+        #zone_addresses = [self.primary]        
         self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
-
+        self.nodeReady = True
         
 
             
