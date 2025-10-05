@@ -295,7 +295,7 @@ class netroAccess(object):
             logging.debug(f'get_controller_info; {key} = {self.netro[key]}')
             return(self.netro[key])
         except KeyError as e:
-            logging.error(f'Excaption get_controller_info {key} : {e}  - {self.netro}')      
+            logging.error(f'Exception get_controller_info {key} : {e}  - {self.netro}')      
             return(None)
 
     def get_zone_info(self, zone_nbr, key):
@@ -304,7 +304,7 @@ class netroAccess(object):
             logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro['active_zones'][zone_nbr]}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
-            logging.error(f"Exception get_zone_info {e}")
+            logging.error(f"Exception get_zone_info {zone_nbr} {key} -{e} : {self.netro['active_zones']}")
 
     def update_info(self) -> str:
         try:
@@ -484,7 +484,7 @@ class netroAccess(object):
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
                         self.netro['active_zones'][zone]['source'] = sch_source
                         self.netro['active_zones'][zone]['status'] = sch_status  
-                        logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
+                    logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
                 if self.netro['next_start'] is None:
                     self.netro['next_start'] = sch_start_time
                 elif sch_start_time < self.netro['next_start']:
@@ -752,7 +752,7 @@ class netroAccess(object):
             logging.debug(f'get Sensor Data for {key} = {self.netro[key]}')
             return(self.netro['sensor_data'][key])
         except KeyError as e:
-            logging.error(f'Exception {key} not in data {self.netro} ')
+            logging.error(f'Exception get_sensor_data {key} not in data {self.netro} ')
             return(None)
 
     
