@@ -224,8 +224,8 @@ class netroController(udi_interface.Node):
         time.sleep(1)
         if res == 'ok':
             time.sleep(2)
-            self.netro_api.update_events(self.EVENT_DAYS)
-            self.netro_api.update_schedules(self.SCH_DAY)
+            self.netro_api.update_events()
+            self.netro_api.update_schedules()
             self.updateISYdrivers()
 
 
