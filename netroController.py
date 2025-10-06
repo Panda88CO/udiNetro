@@ -83,7 +83,7 @@ class netroController(udi_interface.Node):
         
 
     def start(self):                
-        logging.debug('Start Netro Irrigation Node {self.serial_id}')  
+        logging.debug(f'Start Netro Irrigation Node {self.serial_id}')  
 
         while not self.config_done and not self.nodeReady:
             time.sleep(1)

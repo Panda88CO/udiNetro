@@ -17,39 +17,32 @@ except ImportError:
     logging.basicConfig(level=30)
 
 
-
-
-#STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
-#ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
-class netroAccess(object):
-    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7):
-        
-        #super().__init__(polyglot)
-        logging.info(f'Netro API initializing')
-        #self.poly = polyglot
+class basicAPI(object):
+    def __init__(self, serial_nbr):
+        self.session = requests.Session()
+        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'   
         self.serialID = serial_nbr
-        self.EVENT_DAYS = event_days
-        self.MOIST_DAYS = moist_days
-        self.SCH_DAYS = sch_days
-        self.defined_schedules = 0
-        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
-        self.data_ready = False
-        self.DEV_TYPE = None
-        self.netro = {}
-        self.netro['active_zones'] = {}
-        self.update_info() #Get latest API data
-        logging.debug(f'self.nero: {self.netro}')
-        if 'device_type' in self.netro:
-            if self.netro['device_type'] == 'controller':
-                self.update_events( self.EVENT_DAYS)
-                self.update_moisture_info(self.MOIST_DAYS )
-                self.update_schedules(self.SCH_DAYS)
-            elif self.netro['device_type'] == 'sensor':
-                self.update_sensor_data()
-            self.data_ready = True
-        else:
-            logging.error(f'NO DATA from sensor {self.netro}')
-            self.data_ready = False
+
+
+    def callNetroApi(self, method='GET',url=None, body=None):
+        try:
+            logging.debug(f'callNetroApi {url} {body}')
+            payload = {}
+            if body is None:
+                payload['key'] = self.serialID
+            else:
+                payload = body
+                payload['key'] = self.serialID
+            status, res = self._callApi(method, url, payload)
+            response = res
+            if status == 'ok':
+                if 'errors' in res and len(res['errors']>0):
+                    status = 'error'
+                    response = res['errors']
+            return(status, response)
+        except KeyError as e:
+            return ('error', e)
+        
 
     def netroType(self):
         #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
@@ -74,7 +67,96 @@ class netroAccess(object):
                 return('unknown', 'unknown')
         except KeyError as e:
             logging.error(f'Exception - keyerror : {e}')
-            return('unknown', 'unknown')
+            return('unknown', 'unknown')        
+
+    def _callApi(self, method='GET', url=None, payload=None):
+        # When calling an API, get the access token (it will be refreshed if necessary)
+        #self.apiLock.acquire()
+
+        response = None
+        #payload = body
+        completeUrl = self.yourApiEndpoint + url
+
+        headers = {}
+        if method in [ 'PATCH', 'POST']:
+            headers = {
+                'Content-Type'  : 'application/json',
+                'Accept'        : 'application/json',
+            }
+        #if payload is not None:
+        #    payload = json.dumps(payload)
+        logging.debug(f' call info url={completeUrl}, header {headers}, params ={payload}')
+
+        try:
+            if method == 'GET':
+                response = requests.get(completeUrl, headers=headers, params=payload)
+            elif method == 'DELETE':
+                response = requests.delete(completeUrl, headers=headers)
+            elif method == 'PATCH':
+                response = requests.patch(completeUrl, headers=headers, json=payload)
+            elif method == 'POST':
+                response = requests.post(completeUrl, headers=headers, json=payload)
+            elif method == 'PUT':
+                response = requests.put(completeUrl, headers=headers)
+            logging.debug(f'request response: {response}')
+
+            
+            
+            response.raise_for_status()
+            if response.status_code == 200:
+                try:
+                    return 'ok', response.json()
+                except requests.exceptions.JSONDecodeError:
+                    return 'error', response.text
+            elif response.status_code == 400:
+                return 'error', response.text
+            elif response.status_code == 408:
+                return 'offline', response.text
+            elif response.status_code == 429:
+                return 'overload', response.text
+            else:
+                return 'unknown', response.text
+
+        except requests.exceptions.HTTPError as error:
+            logging.error(f"Call { method } { completeUrl } failed: { error }")
+            #self.apiLock.release()
+            if response.status_code == 400:
+                return('error', response.text)
+            else:
+                return ('unknown', response.text)
+    
+#STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
+#ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
+class netroAccess(basicAPI):
+    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False):
+        super().__init__(serial_nbr)
+        
+        logging.info(f'Netro API initializing')
+        self.serialID = serial_nbr
+        self.EVENT_DAYS = event_days
+        self.MOIST_DAYS = moist_days
+        self.SCH_DAYS = sch_days
+        self.defined_schedules = 0
+        
+        self.data_ready = False
+        self.DEV_TYPE = None
+        self.netro = {}
+        self.netro['active_zones'] = {}
+        self.update_info() #Get latest API data
+        logging.debug(f'self.nero: {self.netro}')
+        if 'device_type' in self.netro:
+            if self.netro['device_type'] == 'controller':
+                self.update_events( self.EVENT_DAYS)
+                self.update_moisture_info(self.MOIST_DAYS )
+                self.update_schedules(self.SCH_DAYS)
+            elif self.netro['device_type'] == 'sensor':
+                self.update_sensor_data()
+            self.data_ready = True
+        else:
+            logging.error(f'NO DATA from sensor {self.netro}')
+            self.data_ready = False
+
+
 
     def device_type(self) -> str:
         return(self.netro['device_type'])
@@ -313,7 +395,7 @@ class netroAccess(object):
                 return(None)
     def update_info(self) -> str:
         try:
-            logging.debug(f'get info {self.yourApiEndpoint}')
+            
             status, res = self.callNetroApi('GET', '/info.json')
             logging.debug(f'update_info response:{status} {res}')
 
@@ -773,79 +855,7 @@ class netroAccess(object):
             return(None)
 
     
-    def callNetroApi(self, method='GET',url=None, body=None):
-        try:
-            logging.debug(f'callNetroApi {url} {body}')
-            payload = {}
-            if body is None:
-                payload['key'] = self.serialID
-            else:
-                payload = body
-                payload['key'] = self.serialID
-            status, res = self._callApi(method, url, payload)
-            response = res
-            if status == 'ok':
-                if 'errors' in res and len(res['errors']>0):
-                    status = 'error'
-                    response = res['errors']
-            return(status, response)
-        except KeyError as e:
-            return ('error', e)
+
     
     
-    def _callApi(self, method='GET', url=None, payload=None):
-        # When calling an API, get the access token (it will be refreshed if necessary)
-        #self.apiLock.acquire()
-
-        response = None
-        #payload = body
-        completeUrl = self.yourApiEndpoint + url
-
-        headers = {}
-        if method in [ 'PATCH', 'POST']:
-            headers = {
-                'Content-Type'  : 'application/json',
-                'Accept'        : 'application/json',
-            }
-        #if payload is not None:
-        #    payload = json.dumps(payload)
-        logging.debug(f' call info url={completeUrl}, header {headers}, params ={payload}')
-
-        try:
-            if method == 'GET':
-                response = requests.get(completeUrl, headers=headers, params=payload)
-            elif method == 'DELETE':
-                response = requests.delete(completeUrl, headers=headers)
-            elif method == 'PATCH':
-                response = requests.patch(completeUrl, headers=headers, json=payload)
-            elif method == 'POST':
-                response = requests.post(completeUrl, headers=headers, json=payload)
-            elif method == 'PUT':
-                response = requests.put(completeUrl, headers=headers)
-            logging.debug(f'request response: {response}')
-
-            
-            
-            response.raise_for_status()
-            if response.status_code == 200:
-                try:
-                    return 'ok', response.json()
-                except requests.exceptions.JSONDecodeError:
-                    return 'error', response.text
-            elif response.status_code == 400:
-                return 'error', response.text
-            elif response.status_code == 408:
-                return 'offline', response.text
-            elif response.status_code == 429:
-                return 'overload', response.text
-            else:
-                return 'unknown', response.text
-
-        except requests.exceptions.HTTPError as error:
-            logging.error(f"Call { method } { completeUrl } failed: { error }")
-            #self.apiLock.release()
-            if response.status_code == 400:
-                return('error', response.text)
-            else:
-                return ('unknown', response.text)
     

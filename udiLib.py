@@ -300,7 +300,7 @@ def CO_setDriver(self, key, value, Unit=None):
     logging.debug(f'CO_setDriver : {key} {value} {Unit}')
     try:
         if value is None:
-            #logging.debug('None value passed = seting 99, UOM 25')
+            logging.debug('None value passed = seting 99, UOM 25')
             self.node.setDriver(key, 99, True, True, 25)
         elif isinstance(value, str) and value == 'invalid':
             self.node.setDriver(key, 97, True, True, 25)
@@ -310,7 +310,8 @@ def CO_setDriver(self, key, value, Unit=None):
             else:
                 self.node.setDriver(key, value)
     except ValueError: #A non number was passed 
-        self.node.setDriver(key, 99, True, True, 25)
+        logging.debug(f'Exception CO_setDriver : {key} {value} {Unit}')
+        #self.node.setDriver(key, 99, True, True, 25)
         
 
 
