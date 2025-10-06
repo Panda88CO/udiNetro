@@ -700,14 +700,14 @@ class netroAccess(basicAPI):
         try:
             logging.debug(f'update_events {self.serialID} {days_back}')
             params={}
-            '''
+            
             if days_back is None:
                 days_back = self.EVENT_DAYS 
             if isinstance(days_back, int):
                 start_str, stop_str = self.start_stop_dates(days_back)
                 params['start_date']=start_str
                 params['end_date']=stop_str
-            '''
+            
             status, res = self.callNetroApi('GET', '/events.json', params)
             if status == 'ok':
                 logging.debug(f'res = {res}')
