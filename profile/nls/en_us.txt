@@ -23,11 +23,11 @@ IrrState-99=Unknown
 ND-irrctrl-NAME=Netro Irrigation Controller
 ND-irrctrl-ICON=Irrigation
 ST-nlsirrctrl-GV1-NAME=Number Active Zones
-ST-nlsirrctrl-GV2-NAME=Next Start Time
-ST-nlsirrctrl-GV3-NAME=Previous Start Time
+#ST-nlsirrctrl-GV2-NAME=
+ST-nlsirrctrl-GV3-NAME=Next Start Time
 ST-nlsirrctrl-GV4-NAME=Previous End Time 
-ST-nlsirrctrl-GV5-NAME=Next Start Time
-ST-nlsirrctrl-GV6-NAME=Next End Time 
+ST-nlsirrctrl-GV5-NAME=Last Offline Event
+ST-nlsirrctrl-GV6-NAME=Last Online Event
 
 ST-nlsirrctrl-GV10-NAME=Schedule Type
 Sch_Source-0=Netro Smart Schedule

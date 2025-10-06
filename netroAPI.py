@@ -375,7 +375,7 @@ class netroAccess(basicAPI):
     """
     def get_controller_info(self, key):
         try:
-            logging.debug(f'get_controller_info; {key} = {self.netro[key]}')
+            logging.debug(f'get_controller_info; {key} = {self.netro[key]}  {self.netro}')
             return(self.netro[key])
         except KeyError as e:
             logging.error(f'Exception get_controller_info {key} : {e}  - {self.netro}')      

@@ -170,8 +170,8 @@ class netroController(udi_interface.Node):
             logging.debug(f"ST {self.netro_api.get_controller_info('status')} {self.ctrl_status2ISY(self.netro_api.get_controller_info('status'))}")
             self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.get_controller_info('status')),25)
             self.CO_setDriver('GV1',self.netro_api.get_controller_info('nbr_active_zones'),70)        
-            self.CO_setDriver('GV3',self.netro_api.get_controller_info('last_end'),151)
-            self.CO_setDriver('GV4',self.netro_api.get_controller_info('next_start'),151)
+            self.CO_setDriver('GV3',self.netro_api.get_controller_info('next_start'),151)
+            self.CO_setDriver('GV4',self.netro_api.get_controller_info('last_end'),151)
             self.CO_setDriver('GV5',self.netro_api.get_controller_info('offline_event'),151)
             self.CO_setDriver('GV6',self.netro_api.get_controller_info('online_event'),151)
             bat_lvl = self.netro_api.get_controller_info('battery_level')
@@ -250,7 +250,7 @@ class netroController(udi_interface.Node):
 
 
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
-            {'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
+            #{'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
             {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV17', 'value': 0, 'uom': 70},  #Nmber of api call remaining
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
