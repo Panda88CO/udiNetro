@@ -306,8 +306,11 @@ class netroAccess(object):
             logging.debug(f"get_zone_info for zone - self.netro: {self.netro}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
-            logging.error(f"Exception get_zone_info {zone_nbr} {key} -{e} : {self.netro['active_zones']}")
-
+            if key in ['last_start', 'last_end', 'next_start', 'next_end'] and self.netro['active_zones'][zone_nbr]['status'] in ['NO SCHEDULE']:
+                return(None)
+            else:
+                logging.debug(f"Exception get_zone_info {zone_nbr} {key} -{e} : {self.netro['active_zones']}")
+                return(None)
     def update_info(self) -> str:
         try:
             logging.debug(f'get info {self.yourApiEndpoint}')
