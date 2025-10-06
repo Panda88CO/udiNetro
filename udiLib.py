@@ -183,38 +183,6 @@ def sync_state2ISY(self, state):
 #sync_state2ISY
 
 
-def display2ISY(self,state):
-    logging.debug(f'display2ISY : state {state}')
-    if state is not None:
-        if state == 'DisplayStateUnknown':
-            return(0)
-        elif state == 'DisplayStateOff':
-            return(1)
-        elif state == 'DisplayStateDim':
-            return(2) 
-        elif state == 'DisplayStateAccessory':
-            return(3)
-        elif state == 'DisplayStateOn':
-            return(4)
-        elif state == 'DisplayStateDriving':
-            return(5)
-        elif state == 'DisplayStateCharging':
-            return(6)
-        elif state == 'DisplayStateLock':
-            return(7)
-        elif state == 'DisplayStateSentry':
-            return(8)
-        elif state == 'DisplayStateDog':
-            return(9)
-        elif state == 'DisplayStateEntertainment':
-            return(10)     
-        elif state == 'invalid':
-            return(97)                                                                                  
-        else:          
-            logging.error('Unknown state passed {state}')
-            return(99)
-    else:
-        return(99)
 
 def code2ISY(self, state):
     logging.debug(f'code2ISY : state {state}')
@@ -312,26 +280,7 @@ def sentry2ISY(self, state) -> int:
         logging.debug(f'Error sentry2ISY {state}:  {e} ')
         return(99)
 
-def chargeState2ISY(self, state):
-    if state is not None:
-        if state in ['disconnected','ChargeStateDisconnected', 'DetailedChargeStateDisconnected']:
-            return(0)
-        elif state in ['nopower','ChargeStateNoPower', 'DetailedChargeStateNoPower']:
-            return(1)          
-        elif state in ['starting','ChargeStateStarting', 'DetailedChargeStateStarting']:
-            return(2)
-        elif state in ['charging',  'enable', 'ChargeStateCharging', 'DetailedChargeStateCharging']:
-            return(3)
-        elif state in ['stopped','ChargeStateStopped', 'DetailedChargeStateStopped']:
-            return(4)
-        elif state in ['complete','ChargeStateComplete', 'DetailedChargeStateComplete']:
-            return(5)
-        elif state in ['invalid',]:
-            return(97)        
-        else:
-            return(99) 
-    else:
-        return(99)
+
 
 def period2ISY(self, period):
     logging.debug('period2ISY {period}')

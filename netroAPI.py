@@ -216,9 +216,9 @@ class netroAccess(object):
     def update_controller_data(self):
         logging.debug('update_controller')
         self.update_info()
-        self.update_moisture_info(self.MOIST_DAYS)
-        self.update_events(self.EVENT_DAYS)
-        self.update_schedules(self.SCH_DAYS)
+        self.update_moisture_info()
+        self.update_schedules()
+        self.update_events()
 
     """
     def last_end_time(self):
@@ -420,7 +420,8 @@ class netroAccess(object):
     def update_moisture_info(self, days_back=None, zone_list=None ) -> dict:
         try:
             logging.debug(f'update_moisture')
-
+            if days_back is None:
+                days_back = self.MOIST_DAYS
             params = {}
             if isinstance(days_back, int):
                 start_str, stop_str = self.start_stop_dates(days_back)
@@ -533,6 +534,8 @@ class netroAccess(object):
         try:
             logging.debug(f'update_schedules ')
             params={}
+            if next_days is None:
+                next_days = self.SCH_DAYS
             if isinstance(next_days, int):
                 first_day, last_day = self.start_stop_dates(next_days)
                 params['start_date']=first_day
@@ -611,6 +614,8 @@ class netroAccess(object):
         try:
             logging.debug(f'update_events {self.serialID}')
             params={}
+            if days_back is None:
+                days_back = self.EVENT_DAYS 
             if isinstance(days_back, int):
                 start_str, stop_str = self.start_stop_dates(days_back)
                 params['start_date']=start_str

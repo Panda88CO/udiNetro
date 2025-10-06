@@ -108,7 +108,7 @@ class netroController(udi_interface.Node):
                 zone_addresses.append(address)
                 self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
         
-        self.netro_api.update_controller_data()
+        #self.netro_api.update_controller_data()
         self.updateISYdrivers()
         self.nodeReady = True
         logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
@@ -224,8 +224,8 @@ class netroController(udi_interface.Node):
         time.sleep(1)
         if res == 'ok':
             time.sleep(2)
-            self.netro_api.update_events()
-            self.netro_api.update_schedules()
+            self.netro_api.update_events(self.EVENT_DAYS)
+            self.netro_api.update_schedules(self.SCH_DAY)
             self.updateISYdrivers()
 
 
