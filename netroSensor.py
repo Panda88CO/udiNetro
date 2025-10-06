@@ -90,7 +90,7 @@ class netroSensor(udi_interface.Node):
     
 
     def updateISYdrivers(self):
-        logging.debug(f'updateISYdrivers')
+        logging.debug(f'updateISYdrivers {self.drivers}')
         if self.sensor_data is not None:
             self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),72)
             if self.temp_unit == 'C':

@@ -164,7 +164,7 @@ class netroController(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Controller  updateISYdrivers')
+            logging.info(f'Irrigation Controller  updateISYdrivers  {self.drivers}')
             
             #self.update_time()
             logging.debug(f"ST {self.netro_api.get_controller_info('status')} {self.ctrl_status2ISY(self.netro_api.get_controller_info('status'))}")
