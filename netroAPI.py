@@ -36,6 +36,7 @@ class netroAccess(object):
         self.data_ready = False
         self.DEV_TYPE = None
         self.netro = {}
+        self.netro['active_zones'] = {}
         self.update_info() #Get latest API data
         logging.debug(f'self.nero: {self.netro}')
         if 'device_type' in self.netro:
@@ -348,7 +349,7 @@ class netroAccess(object):
                     self.netro['offline_event'] = None
                     self.netro['online_event'] = None                    
 
-                    self.netro['active_zones'] = {}
+                    
                     for indx, zone in enumerate( self.netro['info'][self.DEV_TYPE]['zones']):
                         #self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
                         if zone['enabled']:
