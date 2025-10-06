@@ -130,7 +130,7 @@ class basicAPI(object):
 class netroAccess(basicAPI):
     def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False):
         super().__init__(serial_nbr)
-        
+
         logging.info(f'Netro API initializing')
         self.serialID = serial_nbr
         self.EVENT_DAYS = event_days
@@ -504,7 +504,7 @@ class netroAccess(basicAPI):
 
     def update_moisture_info(self, days_back=None, zone_list=None ) -> dict:
         try:
-            logging.debug(f'update_moisture')
+            logging.debug(f'update_moisture {days_back}')
             if days_back is None:
                 days_back = self.MOIST_DAYS
             params = {}
@@ -617,7 +617,7 @@ class netroAccess(basicAPI):
 
     def update_schedules(self, next_days=None, zone_list=None ) -> dict:
         try:
-            logging.debug(f'update_schedules ')
+            logging.debug(f'update_schedules {next_days}')
             params={}
             if next_days is None:
                 next_days = self.SCH_DAYS
@@ -697,7 +697,7 @@ class netroAccess(basicAPI):
         
     def update_events(self, days_back = None) -> dict:
         try:
-            logging.debug(f'update_events {self.serialID}')
+            logging.debug(f'update_events {self.serialID} {days_back}')
             params={}
             if days_back is None:
                 days_back = self.EVENT_DAYS 
