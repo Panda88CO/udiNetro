@@ -92,7 +92,7 @@ class netroSensor(udi_interface.Node):
     def updateISYdrivers(self):
         logging.debug(f'updateISYdrivers {self.drivers}')
         if self.sensor_data is not None:
-            self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),72)
+            self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),70)
             if self.temp_unit == 'C':
                 if self.netro_api.get_sensor_data('celsius') is None:
                     logging.debug('No temperature data')
@@ -117,7 +117,7 @@ class netroSensor(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 72},  #Moisture 0-100
+            {'driver': 'ST', 'value': 0, 'uom': 70},  #Moisture 0-100
             {'driver': 'TEMP', 'value': 0, 'uom': 4},  #outside_temp
             {'driver': 'GV2', 'value': 0, 'uom': 36},  #sunlight (LUX)
             {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
