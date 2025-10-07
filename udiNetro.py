@@ -94,9 +94,6 @@ class netroStart(udi_interface.Node):
             dev_type, name = api_access.netroType()
             del api_access
             time.sleep(1)   
-            #api_access = netroAccess(serial_nbr)
-            #dev_type, name = api_access.netroType()
-            #dev_type, name = netroAccess.netroType(self, serial_nbr)
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)

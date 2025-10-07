@@ -117,11 +117,11 @@ class netroSensor(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 70},  #Moisture 0-100
-            {'driver': 'TEMP', 'value': 0, 'uom': 4},  #outside_temp
-            {'driver': 'GV2', 'value': 0, 'uom': 36},  #sunlight (LUX)
+            {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
+            {'driver': 'TEMP', 'value': 99, 'uom': 25},  #outside_temp
+            {'driver': 'GV2', 'value': 99, 'uom': 25},  #sunlight (LUX)
             {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
-            {'driver': 'GV14', 'value': 0, 'uom': 51},  #battery
+            {'driver': 'GV14', 'value': 99, 'uom': 25},  #battery
             {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
             ]
