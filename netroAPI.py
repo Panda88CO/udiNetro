@@ -249,10 +249,8 @@ class netroAccess(basicAPI):
     def system_status(self):
         try:
             logging.debug('system_status')
-            if 'status' in self.netro['info'][self.DEV_TYPE]:
-                return(self.netro['info'][self.DEV_TYPE]['status'])
-            else:
-                return(None)
+            return(self.netro['status'])
+
         except KeyError as e:
             logging.error(f'ERROR - system_status {e} ')
             return(None)
@@ -270,7 +268,7 @@ class netroAccess(basicAPI):
         try:
             logging.debug('device_name')
             #if self.netro['device_type'] == 'controller':
-            return(self.netro['info'][self.DEV_TYPE]['name'])
+            return(self.netro['name'])
             #elif self.netro['device_type'] == 'sensor':
             #   return(self.netro['name'])            
             #else:
@@ -424,8 +422,7 @@ class netroAccess(basicAPI):
                     else:
                         self.netro['status'] = None
                     self.netro['name'] = res['data'][self.DEV_TYPE ]['name']
-                    self.netro['info'] = res['data'] 
-                    #self.netro['status'] = res['data']['status']
+
                     self.netro['total_zones'] = res['data'][self.DEV_TYPE]['zone_num']
 
                     self.netro['last_start'] = None
@@ -436,8 +433,7 @@ class netroAccess(basicAPI):
                     self.netro['online_event'] = None                    
 
                     
-                    for indx, zone in enumerate( self.netro['info'][self.DEV_TYPE]['zones']):
-                        #self.netro['total_zones'] = len(self.netro['info']['device']['zones'])
+                    for indx, zone in enumerate(res['data'][self.DEV_TYPE]['zones']):
                         if zone['enabled']:
                             self.netro['active_zones'][zone['ith']] = zone # includes name, smart, enabled etc
                             self.netro['active_zones'][zone['ith']]['status'] = 'NO SCHEDULE' # defauls active zones 
@@ -458,7 +454,6 @@ class netroAccess(basicAPI):
                     else:
                         self.netro['status'] = None
                     self.netro['name'] = res['data'][self.DEV_TYPE]['name']
-                    self.netro['info'] = res['data']
                 else:
                     self.netro['device_type'] = 'Unknown'
                     self.DEV_TYPE = 'unknown'
