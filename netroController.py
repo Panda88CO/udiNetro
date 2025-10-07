@@ -109,7 +109,7 @@ class netroController(udi_interface.Node):
                 self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
                 time.sleep(1) #stagger node creation to avoid flooding isy
         #self.netro_api.update_controller_data()
-        time.sleep(5)
+        time.sleep(2)
         self.nodeReady = True
         self.updateISYdrivers()
 
