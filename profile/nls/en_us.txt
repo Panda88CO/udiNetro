@@ -95,7 +95,7 @@ CMD-nlszone-Enable-NAME=Controller State
 smart-98=Smart Zone Enabled
 smart-99=Unknown
 schedule-98=No Schedule Defined
-schedule-99=Unknown
+schedule-99=No Data
 temp-98=No data
 temp-99=Unknown
 
