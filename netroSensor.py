@@ -17,6 +17,7 @@ class netroSensor(udi_interface.Node):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
+        self.hb = 0
         self.ISYforced = False
         self.serial_id = address
         self.primary = primary
