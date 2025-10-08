@@ -527,7 +527,7 @@ class netroAccess(basicAPI):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug(f'event 3 {zone_nbr} {self.netro["active_zones"]}'))
+                    logging.debug(f'event 3 {zone_nbr} {self.netro["active_zones"]}')
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
