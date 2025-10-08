@@ -145,18 +145,21 @@ class netroController(udi_interface.Node):
 
 
     def longPoll(self):
-        self.netro_api.update_controller_data()
-        self.updateISYdrivers()
-        for node in self.zone_nodes.values():
-            logging.debug(f'longPoll - updating zone node {node}')
-            if node.node_ready():
-                node.updateISYdrivers()
+        self.updateISYdata()
+        
         #pass
 
 
     def shortPoll(self):
         self.heartbeat()
     
+    def updateISYdata(self):
+        self.netro_api.update_controller_data()
+        self.updateISYdrivers()
+        for node in self.zone_nodes.values():
+            logging.debug(f'longPoll - updating zone node {node}')
+            if node.node_ready():
+                node.updateISYdrivers()
 
     #def forceUpdateISYdrivers(self):
 
@@ -196,7 +199,7 @@ class netroController(udi_interface.Node):
 
     def update (self, command):
         logging.info('update- called')
-
+        self.updateISYdata()
 
 
     def skip_days (self, command):
