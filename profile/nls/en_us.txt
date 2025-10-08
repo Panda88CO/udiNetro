@@ -115,5 +115,5 @@ ST-nlssensor-GV18-NAME=Data Report Time
 ST-nlssensor-GV14-NAME=Battery Level
 ST-nlssensor-GV15-NAME=Connection Status
 ST-nlssensor-GV19-NAME=Last Update
-CMD-nls_ctrl-Update-NAME=Update Data
+CMD-nlssensor-UPDATE-NAME=Update Data
 

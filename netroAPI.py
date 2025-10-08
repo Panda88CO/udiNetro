@@ -191,61 +191,6 @@ class netroAccess(basicAPI):
         return(start_day, end_day)
     
 
-    """
-    def status(self):
-        logging.debug('status : {}'.format(self.netro['info'][self.DEV_TYPE]))
-        try:
-            if 'status' in self.netro['info'][self.DEV_TYPE]:
-                return(self.netro['info'][self.DEV_TYPE]['status'])
-            else:
-                return(None)
-        except KeyError as e:
-            logging.error(f'ERROR - no key found {e}')
-            return(None)
-    
-    def total_zones(self):
-        logging.debug('total_zones')
-        return(self.netro['total_zones'])
-    
-    def zone_list(self):
-        logging.debug('zone_list')
-        return(self.netro['active_zones'])
-
-    def zone_info(self, zone_nbr=None):
-        try:
-            logging.debug('update_zone_info')
-
-            if self.netro['device_type'] == 'controller':
-                return(self.netro['active_zones'][zone_nbr])
-                                            
-        except KeyError as e:
-            logging.error(f'Error: update_zone_info - zone may not be enabled {e}')
-            return(None)
-
-
-    def zone_source(self, zone_nbr):
-        try:
-            logging.debug(f'zone_source {zone_nbr} {self.netro}')
-            if 'status' in self.netro['active_zones'][zone_nbr]:
-                return(self.netro['active_zones'][zone_nbr]['status'])
-            else:
-                return('NO SCHEDULE')
-
-        except KeyError as e:
-            logging.error(f'ERROR - zone_config {e} ')
- 
-    
-    def zone_status(self, zone_nbr):
-        try:
-            logging.debug(f'zone_status {zone_nbr} {self.netro}')
-            if 'status' in self.netro['active_zones'][zone_nbr]:
-                return(self.netro['active_zones'][zone_nbr]['status'])
-            else:
-                return('NO SCHEDULE')
-
-        except KeyError as e:
-            logging.error(f'ERROR - zone_config {e} ')
-    """
     def system_status(self):
         try:
             logging.debug('system_status')
@@ -255,15 +200,7 @@ class netroAccess(basicAPI):
             logging.error(f'ERROR - system_status {e} ')
             return(None)
 
-    """
-    def zone_config(self, zone_nbr) -> str:
-        try:
-            logging.debug(f'zone_config {zone_nbr}')
-            return(self.netro['active_zones'][zone_nbr]['smart'])
-
-        except KeyError as e:
-            logging.error(f'ERROR - zone_config {e} ')
-    """
+ 
     def device_name(self):
         try:
             logging.debug('device_name')
@@ -300,77 +237,7 @@ class netroAccess(basicAPI):
         self.update_schedules()
         self.update_events()
 
-    """
-    def last_end_time(self):
-        logging.debug('last_end_time {}'.format(self.netro['last_end']))
-        try:
-            return(self.netro['last_end'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
-        
-    def last_start_time(self):
-        logging.debug('last_strart_time {}'.format(self.netro['last_start']))
-        try:
-            return(self.netro['last_start'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
- 
-    def next_end_time(self):
-        logging.debug('next_end_time {}'.format(self.netro['next_end']))
-        try:
-            return(self.netro['next_end'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
-        
-    def next_start_time(self):
-        logging.debug('next_start_time {}'.format(self.netro['next_start']))
-        try:
-            return(self.netro['next_start'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
 
-    def last_offline_event(self):
-        logging.debug(f'last_offline_event {self.netro}')
-        try:
-            return(self.netro['offline_event'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
-        
-    def last_online_event(self):
-        logging.debug(f'last_online_event {self.netro}')
-        try:
-            return(self.netro['online_event'])
-        except KeyError as e:
-            logging.error(f'EXCEPTION - {e}')
-            return(None)
-    
-
-    def get_battery_level(self):
-        logging.debug('get_battery_level {}'.format(self.netro['info'][self.DEV_TYPE]))
-        if 'battery_level' in self.netro['info'][self.DEV_TYPE]:
-            return(round(self.netro['info'][self.DEV_TYPE]['battery_level']*100,1))
-        else:
-            return(None)
-
-    def apicalls_remaining(self):
-        logging.debug('apicalls_remaining {}'.format(self.netro))
-        if 'calls_remaining' in self.netro:
-            return(self.netro['calls_remaining'])
-        else:
-            return(None)
-        
-    def last_API(self):
-        logging.debug('last_API {}'.format(self.netro['last_api_time']))
-        if 'last_api_time' in self.netro:
-            return(self.netro['last_api_time'])
-        else:
-            return(None)     
-    """
     def get_controller_info(self, key):
         try:
             logging.debug(f'get_controller_info; {key} = {self.netro[key]}  {self.netro}')
@@ -660,7 +527,7 @@ class netroAccess(basicAPI):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug('event 3 {} {}'.format(zone_nbr, json.dumps(self.netro['active_zones'], indent=4)))
+                    logging.debug(f'event 3 {zone_nbr} {self.netro["active_zones"]}'))
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
@@ -674,7 +541,7 @@ class netroAccess(basicAPI):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug(f'event 4 {zone_nbr} {json.dumps(self.netro["active_zones"], indent=4)}')
+                    logging.debug(f'event 4 {zone_nbr} {self.netro["active_zones"]}')
                     if isinstance(zone_nbr, int):
                         if 'last_end' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
