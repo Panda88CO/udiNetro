@@ -86,6 +86,7 @@ class netroSensor(udi_interface.Node):
         self.updateISYdrivers()
 
     def shortpoll(self):
+        self.heartbeat()
         pass # heartbeat 
     
 

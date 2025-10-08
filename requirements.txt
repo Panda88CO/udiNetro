@@ -1,0 +1,5 @@
+udi_interface>=3.3.16
+requests>=2.33.4
+paho-mqtt>=2.1.0
+
+
