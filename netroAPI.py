@@ -435,7 +435,7 @@ class netroAccess(basicAPI):
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
                         self.netro['active_zones'][zone]['source'] = sch_source
                         self.netro['active_zones'][zone]['status'] = sch_status  
-                        logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
+                        #logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
                     if self.netro['next_start'] is None:
                         self.netro['next_start'] = sch_start_time
                     elif sch_start_time < self.netro['next_start']:
@@ -527,7 +527,7 @@ class netroAccess(basicAPI):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug(f'event 3 {zone_nbr} {self.netro["active_zones"]}')
+                    #logging.debug(f'event 3 {zone_nbr} {self.netro["active_zones"]}')
                     if isinstance(zone_nbr, int):
                         if 'last_start' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_start' ] = time
@@ -541,7 +541,7 @@ class netroAccess(basicAPI):
                     match = re.search(r'zone (\d+)', e_data['message'] )
                     if match:
                         zone_nbr = int(match.group(1))
-                    logging.debug(f'event 4 {zone_nbr} {self.netro["active_zones"]}')
+                    #logging.debug(f'event 4 {zone_nbr} {self.netro["active_zones"]}')
                     if isinstance(zone_nbr, int):
                         if 'last_end' not in self.netro['active_zones'][zone_nbr]:
                             self.netro['active_zones'][zone_nbr]['last_end' ] = time
