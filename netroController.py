@@ -73,6 +73,7 @@ class netroController(udi_interface.Node):
         logging.debug("check_for_planned_schedules  executed.")
         time_now = int(time.time())
         if isinstance(self.netro_api.get_controller_info('next_start'), int) and isinstance(self.netro_api.get_controller_info('last_end'), int):
+            logging.debug(f"schedule dataAG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
             if time_now >= self.netro_api.get_controller_info('next_start')or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.get_controller_info('last_end')): #:                
                 logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
                 logging.debug(f"schedule dataBG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")

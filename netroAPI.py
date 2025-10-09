@@ -435,15 +435,15 @@ class netroAccess(basicAPI):
                         self.netro['active_zones'][zone]['next_end'] = sch_end_time
                         self.netro['active_zones'][zone]['source'] = sch_source
                         self.netro['active_zones'][zone]['status'] = sch_status  
-                    logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
-                if self.netro['next_start'] is None:
-                    self.netro['next_start'] = sch_start_time
-                elif sch_start_time < self.netro['next_start']:
-                    self.netro['next_start'] = sch_start_time 
-                if self.netro['next_end'] is None:
-                    self.netro['next_end'] = sch_end_time
-                elif sch_end_time < self.netro['next_end']:
-                    self.netro['next_end'] = sch_end_time 
+                        logging.debug('Next schedule update: {}'.format(self.netro['active_zones'][zone]))
+                    if self.netro['next_start'] is None:
+                        self.netro['next_start'] = sch_start_time
+                    elif sch_start_time < self.netro['next_start']:
+                        self.netro['next_start'] = sch_start_time 
+                    if self.netro['next_end'] is None:
+                        self.netro['next_end'] = sch_end_time
+                    elif sch_end_time < self.netro['next_end']:
+                        self.netro['next_end'] = sch_end_time 
             logging.debug(f'next_start {self.netro["next_start"]} next_end {self.netro["next_end"]}')
 
                 
