@@ -129,6 +129,15 @@ class netroZone(udi_interface.Node):
         logging.debug(f'set_watering {status}')
 
 
+    def stop_water_all (self, command=None):
+        logging.info('stop_water called')
+        res = self.netro_api.stop_watering()
+        time.sleep(1)
+        if res == 'ok':
+            time.sleep(2)
+            self.netro_api.update_events()
+            self.netro_api.update_schedules()
+            self.updateISYdrivers()
 
 
 
@@ -136,7 +145,7 @@ class netroZone(udi_interface.Node):
     commands = { 
                  'Update' : update,
                  'Water' : water_control,
-                 #'SkipDays' : skip_days,
+                 'StopWater' : stop_water_all,
                  #'Enable' : enable,
                 }
 

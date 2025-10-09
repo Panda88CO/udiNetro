@@ -73,7 +73,7 @@
          </sends>
          <accepts>
             <cmd id="Water" >   
-               <!--<p id="StartStop" editor="StartStop" />-->
+               <p id="StopWater" />
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >

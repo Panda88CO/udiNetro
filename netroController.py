@@ -224,7 +224,7 @@ class netroController(udi_interface.Node):
                 time.sleep(1)
                 self.CO_setDriver('ST', self.netro_api.get_status(), 25)
 
-    def stop_water (self, command=None):
+    def stop_water_all (self, command=None):
         logging.info('stop_water called')
         res = self.netro_api.stop_watering()
         time.sleep(1)
@@ -240,7 +240,7 @@ class netroController(udi_interface.Node):
                  'Update' : update,
                  'SkipDays' : skip_days,
                  'Enable' : enable,
-                 'StopWater' : stop_water,
+                 'StopWater' : stop_water_all,
                 }
 
     drivers = [
