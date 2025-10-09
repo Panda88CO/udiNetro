@@ -70,7 +70,7 @@ class netroController(udi_interface.Node):
 
     def check_for_planned_schedules(self):
         # Place the code you want to run every 30 seconds here
-        logging.debug("check_for_planned_schedules  executed.")
+        logging.debug("check_for_planned_schedules executed.")
         time_now = int(time.time())
         if isinstance(self.netro_api.get_controller_info('next_start'), int) and isinstance(self.netro_api.get_controller_info('last_end'), int):
             logging.debug(f"schedule dataAG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
