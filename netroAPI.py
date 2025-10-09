@@ -4,6 +4,7 @@ import time
 import json
 #from threading import Lock
 from datetime import timedelta, datetime, timezone
+from threading import Lock
 #from basic_api import basic_api
 import numpy as np
 import re
@@ -137,7 +138,7 @@ class netroAccess(basicAPI):
         self.MOIST_DAYS = moist_days
         self.SCH_DAYS = sch_days
         self.defined_schedules = 0
-        
+        self.data_access = Lock()
         self.data_ready = False
         self.DEV_TYPE = None
         self.netro = {}
@@ -216,14 +217,17 @@ class netroAccess(basicAPI):
 
     def extractAPIinfo(self, res) -> int:
         try:
+            self.data_access.acquire()
             date_time_str = res['meta']['last_active']
             logging.debug('extractAPIinfo {}'.format(json.dumps(res['meta'], indent=4)))
             unix_time = self.daytimestr2epocTime(date_time_str)
             self.netro['last_api_time'] = unix_time     
             self.netro['calls_remaining'] = res['meta']['token_remaining']   
+            self.data_access.release()
             return('ok')
         except Exception as e:
             logging.error(f'ERROR extractAPIinfo: {e} ')
+            self.data_access.release()
             return(None)
 
     def api_last_update(self) -> int:
@@ -249,15 +253,15 @@ class netroAccess(basicAPI):
     def get_zone_info(self, zone_nbr, key):
         try:
             #logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro}")
-            logging.debug(f"get_zone_info for zone {zone_nbr} : {key}: {self.netro['active_zones'][zone_nbr]}")
+            logging.debug(f"get_zone_info for zone {zone_nbr} : key: {key}: {self.netro['active_zones'][zone_nbr]}")
             logging.debug(f"get_zone_info for zone - self.netro: {self.netro}")
             return(self.netro['active_zones'][zone_nbr][key])
         except KeyError as e:
             if key in ['last_start', 'last_end', 'next_start', 'next_end']:
-                logging.debug(f"No schedule or events for zone {zone_nbr} {key}")
+                logging.debug(f"No schedule or events for zone {zone_nbr} key: {key}")
                 return(None)
             else:
-                logging.debug(f"Exception get_zone_info {zone_nbr} {key} -{e} : {self.netro['active_zones']}")
+                logging.debug(f"Exception get_zone_info {zone_nbr} key: {key} -{e} : {self.netro['active_zones']}")
                 return(None)
     def update_info(self) -> str:
         try:
@@ -269,7 +273,7 @@ class netroAccess(basicAPI):
                 self.extractAPIinfo(res)
                 logging.debug('res = {}'.format(json.dumps(res['data'], indent=4)))    
 
-
+                self.data_access.acquire()
                 if 'device' in res['data']:
                     self.DEV_TYPE = 'device'
                     logging.debug(f"Coltroller selected {res['data'][self.DEV_TYPE ]['status']}") # controller
@@ -325,6 +329,7 @@ class netroAccess(basicAPI):
                     self.netro['device_type'] = 'Unknown'
                     self.DEV_TYPE = 'unknown'
                     return('error')
+                self.data_access.release()
                 logging.debug(f'self.netro {self.netro}')
 
                 return(status)
@@ -332,12 +337,14 @@ class netroAccess(basicAPI):
                 return(None)
         except Exception as e:
             logging.error(f'Exception update_info {e} ')
+            self.data_access.release()  
             return(None)
         
 
     def _process_moisture_info(self, data):
         try:
             logging.debug(f'_process_moisture_info {json.dumps(data, indent=4)}')
+            self.data_access.acquire()
             now_obj = datetime.now()
             if len(data)>0:
                 for indx, m_data in enumerate(data):
@@ -358,8 +365,10 @@ class netroAccess(basicAPI):
                     f = np.polyfit(x,y, deg=1)
                     self.netro['active_zones'][zone]['polyfit'] = f
                     #logging.debug(f'moisture slope {f[0]}')
+            self.data_access.release()
             logging.debug(f' after processing moisture data {self.netro}')
         except KeyError as e:
+            self.data_access.release()
             logging.error(f'ERROR parcing moisture data: {e}')                    
 
 
@@ -394,7 +403,15 @@ class netroAccess(basicAPI):
         logging.debug(f'moisture {zone_nbr}')
         try:
             if 'moisture' in self.netro['active_zones'][zone_nbr]:
-                return(self.netro['active_zones'][zone_nbr]['moisture'][1])
+                logging.debug(f'moisture data {self.netro["active_zones"][zone_nbr]["moisture"]} , len {len(self.netro["active_zones"][zone_nbr]["moisture"])}')
+                dat  = self.netro['active_zones'][zone_nbr]['moisture']
+                min_day = 30
+                moinsture = None
+                for day in self.netro['active_zones'][zone_nbr]['moisture']:
+                    if day < min_day:
+                        min_day = day
+                        moisture = dat[day]
+                return(moisture)
             else:
                 return(None)
         except KeyError as e:
@@ -415,7 +432,8 @@ class netroAccess(basicAPI):
     def _process_schedule_info(self, data):
         try:
             logging.debug(f'_process_schedule_info data {json.dumps(data, indent=4)}')   
-            logging.debug(f'_process_schedule_info self.netro {self.netro}')   
+            logging.debug(f'_process_schedule_info self.netro {self.netro}')
+            self.data_access.acquire()
             for indx, sch_data in enumerate(data):
                 sch_start_time = self.daytimestr2epocTime(sch_data['start_time'])
                 sch_end_time = self.daytimestr2epocTime(sch_data['end_time'])
@@ -444,11 +462,13 @@ class netroAccess(basicAPI):
                         self.netro['next_end'] = sch_end_time
                     elif sch_end_time < self.netro['next_end']:
                         self.netro['next_end'] = sch_end_time 
+            self.data_access.release()
             logging.debug(f'next_start {self.netro["next_start"]} next_end {self.netro["next_end"]}')
 
                 
             logging.debug(f'after _process_schedule_info {self.netro}')
         except KeyError as e:
+            self.data_access.release()  
             logging.error(f'ERROR parsing schedule data {e}')
 
 
@@ -510,6 +530,7 @@ class netroAccess(basicAPI):
     def _process_event_data(self, data):
         try:            
             logging.debug(f'_process_event_data {json.dumps(data, indent=4)}')   
+            self.data_access.acquire()
             for indx, e_data in enumerate(data):
                 zone_nbr = None
                 time = self.daytimestr2epocTime(e_data['time'])
@@ -553,8 +574,10 @@ class netroAccess(basicAPI):
                             self.netro['last_end'] = self.netro['active_zones'][zone_nbr]['last_end' ]                             
                 else:
                     logging.error(f'ERROR - unsupported event {e_data} ')
+            self.data_access.release()
             logging.debug(f'after parsing event data {self.netro}')
         except KeyError as e:
+            self.data_access.release()
             logging.error(f'ERROR parsing event data {e}')
 
         
@@ -673,6 +696,8 @@ class netroAccess(basicAPI):
         except Exception as e:
             logging.error(f'Exception set_skip_water_days {self.serialID} {e} ')
             return(None)        
+        
+
     ####################
 
     def update_sensor_data(self) -> dict:
@@ -688,8 +713,10 @@ class netroAccess(basicAPI):
                 params['end_date']=stop_str
                 status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
                 logging.debug(f'status {status}  tmp_res{tmp_res}')
-                self.extractAPIinfo(tmp_res)                
+                self.extractAPIinfo(tmp_res)
+
                 if status == 'ok':
+                    self.data_access.acquire()
                     logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
                     if len(tmp_res['data']['sensor_data']) > 0:
                         res = tmp_res['data']['sensor_data'][0]
@@ -701,12 +728,13 @@ class netroAccess(basicAPI):
                         #self.netro['sensor_data'] = res
                         #self.netro['sensor_data']['time'] = self.daytimestr2epocTime(res['time'])
                         logging.debug(f'res = {json.dumps(res, indent=4)}')
-                        
+                    self.data_access.release()
                 
                 return(res)
             else:
                 return(None)
         except Exception as e:
+            self.data_access.release()
             logging.error(f'Exception update_sensor_data {self.serialID} {e} ')
             return(None)
 
