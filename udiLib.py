@@ -21,10 +21,11 @@ import numbers
 from datetime import datetime
 
 
-STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99, 'VALID':0, 'EXECUTING':1, 'EXECUTED':2,'NO SCHEDULE':98}
+STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99, 'VALID':0, 'EXECUTING':1, 'EXECUTED':2,'NO SCHEDULE':98, None:99}
 ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 
 def ctrl_status2ISY(self, status_str) -> int:
+    logging.debug(f'ctrl_status2ISY : {status_str}')
     return(STATUS_CODE[status_str])
 
 def zoneconfig2ISY(self,config_str) -> int:
@@ -182,38 +183,6 @@ def sync_state2ISY(self, state):
 #sync_state2ISY
 
 
-def display2ISY(self,state):
-    logging.debug(f'display2ISY : state {state}')
-    if state is not None:
-        if state == 'DisplayStateUnknown':
-            return(0)
-        elif state == 'DisplayStateOff':
-            return(1)
-        elif state == 'DisplayStateDim':
-            return(2) 
-        elif state == 'DisplayStateAccessory':
-            return(3)
-        elif state == 'DisplayStateOn':
-            return(4)
-        elif state == 'DisplayStateDriving':
-            return(5)
-        elif state == 'DisplayStateCharging':
-            return(6)
-        elif state == 'DisplayStateLock':
-            return(7)
-        elif state == 'DisplayStateSentry':
-            return(8)
-        elif state == 'DisplayStateDog':
-            return(9)
-        elif state == 'DisplayStateEntertainment':
-            return(10)     
-        elif state == 'invalid':
-            return(97)                                                                                  
-        else:          
-            logging.error('Unknown state passed {state}')
-            return(99)
-    else:
-        return(99)
 
 def code2ISY(self, state):
     logging.debug(f'code2ISY : state {state}')
@@ -311,26 +280,7 @@ def sentry2ISY(self, state) -> int:
         logging.debug(f'Error sentry2ISY {state}:  {e} ')
         return(99)
 
-def chargeState2ISY(self, state):
-    if state is not None:
-        if state in ['disconnected','ChargeStateDisconnected', 'DetailedChargeStateDisconnected']:
-            return(0)
-        elif state in ['nopower','ChargeStateNoPower', 'DetailedChargeStateNoPower']:
-            return(1)          
-        elif state in ['starting','ChargeStateStarting', 'DetailedChargeStateStarting']:
-            return(2)
-        elif state in ['charging',  'enable', 'ChargeStateCharging', 'DetailedChargeStateCharging']:
-            return(3)
-        elif state in ['stopped','ChargeStateStopped', 'DetailedChargeStateStopped']:
-            return(4)
-        elif state in ['complete','ChargeStateComplete', 'DetailedChargeStateComplete']:
-            return(5)
-        elif state in ['invalid',]:
-            return(97)        
-        else:
-            return(99) 
-    else:
-        return(99)
+
 
 def period2ISY(self, period):
     logging.debug('period2ISY {period}')
@@ -350,7 +300,7 @@ def CO_setDriver(self, key, value, Unit=None):
     logging.debug(f'CO_setDriver : {key} {value} {Unit}')
     try:
         if value is None:
-            #logging.debug('None value passed = seting 99, UOM 25')
+            logging.debug('None value passed = seting 99, UOM 25')
             self.node.setDriver(key, 99, True, True, 25)
         elif isinstance(value, str) and value == 'invalid':
             self.node.setDriver(key, 97, True, True, 25)
@@ -360,7 +310,8 @@ def CO_setDriver(self, key, value, Unit=None):
             else:
                 self.node.setDriver(key, value)
     except ValueError: #A non number was passed 
-        self.node.setDriver(key, 99, True, True, 25)
+        logging.debug(f'Exception CO_setDriver : {key} {value} {Unit}')
+        #self.node.setDriver(key, 99, True, True, 25)
         
 
 

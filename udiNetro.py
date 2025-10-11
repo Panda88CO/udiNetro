@@ -13,16 +13,17 @@ import json
 import re
 import time
 
-from netroAPI import netroAccess
+from netroAPI import netroAccess, basicAPI
 from datetime import timedelta, datetime
 #from tzlocal import get_localzone
 from netroController import netroController
 from netroSensor import netroSensor
-VERSION = '0.0.3'
+
+VERSION = '0.0.16'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
-
+    #
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
         logging.info(f'_init_ Netro Controller {VERSION}')
@@ -30,9 +31,9 @@ class netroStart(udi_interface.Node):
         logging.debug('Init Message system')
         self.poly = polyglot
         self.node = None
-        self.EVENT_DAYS = -7
+        self.EVENT_DAYS = -3
         self.SCH_DAYS = 7
-        self.MOIST_DAYS = -5
+        self.MOIST_DAYS = -4
         self.paramsProcessed = False
         self.customParameters = Custom(self.poly, 'customparams')
         #self.portalData = Custom(self.poly, 'customNSdata')
@@ -60,8 +61,6 @@ class netroStart(udi_interface.Node):
         self.poly.updateProfile()
         self.poly.ready()
         self.node = self.poly.getNode(address)
-        self.tempUnit = 0 # C
-        self.distUnit = 0 # KM
         self.customParam_done = False
         self.config_done = False
 
@@ -79,7 +78,6 @@ class netroStart(udi_interface.Node):
         while not self.customParam_done  or not self.config_done :
         #while not self.config_done and not self.portalReady :
             logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
-            #logging.debug(f' 1 2 3: {} {} {} {}'.format(self.customParam_done, , self.config_done))
             time.sleep(1)
         
         logging.debug(f'Detected devices : {self.serialID_list}')
@@ -89,39 +87,46 @@ class netroStart(udi_interface.Node):
             time.sleep(10)
             sys.exit()
    
-        api = {}
-        for indx, device in enumerate (self.serialID_list):
-            logging.debug(f'Instanciating nodes for {device}')
-            
-            api[indx] = netroAccess(device, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
-            name = api[indx].device_name()
-            logging.debug(f'Name : {name}, {api[indx].device_type() }')
-            if api[indx].device_type() == 'controller':
-                name = self.poly.getValidName(api[indx].device_name())
-                self.node_dict[device] = netroController(self.poly, device, device, name,api[indx])
-                assigned_primary_addresses.append(device)
-            elif api[indx].device_type() == 'sensor':
-                name = self.poly.getValidName(api[indx].device_name())
-                self.node_dict[device] = netroSensor(self.poly, device, device, name , api[indx] )
-                assigned_primary_addresses.append(device)
-        
-           
+        logging.debug(f'Instanciating nodes for {self.serialID_list}')
+        for indx, serial_nbr in enumerate(self.serialID_list):
+            logging.debug(f'Instanciating nodes for {serial_nbr}')
+            api_access = basicAPI(serial_nbr)
+            dev_type, name = api_access.netroType()
+            del api_access
+            time.sleep(1)   
+            logging.debug(f'Name : {name}, {dev_type }')
+            if dev_type == 'controller':
+                name = self.poly.getValidName(name)
+                self.node_dict[serial_nbr] = netroController(self.poly, serial_nbr, serial_nbr, name, self.Temp_unit, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
+                assigned_primary_addresses.append(serial_nbr)
+            elif dev_type == 'sensor':
+                name = self.poly.getValidName(name)
+                self.node_dict[serial_nbr] = netroSensor(self.poly, serial_nbr, serial_nbr, name, self.Temp_unit )
+                assigned_primary_addresses.append(serial_nbr)
+            elif dev_type == 'error':
+                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated ERROR {name}'
+            else:
+                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated  ERROR'
+            time.sleep(1)
+
+        time.sleep(5)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
         for indx, node  in enumerate(self.nodes_in_db):
             #node = self.nodes_in_db[nde]
-            logging.debug(f'Scanning db for node : {node}')
+            logging.debug(f'Scanning db for unused primary nodes  : {node}')
             if node['primaryNode'] not in assigned_primary_addresses:
                 logging.debug('Removing node : {} {}'.format(node['name'], node))
                 self.poly.delNode(node['address'])
             
-
+    
         self.update_all_drivers()
 
         self.poly.Notices['done'] = 'Initialization process completed'
         self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
+
 
 
 
@@ -162,12 +167,12 @@ class netroStart(udi_interface.Node):
                 logging.warning('No serialID found')
                 self.customParameters['SERIALID'] = 'Input list of serial numbers (space separated)'
                 self.poly.Notices['SERIALID'] = 'SerialID(s) not specified'
-    
-            if 'EVENTDAYS' in userParams:
-                if  isinstance(self.customParameters['EVENTDAYS'], int):
-                    self.EVENTDAYS = self.customParameters['EVENTDAYS']
+            
+            if 'EVENT_DAYS' in userParams:
+                if  isinstance(self.customParameters['EVENT_DAYS'], int):
+                    self.EVENT_DAYS = self.customParameters['EVENT_DAYS']
             else:
-                self.EVENTDAYS = -5
+                self.EVENT_DAYS = -5
     
             if 'SCH_DAYS' in userParams:
                 if  isinstance(self.customParameters['SCH_DAYS'], int):
@@ -180,13 +185,21 @@ class netroStart(udi_interface.Node):
             else:
                  self.MOIST_DAYS = -3
             self.customParam_done = True
-
+            if 'TEMP' in userParams:
+                if  self.customParameters['MOIST_DAYS'][0] in ['c', 'C']:
+                    self.Temp_unit = 'C'
+                else:
+                    self.Temp_unit = 'F'
+            else:
+                self.Temp_unit = 'F'
+            self.customParam_done = True
             logging.debug('customParamsHandler finish ')
         except Exception as e:
             logging.error(f'Error detected during custome Param parsing {e}')
         
    
 
+    '''
     def start(self):
         logging.info('start main node')
         self.poly.Notices.clear()
@@ -233,7 +246,7 @@ class netroStart(udi_interface.Node):
         self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
-
+    '''
 
     def validate_params(self):
         logging.debug('validate_params: {}'.format(self.Parameters.dump()))

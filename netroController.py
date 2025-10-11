@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -8,28 +9,40 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 import time
+from netroAPI import netroAccess
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
     from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name, api):
+    def __init__(self, polyglot,  primary, address, name, temp_unit='F', eventdays=-7, moistdays=-3, schdays=7):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
-  
+        self.hb = 0
+        self.serial_id = address
         self.ISYforced = False
-        self.netro_api = api
         self.primary = primary
         self.address = address
         self.name = name
+        self.temp_unit = temp_unit
+        self.EVENTDAYS = eventdays
+        self.MOIST_DAYS = moistdays
+        self.SCH_DAYS = schdays
         self.nodeReady = False
+        self.system_ready = False
+        self._stop_thread = threading.Event()
+        self._thread = threading.Thread(target=self._background_task, daemon=True)
+        self._thread.start()
+
         #self.node = self.poly.getNode(address)
         self.n_queue = []
+        self.customParam_done = False
+        self.config_done= False        
+        self.nodes_in_db = None
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        #polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
-        #polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
+        self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
@@ -39,28 +52,84 @@ class netroController(udi_interface.Node):
         logging.info('_init_ Netro Irrigation Controller Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
         
+    def configDoneHandler(self):
+        logging.debug('configDoneHandler - config_done')
+        # We use this to discover devices, or ask to authenticate if user has not already done so
+        self.poly.Notices.clear()
+        self.nodes_in_db = self.poly.getNodesFromDb()
+        self.config_done= True
+
+    def _background_task(self):
+        while not self._stop_thread.is_set():
+            try:
+                if self.system_ready:# Call the function you want to run every 30 seconds
+                    self.check_for_planned_schedules()
+            except Exception as e:
+                logging.error(f"Error in background thread: {e}")
+            self._stop_thread.wait(30)  # Wait 30 seconds or until stopped
+
+    def check_for_planned_schedules(self):
+        # Place the code you want to run every 30 seconds here
+        logging.debug("check_for_planned_schedules executed.")
+        time_now = int(time.time())
+        if isinstance(self.netro_api.get_controller_info('next_start'), int) and isinstance(self.netro_api.get_controller_info('last_end'), int):
+            logging.debug(f"schedule dataAG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
+            # Need statemachine 
+            if time_now >= self.netro_api.get_controller_info('next_start')or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.get_controller_info('last_end')): #:                
+                logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
+                logging.debug(f"schedule dataBG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
+                self.netro_api.update_controller_data()
+                # Update ISY drivers with the latest data
+                self.updateISYdrivers()
+
+        
 
     def start(self):                
-        logging.debug('Start Netro Irrigation Node')  
+        logging.debug(f'Start Netro Irrigation Node {self.serial_id}')  
+
+        while not self.config_done and not self.nodeReady:
+            time.sleep(1)
+            logging.info(f'Waiting for system to initialize {self.customParam_done} {self.config_done}')
         #self.CO_setDriver('ST', 1)
+        self.netro_api = netroAccess(self.serial_id, self.EVENTDAYS, self.MOIST_DAYS, self.SCH_DAYS)
         self.zone_nodes = {}
-        active_zones = self.netro_api.zone_list()
-        logging.debug(f'Adding   {len(active_zones)} {active_zones}')
-        for key, tmp_zone in active_zones.items():
-            logging.debug(f'Key {key} Selected Zone {tmp_zone}')
-            name = self.poly.getValidName(tmp_zone['name'])
+        zone_addresses = [self.primary]
+        if self.netro_api.get_controller_info('total_zones') == 1:
+            name = 'Hose Zone'
+            address = self.poly.getValidAddress(self.address[-10:]+'_z1')
+            zone_addresses.append(address)
+            self.zone_nodes[1] = netroZone(self.poly, self.address, address, name , self.netro_api )
+        else:
+            active_zones = self.netro_api.get_controller_info('active_zones')
+            logging.debug(f'Adding   {len(active_zones)} {active_zones}')
+            for key, tmp_zone in active_zones.items():
+                logging.debug(f'Key {key} Selected Zone {tmp_zone}')
+                name = self.poly.getValidName(tmp_zone['name'])
 
-            address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
-            self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
+                address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
+                zone_addresses.append(address)
+                self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
+                time.sleep(1) #stagger node creation to avoid flooding isy
+        #self.netro_api.update_controller_data()
+        time.sleep(2)
         self.nodeReady = True
-        self.netro_api.update_controller_data()
         self.updateISYdrivers()
-        #self.update_time()
-    
 
+        logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
+        
+
+        #for indx, node  in enumerate(self.nodes_in_db):
+        #    logging.debug(f'Scanning db for node : {node}')
+        #    if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
+        #       logging.debug('Removing node : {} {}'.format(node['name'], node))
+        #       self.poly.delNode(node['address'])
+        self.system_ready = True
+            
     def stop(self):
         logging.debug('stop - Cleaning up')
-    
+        self._stop_thread.set()
+        if self._thread.is_alive():
+            self._thread.join()
     #def climateNodeReady (self):
     #    return(self.nodeReady )
     
@@ -68,22 +137,31 @@ class netroController(udi_interface.Node):
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
-    
-        if 'longPoll' in pollList: 
-            self.longPoll()
-            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
-                self.heartbeat()
-        if 'shortPoll' in pollList:
-            self.shortPoll()
+        if self.nodeReady:
+            if 'longPoll' in pollList: 
+                self.longPoll()
+                if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
+                    self.shortPoll()
+            if 'shortPoll' in pollList:
+                self.shortPoll()
 
 
     def longPoll(self):
-        pass
+        self.updateISYdata()
+        
+        #pass
 
 
     def shortPoll(self):
-        pass
-
+        self.heartbeat()
+    
+    def updateISYdata(self):
+        self.netro_api.update_controller_data()
+        self.updateISYdrivers()
+        for node in self.zone_nodes.values():
+            logging.debug(f'longPoll - updating zone node {node}')
+            if node.node_ready():
+                node.updateISYdrivers()
 
     #def forceUpdateISYdrivers(self):
 
@@ -93,21 +171,23 @@ class netroController(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Contrller  updateISYdrivers')
+            logging.info(f'Irrigation Controller  updateISYdrivers  {self.drivers}')
             
             #self.update_time()
-            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.status()))
-            self.CO_setDriver('GV1',len(self.netro_api.zone_list()))        
-            self.CO_setDriver('GV3',self.netro_api.last_end_time())
-            self.CO_setDriver('GV4',self.netro_api.next_start_time())
-            self.CO_setDriver('GV5',self.netro_api.last_offline_event())
-            self.CO_setDriver('GV6',self.netro_api.last_online_event())                  
-            self.CO_setDriver('GV16', self.netro_api.get_battery_level())
-            self.CO_setDriver('GV10', 0, 25)
-            self.CO_setDriver('GV11',0, 25)
-            self.CO_setDriver('GV17', self.netro_api.apicalls_reamaining())
-            #self.CO_setDriver('GV18',0)
-            self.CO_setDriver('GV19', self.netro_api.last_API)
+            logging.debug(f"ST {self.netro_api.get_controller_info('status')} {self.ctrl_status2ISY(self.netro_api.get_controller_info('status'))}")
+            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.get_controller_info('status')),25)
+            self.CO_setDriver('GV1',self.netro_api.get_controller_info('nbr_active_zones'),70)        
+            self.CO_setDriver('GV3',self.netro_api.get_controller_info('next_start'),151)
+            self.CO_setDriver('GV4',self.netro_api.get_controller_info('last_end'),151)
+            self.CO_setDriver('GV5',self.netro_api.get_controller_info('offline_event'),151)
+            self.CO_setDriver('GV6',self.netro_api.get_controller_info('online_event'),151)
+            bat_lvl = self.netro_api.get_controller_info('battery_level')
+            if bat_lvl is None:
+                self.CO_setDriver('GV16', 98, 25)
+            else:
+                self.CO_setDriver('GV16', bat_lvl , 52)
+            self.CO_setDriver('GV17', self.netro_api.get_controller_info('calls_remaining'),70)
+            self.CO_setDriver('GV19', self.netro_api.get_controller_info('last_api_time'),151)
         except Exception as e:
             logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
 
@@ -121,7 +201,7 @@ class netroController(udi_interface.Node):
 
     def update (self, command):
         logging.info('update- called')
-
+        self.updateISYdata()
 
 
     def skip_days (self, command):
@@ -143,9 +223,9 @@ class netroController(udi_interface.Node):
             res = self.netro_api.set_status(status)
             if res == 'ok':
                 time.sleep(1)
-                self.CO_setDriver('ST', self.netro_api.get_status())
+                self.CO_setDriver('ST', self.netro_api.get_status(), 25)
 
-    def stop_water (self, command=None):
+    def stop_water_all (self, command=None):
         logging.info('stop_water called')
         res = self.netro_api.stop_watering()
         time.sleep(1)
@@ -161,12 +241,12 @@ class netroController(udi_interface.Node):
                  'Update' : update,
                  'SkipDays' : skip_days,
                  'Enable' : enable,
-                 'StopWater' : stop_water,
+                 'StopWater' : stop_water_all,
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},   #Controller state
-            {'driver': 'GV1', 'value': 0, 'uom': 72},   #Nmber of enabled zones
+            {'driver': 'ST', 'value': 99, 'uom': 25},   #Controller state
+            {'driver': 'GV1', 'value': 0, 'uom': 70},   #Nmber of enabled zones
 
             #{'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Next Start Time
@@ -177,9 +257,9 @@ class netroController(udi_interface.Node):
 
 
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
-            #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
+            #{'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
             {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
-            {'driver': 'GV17', 'value': 0, 'uom': 72},  #Nmber of api call remaining
+            {'driver': 'GV17', 'value': 0, 'uom': 70},  #Nmber of api call remaining
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
 

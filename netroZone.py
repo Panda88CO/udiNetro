@@ -40,12 +40,14 @@ class netroZone(udi_interface.Node):
         self.nodeReady = True
         logging.info('_init_ Netro Irrigation Controlle Node COMPLETE')
         logging.debug(f'drivers ; {self.drivers}')
+        
 
     def start(self):                
         logging.debug(f'Start Netro Irrigation Controller Node {self.zone_nbr}') 
-
+        while not self.nodeReady:
+            time.sleep(1)
         #self.CO_setDriver('ST', 1)
-        self.nodeReady = True
+        #self.nodeReady = True
         self.updateISYdrivers()
         #self.update_time()
   
@@ -58,32 +60,42 @@ class netroZone(udi_interface.Node):
     def updateISYdrivers(self):
         try:
 
-            logging.info(f'Irrigation Contrller  updateISYdrivers {self.zone_nbr}: {self.drivers}')
+            logging.info(f'Zone  {self.zone_nbr} updateISYdrivers : {self.drivers}')
             
            #self.update_time()
-            logging.debug(f'Zone {self.zone_nbr} {self.netro_api.zone_status(self.zone_nbr)}')
-            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.zone_status(self.zone_nbr)))
-            self.CO_setDriver('GV0', self.zone_nbr)
-
-            self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.zone_config(self.zone_nbr)))        
-            self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr) )
-            self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr) )
-            if self.netro_api.zone_config(self.zone_nbr) in ['ASSISTANT', 'TIMER']:
-                self.CO_setDriver('GV4', self.netro_api.last_sch_start(self.zone_nbr), 151)
-                self.CO_setDriver('GV5', self.netro_api.last_sch_end(self.zone_nbr), 151)
-                self.CO_setDriver('GV6', self.netro_api.next_sch_start(self.zone_nbr), 151)
-                self.CO_setDriver('GV7', self.netro_api.next_sch_end(self.zone_nbr), 151)
-            else:
+            logging.debug(f"Zone {self.zone_nbr} {self.netro_api.get_zone_info(self.zone_nbr, 'status')}")
+            self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.get_zone_info(self.zone_nbr, 'status')), 25)
+            self.CO_setDriver('GV0', self.zone_nbr,70)
+            self.CO_setDriver('GV1',self.zoneconfig2ISY(self.netro_api.get_zone_info(self.zone_nbr, 'smart'))) 
+            self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr), 70)
+            self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr),70 )
+            logging.debug(f"Zone {self.zone_nbr} smart {self.netro_api.get_zone_info(self.zone_nbr, 'smart')}" )
+            if str(self.netro_api.get_zone_info(self.zone_nbr, 'status')) in ['NO_SCHEDULE']:
+                logging.debug(f"NO SCHEDULE FOR {self.zone_nbr}")
                 self.CO_setDriver('GV4', 98, 25)
                 self.CO_setDriver('GV5', 98, 25)
                 self.CO_setDriver('GV6', 98, 25)
                 self.CO_setDriver('GV7', 98, 25)
-
+                
+                
+            elif str(self.netro_api.get_zone_info(self.zone_nbr, 'smart')) in ['ASSISTANT', 'TIMER', 'SMART']: #why not smart?
+                logging.debug(f"SCHEDULE DEFINED FOR {self.zone_nbr}  {self.netro_api.netro}")
+                self.CO_setDriver('GV4', self.netro_api.get_zone_info(self.zone_nbr, 'last_start') , 151)
+                self.CO_setDriver('GV5', self.netro_api.get_zone_info(self.zone_nbr, 'last_end'), 151)
+                self.CO_setDriver('GV6', self.netro_api.get_zone_info(self.zone_nbr, 'next_start'), 151)
+                self.CO_setDriver('GV7', self.netro_api.get_zone_info(self.zone_nbr, 'next_end'), 151)
+            else:
+                logging.debug(f"SCHEDULE UNKNOWN {self.zone_nbr}")
+                self.CO_setDriver('GV4', 99, 25)
+                self.CO_setDriver('GV5', 99, 25)
+                self.CO_setDriver('GV6', 99, 25)
+                self.CO_setDriver('GV7', 99, 25)
+                
             #self.CO_setDriver('GV10', 0, 25)
             #self.CO_setDriver('GV11',0, 25)
 
             #self.CO_setDriver('GV18',0)
-            self.CO_setDriver('GV19',self.netro_api.api_last_update() )
+            self.CO_setDriver('GV19',self.netro_api.get_controller_info('last_api_time'),151 )
         except Exception as e:
             logging.error(f'updateISYdrivers Netro Irrigation Controller  failed: Nodes may not be 100% ready {e}')
 
@@ -117,6 +129,15 @@ class netroZone(udi_interface.Node):
         logging.debug(f'set_watering {status}')
 
 
+    def stop_water_all (self, command=None):
+        logging.info('stop_water called')
+        res = self.netro_api.stop_watering()
+        time.sleep(1)
+        if res == 'ok':
+            time.sleep(2)
+            self.netro_api.update_events()
+            self.netro_api.update_schedules()
+            self.updateISYdrivers()
 
 
 
@@ -124,7 +145,7 @@ class netroZone(udi_interface.Node):
     commands = { 
                  'Update' : update,
                  'Water' : water_control,
-                 #'SkipDays' : skip_days,
+                 'StopWater' : stop_water_all,
                  #'Enable' : enable,
                 }
 

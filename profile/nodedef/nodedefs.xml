@@ -6,9 +6,7 @@
          <st id="ST" editor="Enabled" />
       </sts>
       <cmds>
-         <sends>
-            <cmd id="DON" /> 
-            <cmd id="DOF" />          
+         <sends>    
          </sends>
          <accepts>
          </accepts>
@@ -25,10 +23,11 @@
          <st id="GV3" editor="unixtime" />  
          <st id="GV4" editor="unixtime" />
          <st id="GV5" editor="unixtime" />  
-         <st id="GV6" editor="unixtime" />         
-         <st id="GV16" editor="battery" />         
-         <!--<st id="GV10" editor="Sch_Source" />
-         <st id="GV11" editor="Sch_Status" />-->
+         <st id="GV6" editor="unixtime" />      
+         <!--<st id="GV14" editor="battery" />
+         <st id="GV10" editor="Sch_Source" />
+         <st id="GV15" editor="con_status" />-->   
+         <st id="GV16" editor="battery" />
          <st id="GV17" editor="count" /> 
          <!--<st id="GV18" editor="unixtime" /> Last event-->
          <st id="GV19" editor="unixtime" /> <!--Last api-->
@@ -74,7 +73,7 @@
          </sends>
          <accepts>
             <cmd id="Water" >   
-               <!--<p id="StartStop" editor="StartStop" />-->
+               <p id="StopWater" />
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
@@ -87,11 +86,15 @@
    <nodeDef id="sensor" nls="nlssensor">
       <editors />
       <sts>
-         <st id="ST" editor="Status" /> 
-         <st id="GV1" editor="Moisture"/>
+         <st id="ST" editor="Moisture" /> 
+         <st id="TEMP" editor="temmp"/>
          <st id="GV2" editor="Sunlight" />
-         <st id="GV3" editor="TEMP" />
-         <st id="GV4" editor="battery" />
+         <st id="GV18" editor="unixtime" />
+         <st id="GV14" editor="battery" />
+         <st id="GV15" editor="con_status" />   
+         <st id="GV19" editor="unixtime" />
+
+
       </sts>
       <cmds>
          <sends>

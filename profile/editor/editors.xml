@@ -1,6 +1,6 @@
 <editors> 
   <editor id="IrrState" > 
-     <range  uom="25" subset="0,1,2,3,4,5,6,99"  nls='IrrState'/>
+     <range  uom="25" subset="0,1,2,3,4,5,6,7,99"  nls='IrrState'/>
   </editor>
     <editor id="Enabled" > 
      <range  uom="25" subset="0,1,99"  nls='Enabled'/>
@@ -8,13 +8,20 @@
       <editor id="Status" > 
      <range  uom="25" subset="0,1,99"  nls='Status'/>
   </editor>
+  <editor id="con_status" > 
+     <range  uom="25" subset="0-3,99"  nls='con_status'/>
+  </editor>
   <editor id="Nbr_Zones" > 
-     <range  uom="72" min="0" max="16" />
+     <range  uom="70" min="0" max="16" />
   </editor>
   <editor id="count" > 
-     <range  uom="72" min="0" max="2000" />
+     <range  uom="70" min="0" max="2000" />
   </editor>
-
+<editor id="temp"> 
+        <range uom="4" min="-40" max="105" prec="1" />
+        <range uom="17" min="-40" max="221" prec="1" />        
+        <range uom="25" subset="98,99" nls="temp" />
+  </editor>
     <editor id="setEnable" > 
      <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>
@@ -63,7 +70,7 @@
      <range  uom="36" min="0" max="10000" prec="1" />
   </editor>
     <editor id="battery" > 
-     <range  uom="70" min="0" max="100" />
+     <range  uom="51" min="0" max="100" />
       <range  uom="25" subset="98,99" nls="battery" />
   </editor>
 
@@ -75,7 +82,7 @@
   </editor> 
     <editor id="unixtime" > 
       <range  uom="151" min="1748387733" max="102063945730" />
-      <range  uom="25" subset="98,99" nls="smart" />
+      <range  uom="25" subset="98,99" nls="schedule" />
   </editor>
 
 </editors> 
