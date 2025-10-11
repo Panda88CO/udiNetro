@@ -104,7 +104,7 @@ temp-99=Unknown
 
 ND-sensor-NAME=Irrigation Sensor
 ND-sensor-ICON=Irrigation
-ST-nlssensor-ST-NAME=Moisture Level (0-100)
+ST-nlssensor-ST-NAME=Moisture Level (0-100)(Estimated) 
 Status-0=Offline
 Status-1=Online
 Status-98=Smart Schedule Enabled
