@@ -143,7 +143,7 @@ class netroZone(udi_interface.Node):
 
     id = 'zone'
     commands = { 
-                 'Update' : update,
+                 #'Update' : update,
                  'Water' : water_control,
                  'StopWater' : stop_water_all,
                  #'Enable' : enable,
