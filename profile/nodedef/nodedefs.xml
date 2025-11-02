@@ -63,8 +63,6 @@
          <st id="GV6" editor="unixtime" />
          <st id="GV7" editor="unixtime" />
          <st id="GV19" editor="unixtime" />
-
-
       </sts>
       <cmds>
          <sends>
@@ -77,8 +75,6 @@
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
-            
-
          </accepts>
       </cmds>
    </nodeDef> 
@@ -93,8 +89,6 @@
          <st id="GV14" editor="battery" />
          <st id="GV15" editor="con_status" />   
          <st id="GV19" editor="unixtime" />
-
-
       </sts>
       <cmds>
          <sends>
