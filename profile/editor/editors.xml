@@ -8,10 +8,10 @@
       <editor id="Status" > 
      <range  uom="25" subset="0,1,99"  nls='Status'/>
   </editor>
-  <editor id="con_status" > 
-     <range  uom="25" subset="0-3,99"  nls='con_status'/>
+  <editor id="constatus" > 
+     <range  uom="25" subset="0-3,99"  nls='constatus'/>
   </editor>
-  <editor id="Nbr_Zones" > 
+  <editor id="NbrZones" > 
      <range  uom="70" min="0" max="16" />
   </editor>
   <editor id="count" > 
@@ -25,11 +25,11 @@
     <editor id="setEnable" > 
      <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>
-  <editor id="Sch_Source" > 
-     <range  uom="25" subset="0,1,2,99" nls="Sch_Source" />
+  <editor id="SchSource" > 
+     <range  uom="25" subset="0,1,2,99" nls="SchSource" />
   </editor>
-  <editor id="Sch_Status" > 
-     <range  uom="25" subset="0,1,2,98,99" nls="Sch_Status" />
+  <editor id="SchStatus" > 
+     <range  uom="25" subset="0,1,2,98,99" nls="SchStatus" />
   </editor>
 
    <editor id="StartStop" > 

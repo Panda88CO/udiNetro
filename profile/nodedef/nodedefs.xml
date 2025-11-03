@@ -18,15 +18,15 @@
       <sts>
          <st id="ST" editor="IrrState" />
          <!--<st id="GV0" editor="IrrState" />-->
-         <st id="GV1" editor="Nbr_Zones" />
+         <st id="GV1" editor="NbrZones" />
          <!--<st id="GV2" editor="unixtime" />-->
          <st id="GV3" editor="unixtime" />  
          <st id="GV4" editor="unixtime" />
          <st id="GV5" editor="unixtime" />  
          <st id="GV6" editor="unixtime" />      
          <!--<st id="GV14" editor="battery" />
-         <st id="GV10" editor="Sch_Source" />
-         <st id="GV15" editor="con_status" />-->   
+         <st id="GV10" editor="SchSource" />
+         <st id="GV15" editor="constatus" />-->   
          <st id="GV16" editor="battery" />
          <st id="GV17" editor="count" /> 
          <!--<st id="GV18" editor="unixtime" /> Last event-->
@@ -53,8 +53,8 @@
    <nodeDef id="zone" nls="nlszone">
       <editors />
       <sts>
-         <st id="ST" editor="Sch_Status" /> 
-         <st id="GV0" editor="Nbr_Zones" /> 
+         <st id="ST" editor="SchStatus" /> 
+         <st id="GV0" editor="NbrZones" /> 
          <st id="GV1" editor="ZoneType" /> 
          <st id="GV2" editor="Moisture" />
          <st id="GV3" editor="slope" />         
@@ -71,7 +71,7 @@
          </sends>
          <accepts>
             <cmd id="Water" >   
-               <p id="StopWater" />
+               <p id="StopWaterA"/>
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
@@ -87,7 +87,7 @@
          <st id="GV2" editor="Sunlight" />
          <st id="GV18" editor="unixtime" />
          <st id="GV14" editor="battery" />
-         <st id="GV15" editor="con_status" />   
+         <st id="GV15" editor="constatus" />   
          <st id="GV19" editor="unixtime" />
       </sts>
       <cmds>
