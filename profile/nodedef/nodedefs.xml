@@ -3,7 +3,7 @@
    <nodeDef id="controller" nls="nlsctrl">
       <editors />
       <sts>
-         <st id="ST" editor="Enabled" />
+         <!--<st id="ST" editor="Enabled" />-->
       </sts>
       <cmds>
          <sends>    

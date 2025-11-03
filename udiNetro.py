@@ -257,7 +257,7 @@ class netroStart(udi_interface.Node):
         self.Notices.clear()
         #self.background_thread.stop()
         #if self.TEV:
-        self.CO_setDriver('ST', 0, 25 )
+        #self.CO_setDriver('ST', 0, 25 )
         logging.debug('stop - Cleaning up')
         #self.scheduler.shutdown()
         self.poly.stop()
@@ -325,7 +325,7 @@ class netroStart(udi_interface.Node):
 
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
+            #{'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
             ]
 
     
