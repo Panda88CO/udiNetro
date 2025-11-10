@@ -739,7 +739,6 @@ class netroAccess(basicAPI):
 
     def get_sensor_data(self, key):
         try:
-
             logging.debug(f'get Sensor Data for {key} = {self.netro[key]}')
             return(self.netro[key])
         except KeyError as e:

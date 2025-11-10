@@ -6,30 +6,33 @@
      <range  uom="25" subset="0,1,99"  nls='Enabled'/>
   </editor>
       <editor id="Status" > 
-     <range  uom="25" subset="0,1,99"  nls='Status'/>
+     <range  uom="25" subset="0,1,98,99"  nls='Status'/>
   </editor>
-  <editor id="con_status" > 
-     <range  uom="25" subset="0-3,99"  nls='con_status'/>
+  <editor id="constatus" > 
+     <range  uom="25" subset="0-3,99"  nls='constatus'/>
   </editor>
-  <editor id="Nbr_Zones" > 
+  <editor id="NbrZones" > 
      <range  uom="70" min="0" max="16" />
   </editor>
   <editor id="count" > 
      <range  uom="70" min="0" max="2000" />
   </editor>
-<editor id="temp"> 
+   <editor id="tempC"> 
         <range uom="4" min="-40" max="105" prec="1" />
+        <range uom="25" subset="98,99" nls="temp" />
+  </editor>
+  <editor id="tempF"> 
         <range uom="17" min="-40" max="221" prec="1" />        
         <range uom="25" subset="98,99" nls="temp" />
   </editor>
     <editor id="setEnable" > 
      <range  uom="25" subset="0,1"  nls='Enabled'/>
   </editor>
-  <editor id="Sch_Source" > 
-     <range  uom="25" subset="0,1,2,99" nls="Sch_Source" />
+  <editor id="SchSource" > 
+     <range  uom="25" subset="0,1,2,99" nls="SchSource" />
   </editor>
-  <editor id="Sch_Status" > 
-     <range  uom="25" subset="0,1,2,98,99" nls="Sch_Status" />
+  <editor id="SchStatus" > 
+     <range  uom="25" subset="0,1,2,98,99" nls="SchStatus" />
   </editor>
 
    <editor id="StartStop" > 
@@ -68,15 +71,12 @@
 
     <editor id="Sunlight" > 
      <range  uom="36" min="0" max="10000" prec="1" />
+      <range  uom="25" subset="99" nls="nolight" />     
   </editor>
     <editor id="battery" > 
      <range  uom="51" min="0" max="100" />
       <range  uom="25" subset="98,99" nls="battery" />
   </editor>
-
-   <editor id="Status" > 
-     <range  uom="25" subset="0,1,98,99" nls="Status"/>
-  </editor> 
   <editor id="BOOLSTATE" > 
      <range  uom="25" subset="0,1,98,99" nls="BOOLSTATE"/>
   </editor> 

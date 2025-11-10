@@ -19,7 +19,7 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.0.17'
+VERSION = '0.1.18'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
@@ -199,54 +199,7 @@ class netroStart(udi_interface.Node):
         
    
 
-    '''
-    def start(self):
-        logging.info('start main node')
-        self.poly.Notices.clear()
-        self.poly.updateProfile()
-        assigned_primary_addresses = ['controller']
-        #self.poly.setCustomParamsDoc()
-        
-        while not self.customParam_done  or not self.config_done :
-        #while not self.config_done and not self.portalReady :
-            logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
-            #logging.debug(f' 1 2 3: {} {} {} {}'.format(self.customParam_done, , self.config_done))
-            time.sleep(1)
-        
-        logging.debug(f'Detected devices : {self.serialID_list}')
 
-        if len(self.serialID_list) == 0:
-            self.poly.Notices['No serial IDs input in configuration folder - exiting']
-            time.sleep(10)
-            sys.exit()
-        for indx, device in enumerate (self.serialID_list):
-            logging.debug(f'Instanciating nodes for {device}')
-            api = netroAccess(device, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
-            logging.debug(f'Device Type: {api.device_type()}')
-            if api.device_type() == 'controller':
-                name = self.poly.getValidName(api.device_name())
-                self.node_dict[device] = netroController(self.poly, device, device, name, api )
-                assigned_primary_addresses.append(device)
-            elif api.device_type() == 'sensor':
-                name = self.poly.getValidName(api.device_name())
-                self.node_dict[device] = netroSensor(self.poly, device, device, name , api )
-                assigned_primary_addresses.append(device)
-       
-           
-        #logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
-        #for indx, node  in enumerate(self.nodes_in_db):
-        #    #node = self.nodes_in_db[nde]
-        #    logging.debug(f'Scanning db for node : {node}')
-        #    if node['primaryNode'] not in assigned_primary_addresses:
-        #        logging.debug('Removing node : {} {}'.format(node['name'], node))
-        #        self.poly.delNode(node['address'])
-            
-
-        self.poly.Notices['done'] = 'Initialization process completed'
-        self.initialized = True
-        time.sleep(2)
-        self.poly.Notices.clear()
-    '''
 
     def validate_params(self):
         logging.debug('validate_params: {}'.format(self.Parameters.dump()))
@@ -257,43 +210,13 @@ class netroStart(udi_interface.Node):
         self.Notices.clear()
         #self.background_thread.stop()
         #if self.TEV:
-        self.CO_setDriver('ST', 0, 25 )
+        #self.CO_setDriver('ST', 0, 25 )
         logging.debug('stop - Cleaning up')
         #self.scheduler.shutdown()
         self.poly.stop()
         sys.exit() # kill running threads
 
 
-    '''
-    def systemPoll(self, pollList):
-        logging.debug(f'systemPoll - {pollList}')
-    
-        if 'longPoll' in pollList: 
-            self.longPoll()
-            if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
-                self.heartbeat()
-        if 'shortPoll' in pollList:
-            self.shortPoll()
-
-    
-    def shortPoll(self):
-        pass:
-        try:
-            logging.info('Netro Controller shortPoll(HeartBeat)')
-            self.heartbeat()
-
-
-
-        except Exception:
-            logging.info('Not all nodes ready:')
-
-    def longPoll(self):
-        try:
-            logging.debug(f'long poll list - checking for token update required')
-
-        except Exception:
-            logging.info(f'Not all nodes ready:')
-    '''
 
    
 
@@ -325,7 +248,7 @@ class netroStart(udi_interface.Node):
 
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
+            #{'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
             ]
 
     

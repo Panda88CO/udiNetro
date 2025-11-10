@@ -247,20 +247,12 @@ class netroController(udi_interface.Node):
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},   #Controller state
             {'driver': 'GV1', 'value': 0, 'uom': 70},   #Nmber of enabled zones
-
-            #{'driver': 'GV2', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV3', 'value': 0, 'uom': 151},  #Next Start Time
             {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
-
             {'driver': 'GV5', 'value': 99, 'uom': 25},  #last off-line event
             {'driver': 'GV6', 'value': 0, 'uom': 151},  #last on-line event
-
-
-            #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
-            #{'driver': 'GV15', 'value': 0, 'uom': 25},  #Online Status 
             {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
             {'driver': 'GV17', 'value': 0, 'uom': 70},  #Nmber of api call remaining
-            #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
 
             ]
