@@ -128,8 +128,12 @@ class netroSensor(udi_interface.Node):
                 self.CO_setDriver('GV2',98, 25) 
             else:   
                 self.CO_setDriver('GV2', round(sunlight*1000,0), 36)
-
-            self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level'), 51)
+            batlvl = self.netro_api.get_sensor_data('battery_level')
+            if batlvl is None:
+                logging.debug('No Battery data')
+                self.CO_setDriver('GV14', 99, 25)
+            else:
+                self.CO_setDriver('GV14', round(batlvl*100,0), 51)
             self.CO_setDriver('GV15', self.ctrl_status2ISY(self.netro_api.get_sensor_data('status')),25)
             self.CO_setDriver('GV18', self.netro_api.get_sensor_data('time'),151)    
             self.CO_setDriver('GV19', self.netro_api.get_sensor_data('last_api_time'), 151)
