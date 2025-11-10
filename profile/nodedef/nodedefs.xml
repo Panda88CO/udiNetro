@@ -67,7 +67,6 @@
          <accepts>
             <cmd id="StopWater"/>
             <cmd id="Water" >   
-
                <p id="Duration" editor="setMinutes" />
                <p id="Delay" editor="setMinutes" />                
             </cmd >
@@ -90,7 +89,7 @@
          <sends>
          </sends>
          <accepts>
-            <cmd id="Update" /> 
+            <cmd id="UPDATE" /> 
          </accepts>
       </cmds>
    </nodeDef> 

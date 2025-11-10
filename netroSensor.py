@@ -107,8 +107,14 @@ class netroSensor(udi_interface.Node):
                     self.CO_setDriver('CLITEMP',99, 25)
                 else:
                     self.CO_setDriver('CLITEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
-            self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight')*1000,36)
-            self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level')*100, 51)
+            sunlight =   self.netro_api.get_sensor_data('sunlight')
+            if sunlight is None:
+                logging.debug('No Sunlight data')
+                self.CO_setDriver('GV2',99, 25) 
+            else:   
+                self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight')*1000,36)
+
+            self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level'), 51)
             self.CO_setDriver('GV15', self.ctrl_status2ISY(self.netro_api.get_sensor_data('status')),25)
             self.CO_setDriver('GV18', self.netro_api.get_sensor_data('time'),151)    
             self.CO_setDriver('GV19', self.netro_api.get_sensor_data('last_api_time'), 151)
