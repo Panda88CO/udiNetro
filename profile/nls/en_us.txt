@@ -109,12 +109,12 @@ Status-1=Online
 Status-98=Smart Schedule Enabled
 Status-99=Unknown
 ST-nlssensor-CLITEMP-NAME=Temperature
-ST-nlssensor-GV2-NAME=Sun Light (LUX?)
+ST-nlssensor-GV2-NAME=Sun Light (LUX)
 ST-nlssensor-GV18-NAME=Data Report Time
 ST-nlssensor-GV14-NAME=Battery Level
 ST-nlssensor-GV15-NAME=Connection Status
 ST-nlssensor-GV19-NAME=Last Update
-CMD-nlssensor-Update-NAME=Update Data
+CMD-nlssensor-UPDATE-NAME=Update Data
 
 # Replace duplicated generic sensor "Status-*" keys with prefixed ones to avoid collisions:
 SensorStatus-0=Offline
