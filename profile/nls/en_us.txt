@@ -86,8 +86,8 @@ CMD-nlszone-Water-NAME=Water Zone
 
 CMDP-Duration-NAME=Water Run Time 
 CMDP-Delay-NAME=Start Delay 
-StopWaterA-0=Stop
-StopWaterA-1=Start
+StopWater-0=Stop
+StopWater-1=Start
 #CMD-nlszone-SkipDays-NAME=Days to Skip Watering 
 #CMD-nlszone-Enable-NAME=Controller State
 #CMD-nlszone-StopWater-NAME=Stop All Watering
