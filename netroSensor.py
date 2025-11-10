@@ -13,9 +13,6 @@ from netroAPI import netroAccess
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
     id = 'sensor'
-    commands = { 'UPDATE' : ISYupdate, 
-              
-                }
 
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
@@ -26,6 +23,7 @@ class netroSensor(udi_interface.Node):
             {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
             ]
+    
     def __init__(self, polyglot,  primary, address, name, TEMP_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
@@ -135,19 +133,4 @@ class netroSensor(udi_interface.Node):
             self.CO_setDriver('GV18', self.netro_api.get_sensor_data('time'),151)    
             self.CO_setDriver('GV19', self.netro_api.get_sensor_data('last_api_time'), 151)
 
-    id = 'sensor'
-    commands = { 'UPDATE' : ISYupdate, 
-              
-                }
-
-    drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
-            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},  #outside_CLITEMP
-            {'driver': 'GV2', 'value': 99, 'uom': 25},  #sunlight (LUX)
-            {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
-            {'driver': 'GV14', 'value': 99, 'uom': 25},  #battery
-            {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
-            {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
-            ]
-
-
+    commands = { 'UPDATE' : ISYupdate, }
