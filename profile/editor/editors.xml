@@ -6,7 +6,7 @@
      <range  uom="25" subset="0,1,99"  nls='Enabled'/>
   </editor>
       <editor id="Status" > 
-     <range  uom="25" subset="0,1,99"  nls='Status'/>
+     <range  uom="25" subset="0,1,98,99"  nls='Status'/>
   </editor>
   <editor id="constatus" > 
      <range  uom="25" subset="0-3,99"  nls='constatus'/>
@@ -73,10 +73,6 @@
      <range  uom="51" min="0" max="100" />
       <range  uom="25" subset="98,99" nls="battery" />
   </editor>
-
-   <editor id="Status" > 
-     <range  uom="25" subset="0,1,98,99" nls="Status"/>
-  </editor> 
   <editor id="BOOLSTATE" > 
      <range  uom="25" subset="0,1,98,99" nls="BOOLSTATE"/>
   </editor> 

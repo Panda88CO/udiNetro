@@ -13,7 +13,7 @@ from netroAPI import netroAccess
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
 
-    def __init__(self, polyglot,  primary, address, name, temp_unit):
+    def __init__(self, polyglot,  primary, address, name, TEMP_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
@@ -23,13 +23,13 @@ class netroSensor(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        self.temp_unit = temp_unit
+        self.TEMP_unit = TEMP_unit
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(polyglot.POLL, self.systemPoll)
+        self.poly.subscribe(polyglot.POLL, self.sysCLITEMPoll)
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -70,8 +70,8 @@ class netroSensor(udi_interface.Node):
         logging.info('ISY-update called')
         self.sensor_data = self.retrieve_sensor_data()
 
-    def systemPoll(self, pollList):
-        logging.debug(f'systemPoll - {pollList}')
+    def sysCLITEMPoll(self, pollList):
+        logging.debug(f'sysCLITEMPoll - {pollList}')
     
         if self.nodeReady:
             if 'longPoll' in pollList: 
@@ -95,18 +95,18 @@ class netroSensor(udi_interface.Node):
         logging.debug(f'updateISYdrivers {self.drivers}')
         if self.sensor_data is not None:
             self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),70)
-            if self.temp_unit == 'C':
+            if self.TEMP_unit == 'C':
                 if self.netro_api.get_sensor_data('celsius') is None:
-                    logging.debug('No temperature data')
-                    self.CO_setDriver('TEMP',99, 25)
+                    logging.debug('No CLITEMPerature data')
+                    self.CO_setDriver('CLITEMP',99, 25)
                 else:
-                    self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
+                    self.CO_setDriver('CLITEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
             else:
                 if self.netro_api.get_sensor_data('fahrenheit') is None:
-                    logging.debug('No temperature data')
-                    self.CO_setDriver('TEMP',99, 25)
+                    logging.debug('No CLITEMPerature data')
+                    self.CO_setDriver('CLITEMP',99, 25)
                 else:
-                    self.CO_setDriver('TEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
+                    self.CO_setDriver('CLITEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
             self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight')*1000,36)
             self.CO_setDriver('GV14', self.netro_api.get_sensor_data('battery_level')*100, 51)
             self.CO_setDriver('GV15', self.ctrl_status2ISY(self.netro_api.get_sensor_data('status')),25)
@@ -120,7 +120,7 @@ class netroSensor(udi_interface.Node):
 
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
-            {'driver': 'TEMP', 'value': 99, 'uom': 25},  #outside_temp
+            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},  #outside_CLITEMP
             {'driver': 'GV2', 'value': 99, 'uom': 25},  #sunlight (LUX)
             {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
             {'driver': 'GV14', 'value': 99, 'uom': 25},  #battery

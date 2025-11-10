@@ -16,33 +16,32 @@ IrrState-3=Watering
 IrrState-4=Offline
 IrrState-5=Sleeping
 IrrState-6=Power Off
-IrrState-7=Vave Error
+IrrState-7=Valve Error
 IrrState-99=Unknown
 
 
 ND-irrctrl-NAME=Netro Irrigation Controller
 ND-irrctrl-ICON=Irrigation
 ST-nlsirrctrl-GV1-NAME=Number Active Zones
-#ST-nlsirrctrl-GV2-NAME=
 ST-nlsirrctrl-GV3-NAME=Next Start Time
 ST-nlsirrctrl-GV4-NAME=Previous End Time 
 ST-nlsirrctrl-GV5-NAME=Last Offline Event
 ST-nlsirrctrl-GV6-NAME=Last Online Event
-ST-nlsirrctrl-GV10-NAME=Schedule Type
+
 SchSource-0=Netro Smart Schedule
 SchSource-1=Netro Fixed Schedule
 SchSource-2=Manual Watering
 SchSource-99=Unknown
-ST-nlsirrctrl-GV11-NAME=Schedule Status
+
 SchStatus-0=Awaiting Schedule start 
-SchStatus-1=Schedule Ececuting
+SchStatus-1=Schedule Executing
 SchStatus-2=Schedule Executed
 SchStatus-98=No Schedule Defined
 SchStatus-99=Unknown/Error
-ST-nlsirrctrl-GV15-NAME=Connection Status
+
 ST-nlsirrctrl-GV16-NAME=Battery Level
-ST-nlsirrctrl-GV17-NAME=Remaing API calls
-ST-nlsirrctrl-GV18-NAME=Last Activity
+ST-nlsirrctrl-GV17-NAME=Remaining API calls
+
 ST-nlsirrctrl-GV19-NAME=Last API Update
 CMD-nlsirrctrl-Update-NAME=Update Data
 #CMD-nlsirrctrl-Water-NAME=Water All Zones
@@ -108,12 +107,17 @@ Status-0=Offline
 Status-1=Online
 Status-98=Smart Schedule Enabled
 Status-99=Unknown
-ST-nlssensor-TEMP-NAME=Temperature
+ST-nlssensor-CLITEMP-NAME=Temperature
 ST-nlssensor-GV2-NAME=Sun Light (LUX?)
-ST-nlssensor-GV3-NAME=Temperature
 ST-nlssensor-GV18-NAME=Data Report Time
 ST-nlssensor-GV14-NAME=Battery Level
 ST-nlssensor-GV15-NAME=Connection Status
 ST-nlssensor-GV19-NAME=Last Update
 CMD-nlssensor-Update-NAME=Update Data
+
+# Replace duplicated generic sensor "Status-*" keys with prefixed ones to avoid collisions:
+SensorStatus-0=Offline
+SensorStatus-1=Online
+SensorStatus-98=Smart Schedule Enabled
+SensorStatus-99=Unknown
 

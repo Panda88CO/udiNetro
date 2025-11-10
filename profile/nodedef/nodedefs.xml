@@ -1,9 +1,10 @@
+<?xml version="1.0"?>
 <nodeDefs> 
 
    <nodeDef id="controller" nls="nlsctrl">
       <editors />
       <sts>
-         <!--<st id="ST" editor="Enabled" />-->
+         <st id="ST" editor="Enabled" />
       </sts>
       <cmds>
          <sends>    
@@ -17,20 +18,14 @@
       <editors />
       <sts>
          <st id="ST" editor="IrrState" />
-         <!--<st id="GV0" editor="IrrState" />-->
          <st id="GV1" editor="NbrZones" />
-         <!--<st id="GV2" editor="unixtime" />-->
          <st id="GV3" editor="unixtime" />  
          <st id="GV4" editor="unixtime" />
          <st id="GV5" editor="unixtime" />  
          <st id="GV6" editor="unixtime" />      
-         <!--<st id="GV14" editor="battery" />
-         <st id="GV10" editor="SchSource" />
-         <st id="GV15" editor="constatus" />-->   
          <st id="GV16" editor="battery" />
          <st id="GV17" editor="count" /> 
-         <!--<st id="GV18" editor="unixtime" /> Last event-->
-         <st id="GV19" editor="unixtime" /> <!--Last api-->
+         <st id="GV19" editor="unixtime" />
       </sts>
       <cmds>
          <sends>
@@ -43,7 +38,7 @@
             <cmd id="SkipDays" >   
                <p id="" editor="setDays" /> 
             </cmd >              
-           <cmd id="Enable" >   
+            <cmd id="Enable" >   
                <p id="" editor="setEnable" /> 
             </cmd >
          </accepts>
@@ -83,7 +78,7 @@
       <editors />
       <sts>
          <st id="ST" editor="Moisture" /> 
-         <st id="TEMP" editor="temmp"/>
+         <st id="CLITEMP" editor="temp" />
          <st id="GV2" editor="Sunlight" />
          <st id="GV18" editor="unixtime" />
          <st id="GV14" editor="battery" />
@@ -98,5 +93,4 @@
          </accepts>
       </cmds>
    </nodeDef> 
-</nodeDefs> 
-   
+</nodeDefs>

@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 netroTest.py
 .vscode/launch.json
+scripts/check_nodedefs.py
