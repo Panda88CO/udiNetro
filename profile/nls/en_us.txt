@@ -81,9 +81,9 @@ ST-nlszone-GV6-NAME=Next Start Time
 ST-nlszone-GV7-NAME=Next End Time 
 ST-nlszone-GV19-NAME=Last Update
 
-
+CMD-nlszone-StopWater-NAME=Stop Watering
 CMD-nlszone-Water-NAME=Water Zone
-CMDP-StopWaterA-NAME=Watering
+
 CMDP-Duration-NAME=Water Run Time 
 CMDP-Delay-NAME=Start Delay 
 StopWaterA-0=Stop
