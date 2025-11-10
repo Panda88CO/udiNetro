@@ -95,7 +95,7 @@ smart-98=Smart Zone Enabled
 smart-99=Unknown
 schedule-98=No Schedule Defined
 schedule-99=No Data
-temp-98=No temp data
+temp-98=No Temperature Data
 temp-99=Unknown
 
 nolight-98=No light Data
