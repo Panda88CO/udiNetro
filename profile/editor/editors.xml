@@ -17,8 +17,11 @@
   <editor id="count" > 
      <range  uom="70" min="0" max="2000" />
   </editor>
-<editor id="temp"> 
+   <editor id="tempC"> 
         <range uom="4" min="-40" max="105" prec="1" />
+        <range uom="25" subset="98,99" nls="temp" />
+  </editor>
+  <editor id="tempF"> 
         <range uom="17" min="-40" max="221" prec="1" />        
         <range uom="25" subset="98,99" nls="temp" />
   </editor>
@@ -68,6 +71,7 @@
 
     <editor id="Sunlight" > 
      <range  uom="36" min="0" max="10000" prec="1" />
+      <range  uom="25" subset="99" nls="nolight" />     
   </editor>
     <editor id="battery" > 
      <range  uom="51" min="0" max="100" />

@@ -78,7 +78,7 @@
       <editors />
       <sts>
          <st id="ST" editor="Moisture" /> 
-         <st id="CLITEMP" editor="temp" />
+         <st id="CLITEMP" editor="tempC" />
          <st id="GV2" editor="Sunlight" />
          <st id="GV18" editor="unixtime" />
          <st id="GV14" editor="battery" />
@@ -93,4 +93,25 @@
          </accepts>
       </cmds>
    </nodeDef> 
+
+   <nodeDef id="sensorF" nls="nlssensor">
+      <editors />
+      <sts>
+         <st id="ST" editor="Moisture" /> 
+         <st id="CLITEMP" editor="tempF" />
+         <st id="GV2" editor="Sunlight" />
+         <st id="GV18" editor="unixtime" />
+         <st id="GV14" editor="battery" />
+         <st id="GV15" editor="constatus" />   
+         <st id="GV19" editor="unixtime" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
 </nodeDefs>

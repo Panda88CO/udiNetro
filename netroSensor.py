@@ -12,7 +12,20 @@ from netroAPI import netroAccess
                
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    id = 'sensor'
+    commands = { 'UPDATE' : ISYupdate, 
+              
+                }
 
+    drivers = [
+            {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
+            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},  #outside_CLITEMP
+            {'driver': 'GV2', 'value': 99, 'uom': 25},  #sunlight (LUX)
+            {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
+            {'driver': 'GV14', 'value': 99, 'uom': 25},  #battery
+            {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
+            {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
+            ]
     def __init__(self, polyglot,  primary, address, name, TEMP_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
@@ -24,6 +37,9 @@ class netroSensor(udi_interface.Node):
         self.address = address
         self.name = name
         self.TEMP_unit = TEMP_unit
+        if self.TEMP_unit == 'F':
+            logging.info('Temperature Unit set to Fahrenheit')
+            self.id = 'sensorF'
         self.nodeReady = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
@@ -97,20 +113,20 @@ class netroSensor(udi_interface.Node):
             self.CO_setDriver('ST', self.netro_api.get_sensor_data('moisture'),70)
             if self.TEMP_unit == 'C':
                 if self.netro_api.get_sensor_data('celsius') is None:
-                    logging.debug('No CLITEMPerature data')
-                    self.CO_setDriver('CLITEMP',99, 25)
+                    logging.debug('No Temperature data')
+                    self.CO_setDriver('CLITEMP',98, 25)
                 else:
                     self.CO_setDriver('CLITEMP', round(self.netro_api.get_sensor_data('celsius'),1), 4)
             else:
                 if self.netro_api.get_sensor_data('fahrenheit') is None:
-                    logging.debug('No CLITEMPerature data')
-                    self.CO_setDriver('CLITEMP',99, 25)
+                    logging.debug('No Temperature data')
+                    self.CO_setDriver('CLITEMP',98, 25)
                 else:
                     self.CO_setDriver('CLITEMP', round(self.netro_api.get_sensor_data('fahrenheit'),1), 17)
-            sunlight =   self.netro_api.get_sensor_data('sunlight')
+            sunlight = self.netro_api.get_sensor_data('sunlight')
             if sunlight is None:
                 logging.debug('No Sunlight data')
-                self.CO_setDriver('GV2',99, 25) 
+                self.CO_setDriver('GV2',98, 25) 
             else:   
                 self.CO_setDriver('GV2', self.netro_api.get_sensor_data('sunlight')*1000,36)
 
