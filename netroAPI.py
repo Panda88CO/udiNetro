@@ -20,7 +20,8 @@ except ImportError:
 class basicAPI(object):
     def __init__(self, serial_nbr):
         self.session = requests.Session()
-        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'   
+        # Netro latest API: https://netrohome.com/en/shop/user_guides/7
+        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v2'
         self.serialID = serial_nbr
 
 
