@@ -18,10 +18,11 @@ except ImportError:
 
 
 class basicAPI(object):
-    def __init__(self, serial_nbr):
+    def __init__(self, serial_nbr, api_version='v2'):
         self.session = requests.Session()
-        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'   
+        self.yourApiEndpoint = f'https://api.netrohome.com/npa/{api_version}'   
         self.serialID = serial_nbr
+        self.api_version = api_version
 
 
     def callNetroApi(self, method='GET',url=None, body=None):
@@ -36,7 +37,7 @@ class basicAPI(object):
             status, res = self._callApi(method, url, payload)
             response = res
             if status == 'ok':
-                if 'errors' in res and len(res['errors']>0):
+                if 'errors' in res and len(res['errors']) > 0:
                     status = 'error'
                     response = res['errors']
             return(status, response)
@@ -51,7 +52,7 @@ class basicAPI(object):
                 status, res = self.callNetroApi('GET', '/info.json')
                 logging.debug(f'netroType response:{status} {res}')
                 if status == 'ok':
-                    if 'errors' in res and len(res['errors']>0):
+                    if 'errors' in res and len(res['errors']) > 0:
                         status = 'error'
                         return(status, res['errors'])
                     elif 'device' in res['data']:
@@ -128,8 +129,8 @@ class basicAPI(object):
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(basicAPI):
-    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False):
-        super().__init__(serial_nbr)
+    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False, api_version='v2'):
+        super().__init__(serial_nbr, api_version=api_version)
 
         logging.info(f'Netro API initializing')
         self.serialID = serial_nbr
