@@ -24,13 +24,13 @@ class netroSensor(udi_interface.Node):
             {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
             ]
     
-    def __init__(self, polyglot,  primary, address, name, TEMP_unit):
+    def __init__(self, polyglot,  primary, address, name, api_key, TEMP_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
         self.hb = 0
         self.ISYforced = False
-        self.serial_id = address
+        self.serial_id = api_key
         self.primary = primary
         self.address = address
         self.name = name
