@@ -11,17 +11,17 @@ import time
 from netroAPI import netroAccess
                
 class netroSensor(udi_interface.Node):
-    from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
     id = 'sensor'
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},  #Moisture 0-100
-            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},  #outside_CLITEMP
-            {'driver': 'GV2', 'value': 99, 'uom': 25},  #sunlight (LUX)
-            {'driver': 'GV18', 'value': 0, 'uom': 151}, # data report time 
-            {'driver': 'GV14', 'value': 99, 'uom': 25},  #battery
-            {'driver': 'GV15', 'value': 0, 'uom': 25},  #con status
-            {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
+            {'driver': 'ST', 'value': 99, 'uom': 25, 'name': 'Moisture Level (0-100)(Estimated)'},  #Moisture 0-100
+            {'driver': 'CLITEMP', 'value': 99, 'uom': 25, 'name': 'Temperature'},  #outside_CLITEMP
+            {'driver': 'GV2', 'value': 99, 'uom': 25, 'name': 'Sun Light (LUX)'},  #sunlight (LUX)
+            {'driver': 'GV18', 'value': 0, 'uom': 151, 'name': 'Data Report Time'}, # data report time 
+            {'driver': 'GV14', 'value': 99, 'uom': 25, 'name': 'Battery Level'},  #battery
+            {'driver': 'GV15', 'value': 0, 'uom': 25, 'name': 'Connection Status'},  #con status
+            {'driver': 'GV19', 'value': 0, 'uom': 151, 'name': 'Last Update'}, #Last update
             ]
     
     def __init__(self, polyglot,  primary, address, name, TEMP_unit):
@@ -39,12 +39,14 @@ class netroSensor(udi_interface.Node):
             logging.info('Temperature Unit set to Fahrenheit')
             self.id = 'sensorF'
         self.nodeReady = False
+        self.system_ready = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
+        self.apply_profile_driver_names(self.id)
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -66,6 +68,7 @@ class netroSensor(udi_interface.Node):
         self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
         self.nodeReady = True
+        self.system_ready = True
         
 
             

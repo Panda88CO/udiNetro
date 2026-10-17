@@ -14,10 +14,13 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO)
 
+import os
 from os import truncate
+import re
 import time
 import math
 import numbers 
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 
@@ -368,4 +371,577 @@ def heartbeat(self):
         self.hb = 0
 
 def handleLevelChange(self, level):
-    logging.info('New log level: {level}')        
+    logging.info('New log level: {level}')
+
+
+def get_dynamic_profile_editors():
+    """
+    Return the dynamic JSON editors structure matching profile/editor/editors.xml and profile/nls/en_us.txt.
+    """
+    return [
+        {
+            "id": "IrrState",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,2,3,4,5,6,7,99",
+                    "names": {
+                        "0": "Standby",
+                        "1": "Setup",
+                        "2": "Online",
+                        "3": "Watering",
+                        "4": "Offline",
+                        "5": "Sleeping",
+                        "6": "Power Off",
+                        "7": "Valve Error",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "Enabled",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,99",
+                    "names": {
+                        "0": "Disabled",
+                        "1": "Enabled",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "Status",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,98,99",
+                    "names": {
+                        "0": "Offline",
+                        "1": "Online",
+                        "98": "Smart Schedule Enabled",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "constatus",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0-3,99",
+                    "names": {
+                        "0": "Offline",
+                        "1": "Online",
+                        "2": "Sleeping",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "NbrZones",
+            "ranges": [
+                {
+                    "uom": "70",
+                    "min": 0,
+                    "max": 16,
+                }
+            ],
+        },
+        {
+            "id": "count",
+            "ranges": [
+                {
+                    "uom": "70",
+                    "min": 0,
+                    "max": 2000,
+                }
+            ],
+        },
+        {
+            "id": "tempC",
+            "ranges": [
+                {
+                    "uom": "4",
+                    "min": -40,
+                    "max": 105,
+                    "prec": 1,
+                },
+                {
+                    "uom": "25",
+                    "subset": "98,99",
+                    "names": {
+                        "98": "No Temperature Data",
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "tempF",
+            "ranges": [
+                {
+                    "uom": "17",
+                    "min": -40,
+                    "max": 221,
+                    "prec": 1,
+                },
+                {
+                    "uom": "25",
+                    "subset": "98,99",
+                    "names": {
+                        "98": "No Temperature Data",
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "setEnable",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1",
+                    "names": {
+                        "0": "Disabled",
+                        "1": "Enabled",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "SchSource",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,2,99",
+                    "names": {
+                        "0": "Netro Smart Schedule",
+                        "1": "Netro Fixed Schedule",
+                        "2": "Manual Watering",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "SchStatus",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,2,98,99",
+                    "names": {
+                        "0": "Awaiting Schedule start",
+                        "1": "Schedule Executing",
+                        "2": "Schedule Executed",
+                        "98": "No Schedule Defined",
+                        "99": "Unknown/Error",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "StartStop",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1",
+                    "names": {
+                        "0": "Disabled",
+                        "1": "Enabled",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "Minutes",
+            "ranges": [
+                {
+                    "uom": "44",
+                    "min": 0,
+                    "max": 1440,
+                    "prec": 0,
+                },
+                {
+                    "uom": "25",
+                    "subset": "99",
+                    "names": {
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "setMinutes",
+            "ranges": [
+                {
+                    "uom": "44",
+                    "min": 0,
+                    "max": 120,
+                    "prec": 0,
+                }
+            ],
+        },
+        {
+            "id": "setDays",
+            "ranges": [
+                {
+                    "uom": "10",
+                    "min": 0,
+                    "max": 365,
+                }
+            ],
+        },
+        {
+            "id": "OnOff",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1",
+                    "names": {
+                        "0": "Off",
+                        "1": "On",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "ZoneType",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,2",
+                    "names": {
+                        "0": "Smart",
+                        "1": "Smart Basic",
+                        "2": "Timer",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "Moisture",
+            "ranges": [
+                {
+                    "uom": "70",
+                    "min": 0,
+                    "max": 100,
+                },
+                {
+                    "uom": "25",
+                    "subset": "99",
+                    "names": {
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "slope",
+            "ranges": [
+                {
+                    "uom": "70",
+                    "min": -100,
+                    "max": 100,
+                    "prec": 1,
+                },
+                {
+                    "uom": "25",
+                    "subset": "99",
+                    "names": {
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "Sunlight",
+            "ranges": [
+                {
+                    "uom": "36",
+                    "min": 0,
+                    "max": 10000,
+                    "prec": 1,
+                },
+                {
+                    "uom": "25",
+                    "subset": "99",
+                    "names": {
+                        "98": "No light Data",
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "battery",
+            "ranges": [
+                {
+                    "uom": "51",
+                    "min": 0,
+                    "max": 100,
+                },
+                {
+                    "uom": "25",
+                    "subset": "98,99",
+                    "names": {
+                        "98": "No battery",
+                        "99": "Unknown",
+                    },
+                },
+            ],
+        },
+        {
+            "id": "BOOLSTATE",
+            "ranges": [
+                {
+                    "uom": "25",
+                    "subset": "0,1,98,99",
+                    "names": {
+                        "0": "False",
+                        "1": "True",
+                        "98": "N/A",
+                        "99": "Unknown",
+                    },
+                }
+            ],
+        },
+        {
+            "id": "unixtime",
+            "ranges": [
+                {
+                    "uom": "151",
+                    "min": 1748387733,
+                    "max": 102063945730,
+                },
+                {
+                    "uom": "25",
+                    "subset": "98,99",
+                    "names": {
+                        "98": "No Schedule Defined",
+                        "99": "No Data",
+                    },
+                },
+            ],
+        },
+    ]
+
+
+def get_dynamic_profile_nodedefs():
+    """
+    Return the dynamic JSON nodedefs structure.
+    Used for updateJsonProfile and as the primary source of driver names.
+    """
+    sensor_cmds = {
+        "sends": [],
+        "accepts": [
+            {"id": "UPDATE", "name": "Update Data"},
+        ],
+    }
+
+    return [
+        {
+            "id": "controller",
+            "name": "Netro Irrigation Controller",
+            "icon": "Irrigation",
+            "properties": [
+                {"id": "ST", "editor": "Enabled", "name": "Controller Enabled"},
+            ],
+            "cmds": {
+                "sends": [],
+                "accepts": [],
+            },
+            "links": {"ctl": [], "rsp": []},
+        },
+        {
+            "id": "irrctrl",
+            "name": "Netro Irrigation Controller",
+            "icon": "Irrigation",
+            "properties": [
+                {"id": "ST", "editor": "IrrState", "name": "Controller State"},
+                {"id": "GV1", "editor": "NbrZones", "name": "Number Active Zones"},
+                {"id": "GV3", "editor": "unixtime", "name": "Next Start Time"},
+                {"id": "GV4", "editor": "unixtime", "name": "Previous End Time"},
+                {"id": "GV5", "editor": "unixtime", "name": "Last Offline Event"},
+                {"id": "GV6", "editor": "unixtime", "name": "Last Online Event"},
+                {"id": "GV16", "editor": "battery", "name": "Battery Level"},
+                {"id": "GV17", "editor": "count", "name": "Remaining API calls"},
+                {"id": "GV19", "editor": "unixtime", "name": "Last API Update"},
+            ],
+            "cmds": {
+                "sends": [
+                    {"id": "DON", "name": "On"},
+                    {"id": "DOF", "name": "Off"},
+                ],
+                "accepts": [
+                    {"id": "Update", "name": "Update Data"},
+                    {"id": "StopWater", "name": "Stop All Watering"},
+                    {
+                        "id": "SkipDays",
+                        "name": "Days to Skip Watering",
+                        "parameters": [
+                            {"id": "", "editor": "setDays"},
+                        ],
+                    },
+                    {
+                        "id": "Enable",
+                        "name": "Controller",
+                        "parameters": [
+                            {"id": "", "editor": "setEnable"},
+                        ],
+                    },
+                ],
+            },
+            "links": {"ctl": [], "rsp": []},
+        },
+        {
+            "id": "zone",
+            "name": "Irrigation Zone",
+            "icon": "Irrigation",
+            "properties": [
+                {"id": "ST", "editor": "SchStatus", "name": "Zone Status"},
+                {"id": "GV0", "editor": "NbrZones", "name": "Zone Number"},
+                {"id": "GV1", "editor": "ZoneType", "name": "Zone Type"},
+                {"id": "GV2", "editor": "Moisture", "name": "Moisture Level (0-100)"},
+                {"id": "GV3", "editor": "slope", "name": "Moisture Slope"},
+                {"id": "GV4", "editor": "unixtime", "name": "Previous Start Time"},
+                {"id": "GV5", "editor": "unixtime", "name": "Previous End Time"},
+                {"id": "GV6", "editor": "unixtime", "name": "Next Start Time"},
+                {"id": "GV7", "editor": "unixtime", "name": "Next End Time"},
+                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+            ],
+            "cmds": {
+                "sends": [
+                    {"id": "DON", "name": "On"},
+                    {"id": "DOF", "name": "Off"},
+                ],
+                "accepts": [
+                    {"id": "StopWater", "name": "Stop Watering"},
+                    {
+                        "id": "Water",
+                        "name": "Water Zone",
+                        "parameters": [
+                            {"id": "Duration", "editor": "setMinutes", "name": "Water Run Time"},
+                            {"id": "Delay", "editor": "setMinutes", "name": "Start Delay"},
+                        ],
+                    },
+                ],
+            },
+            "links": {"ctl": [], "rsp": []},
+        },
+        {
+            "id": "sensor",
+            "name": "Irrigation Sensor",
+            "icon": "Irrigation",
+            "properties": [
+                {"id": "ST", "editor": "Moisture", "name": "Moisture Level (0-100)(Estimated)"},
+                {"id": "CLITEMP", "editor": "tempC", "name": "Temperature"},
+                {"id": "GV2", "editor": "Sunlight", "name": "Sun Light (LUX)"},
+                {"id": "GV18", "editor": "unixtime", "name": "Data Report Time"},
+                {"id": "GV14", "editor": "battery", "name": "Battery Level"},
+                {"id": "GV15", "editor": "constatus", "name": "Connection Status"},
+                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+            ],
+            "cmds": sensor_cmds,
+            "links": {"ctl": [], "rsp": []},
+        },
+        {
+            "id": "sensorF",
+            "name": "Irrigation Sensor",
+            "icon": "Irrigation",
+            "properties": [
+                {"id": "ST", "editor": "Moisture", "name": "Moisture Level (0-100)(Estimated)"},
+                {"id": "CLITEMP", "editor": "tempF", "name": "Temperature"},
+                {"id": "GV2", "editor": "Sunlight", "name": "Sun Light (LUX)"},
+                {"id": "GV18", "editor": "unixtime", "name": "Data Report Time"},
+                {"id": "GV14", "editor": "battery", "name": "Battery Level"},
+                {"id": "GV15", "editor": "constatus", "name": "Connection Status"},
+                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+            ],
+            "cmds": sensor_cmds,
+            "links": {"ctl": [], "rsp": []},
+        },
+    ]
+
+
+_profile_driver_names = None
+
+
+def get_profile_driver_names():
+    """
+    Extract the mapping of (nodeDefId, driver_id) -> display name.
+    1. First takes names from dynamic profile definitions (get_dynamic_profile_nodedefs()).
+    2. If not available (or for any missing entries), falls back to static profile files
+       (profile/nodedef/nodedefs.xml and profile/nls/en_us.txt).
+    Cached after the first load.
+    """
+    global _profile_driver_names
+    if _profile_driver_names is not None:
+        return _profile_driver_names
+
+    _profile_driver_names = {}
+
+    # 1. Try dynamic profile definitions first
+    try:
+        for nd in get_dynamic_profile_nodedefs():
+            node_id = nd.get('id')
+            for prop in nd.get('properties', []):
+                driver_id = prop.get('id')
+                name = prop.get('name')
+                if node_id and driver_id and name:
+                    _profile_driver_names[(node_id, driver_id)] = name
+    except Exception as e:
+        logging.warning(f'Could not load driver names from dynamic profile: {e}')
+
+    # 2. Fall back to static profile directory if dynamic profile was unavailable or missing entries
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    xml_path = os.path.join(base_dir, 'profile', 'nodedef', 'nodedefs.xml')
+    nls_path = os.path.join(base_dir, 'profile', 'nls', 'en_us.txt')
+
+    if os.path.exists(xml_path) and os.path.exists(nls_path):
+        try:
+            st_labels = {}
+            with open(nls_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    m = re.match(r'^ST-([\w\-]+)-([\w\-]+)-NAME\s*=\s*(.+)', line.strip())
+                    if m:
+                        nls, driver, label = m.groups()
+                        st_labels[(nls, driver)] = label.strip()
+
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            for node_def in root.findall('.//nodeDef'):
+                node_id = node_def.get('id')
+                nls = node_def.get('nls')
+                if not node_id or not nls:
+                    continue
+                for st in node_def.findall('.//st'):
+                    driver_id = st.get('id')
+                    if driver_id and (nls, driver_id) in st_labels:
+                        if (node_id, driver_id) not in _profile_driver_names:
+                            _profile_driver_names[(node_id, driver_id)] = st_labels[(nls, driver_id)]
+        except Exception as e:
+            logging.warning(f'Could not load driver names from static profile: {e}')
+
+    return _profile_driver_names
+
+
+def apply_profile_driver_names(self, node_id=None):
+    """
+    Populate or update 'name' in each driver dictionary of a node instance
+    using definitions extracted from dynamic or static profiles.
+    """
+    target_id = node_id or getattr(self, 'id', None)
+    if not target_id or not hasattr(self, 'drivers') or not self.drivers:
+        return
+    names = get_profile_driver_names()
+    for d in self.drivers:
+        driver_id = d.get('driver')
+        if driver_id and (target_id, driver_id) in names:
+            d['name'] = names[(target_id, driver_id)]

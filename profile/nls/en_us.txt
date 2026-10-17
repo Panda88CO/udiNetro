@@ -22,6 +22,7 @@ IrrState-99=Unknown
 
 ND-irrctrl-NAME=Netro Irrigation Controller
 ND-irrctrl-ICON=Irrigation
+ST-nlsirrctrl-ST-NAME=Controller State
 ST-nlsirrctrl-GV1-NAME=Number Active Zones
 ST-nlsirrctrl-GV3-NAME=Next Start Time
 ST-nlsirrctrl-GV4-NAME=Previous End Time 

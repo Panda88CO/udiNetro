@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 try:
     import udi_interface
@@ -19,10 +20,10 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.1.18'
+VERSION = '0.1.19'
 
 class netroStart(udi_interface.Node):
-    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY
+    from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY, apply_profile_driver_names
     #
     def __init__(self, polyglot, primary, address, name ):
         super(netroStart, self).__init__(polyglot, primary, address, name)
@@ -48,6 +49,7 @@ class netroStart(udi_interface.Node):
         #polyglot.subscribe(polyglot.ADDNODEDONE, TEV.node_queue)        
         polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
         polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
+        polyglot.subscribe(polyglot.DISCOVER, self.discover)
         #polyglot.subscribe(polyglot.POLL, self.systemPoll)        
         #polyglot.subscribe(polyglot.WEBHOOK, self.webhook)
         #logging.debug('Calling start')
@@ -58,7 +60,7 @@ class netroStart(udi_interface.Node):
         self.hb = 0
         self.connected = False
         self.nodeDefineDone = False
-        self.poly.updateProfile()
+        self.apply_profile_driver_names(self.id)
         self.poly.ready()
         self.node = self.poly.getNode(address)
         self.customParam_done = False
@@ -71,7 +73,6 @@ class netroStart(udi_interface.Node):
         logging.debug(f'drivers ; {self.drivers}')
 
         self.poly.Notices.clear()
-        self.poly.updateProfile()
         assigned_primary_addresses = ['controller']
         #self.poly.setCustomParamsDoc()
 
@@ -109,7 +110,19 @@ class netroStart(udi_interface.Node):
                 self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated  ERROR'
             time.sleep(1)
 
-        time.sleep(5)
+        # Wait for all instantiated nodes (and their child zone nodes) to finish initializing before loading profiles
+        wait_start = time.time()
+        while time.time() - wait_start < 60:
+            all_ready = True
+            for n in self.node_dict.values():
+                if not getattr(n, 'nodeReady', False) or not getattr(n, 'system_ready', False):
+                    all_ready = False
+                    break
+            if all_ready:
+                break
+            time.sleep(1)
+
+        time.sleep(2)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
         for indx, node  in enumerate(self.nodes_in_db):
@@ -121,9 +134,11 @@ class netroStart(udi_interface.Node):
             
     
         self.update_all_drivers()
+        self.nodeDefineDone = True
+        self.initialized = True
+        self._update_dynamic_profile()
 
         self.poly.Notices['done'] = 'Initialization process completed'
-        self.initialized = True
         time.sleep(2)
         self.poly.Notices.clear()
 
@@ -235,12 +250,64 @@ class netroStart(udi_interface.Node):
     def ISYupdate (self, command=None):
         logging.info(f'ISY-update status node  called')
 
+    def discover(self, *args, **kwargs):
+        if not self.initialized:
+            logging.info("Discover requested - waiting for initialization to complete before refreshing profile")
+            return
+        logging.info("Discover requested - refreshing profile")
+        self._update_dynamic_profile()
 
+    def _update_dynamic_profile(self):
+        if not self.initialized:
+            logging.debug("Skipping profile update until node initialization is complete")
+            return
+        profile_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'profile')
+        if os.path.isdir(profile_dir):
+            logging.info("Updating profile (dynamic & static)...")
+        else:
+            logging.info("Updating profile (dynamic)...")
 
+        json_ok = False
+        updater = getattr(self.poly, "updateJsonProfile", None)
+        if callable(updater):
+            try:
+                payload = self._dynamic_profile_payload()
+                updater(payload, {"waitResponse": True})
+                logging.info("Dynamic JSON profile updated successfully via updateJsonProfile")
+                json_ok = True
+            except Exception as e:
+                logging.warning(f"updateJsonProfile failed: {e}; falling back to updateProfile")
 
+        # Only update static profile if the directory exists
+        if os.path.isdir(profile_dir):
+            try:
+                if hasattr(self.poly, "updateProfile"):
+                    self.poly.updateProfile()
+                    logging.info("Static profile updated successfully via updateProfile")
+            except Exception as e:
+                if not json_ok:
+                    logging.error(f"updateProfile failed: {e}")
 
-    
-    
+    def _profile_editors(self):
+        from udiLib import get_dynamic_profile_editors
+        return get_dynamic_profile_editors()
+
+    def _profile_nodedefs(self):
+        from udiLib import get_dynamic_profile_nodedefs
+        return get_dynamic_profile_nodedefs()
+
+    def _dynamic_profile_payload(self):
+        return {
+            "delete": {
+                "editors": ["*"],
+                "nodedefs": ["*"],
+                "linkdefs": ["*"],
+            },
+            "editors": self._profile_editors(),
+            "nodedefs": self._profile_nodedefs(),
+            "linkdefs": [],
+        }
+
     id = 'controller'
 
 
@@ -248,7 +315,7 @@ class netroStart(udi_interface.Node):
 
 
     drivers = [
-            #{'driver': 'ST', 'value': 99, 'uom': 25},   #car State                       
+            #{'driver': 'ST', 'value': 99, 'uom': 25, 'name': 'Controller Enabled'},   #car State                       
             ]
 
     

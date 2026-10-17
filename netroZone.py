@@ -11,7 +11,7 @@ import time
 import re        
                
 class netroZone(udi_interface.Node):
-    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    from  udiLib import zoneconfig2ISY, ctrl_status2ISY, node_queue, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
 
     def __init__(self, polyglot,  primary, address, name, api):
         super(netroZone, self).__init__(polyglot, primary, address, name)
@@ -34,6 +34,7 @@ class netroZone(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, address)
 
         self.poly.ready()
+        self.apply_profile_driver_names(self.id)
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -150,19 +151,19 @@ class netroZone(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},  #Zone Status
-            {'driver': 'GV0', 'value': 0, 'uom': 0},  #Zone Number
-            {'driver': 'GV1', 'value': 99, 'uom': 25},  #Zone config
-            {'driver': 'GV2', 'value': 0, 'uom': 70},  #Moisture
-            {'driver': 'GV3', 'value': 0, 'uom': 70},  #moisture slope 
-            {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous Start Time
-            {'driver': 'GV5', 'value': 0, 'uom': 151},  #Previous End Time
-            {'driver': 'GV6', 'value': 0, 'uom': 151},  #Next Start Time
-            {'driver': 'GV7', 'value': 0, 'uom': 151},  #Next End Time
+            {'driver': 'ST', 'value': 99, 'uom': 25, 'name': 'Zone Status'},  #Zone Status
+            {'driver': 'GV0', 'value': 0, 'uom': 0, 'name': 'Zone Number'},  #Zone Number
+            {'driver': 'GV1', 'value': 99, 'uom': 25, 'name': 'Zone Type'},  #Zone config
+            {'driver': 'GV2', 'value': 0, 'uom': 70, 'name': 'Moisture Level (0-100)'},  #Moisture
+            {'driver': 'GV3', 'value': 0, 'uom': 70, 'name': 'Moisture Slope'},  #moisture slope 
+            {'driver': 'GV4', 'value': 0, 'uom': 151, 'name': 'Previous Start Time'},  #Previous Start Time
+            {'driver': 'GV5', 'value': 0, 'uom': 151, 'name': 'Previous End Time'},  #Previous End Time
+            {'driver': 'GV6', 'value': 0, 'uom': 151, 'name': 'Next Start Time'},  #Next Start Time
+            {'driver': 'GV7', 'value': 0, 'uom': 151, 'name': 'Next End Time'},  #Next End Time
             #{'driver': 'GV10', 'value': 0, 'uom': 25},  #Schedule Type
             #{'driver': 'GV11', 'value': 0, 'uom': 25},  #Schedule Status
             #{'driver': 'GV18', 'value': 0, 'uom': 25},  #sLast event
-            {'driver': 'GV19', 'value': 0, 'uom': 151},  #Last update
+            {'driver': 'GV19', 'value': 0, 'uom': 151, 'name': 'Last Update'},  #Last update
 
             ]
 

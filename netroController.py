@@ -13,7 +13,7 @@ from netroAPI import netroAccess
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
-    from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver
+    from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
 
     def __init__(self, polyglot,  primary, address, name, temp_unit='F', eventdays=-7, moistdays=-3, schdays=7):
         super(netroController, self).__init__(polyglot, primary, address, name)
@@ -45,6 +45,7 @@ class netroController(udi_interface.Node):
         self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
         self.poly.ready()
+        self.apply_profile_driver_names(self.id)
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -245,15 +246,15 @@ class netroController(udi_interface.Node):
                 }
 
     drivers = [
-            {'driver': 'ST', 'value': 99, 'uom': 25},   #Controller state
-            {'driver': 'GV1', 'value': 0, 'uom': 70},   #Nmber of enabled zones
-            {'driver': 'GV3', 'value': 0, 'uom': 151},  #Next Start Time
-            {'driver': 'GV4', 'value': 0, 'uom': 151},  #Previous End Time
-            {'driver': 'GV5', 'value': 99, 'uom': 25},  #last off-line event
-            {'driver': 'GV6', 'value': 0, 'uom': 151},  #last on-line event
-            {'driver': 'GV16', 'value': 99, 'uom':25}, # battery level if appropriate
-            {'driver': 'GV17', 'value': 0, 'uom': 70},  #Nmber of api call remaining
-            {'driver': 'GV19', 'value': 0, 'uom': 151}, #Last update
+            {'driver': 'ST', 'value': 99, 'uom': 25, 'name': 'Controller State'},   #Controller state
+            {'driver': 'GV1', 'value': 0, 'uom': 70, 'name': 'Number Active Zones'},   #Nmber of enabled zones
+            {'driver': 'GV3', 'value': 0, 'uom': 151, 'name': 'Next Start Time'},  #Next Start Time
+            {'driver': 'GV4', 'value': 0, 'uom': 151, 'name': 'Previous End Time'},  #Previous End Time
+            {'driver': 'GV5', 'value': 99, 'uom': 25, 'name': 'Last Offline Event'},  #last off-line event
+            {'driver': 'GV6', 'value': 0, 'uom': 151, 'name': 'Last Online Event'},  #last on-line event
+            {'driver': 'GV16', 'value': 99, 'uom': 25, 'name': 'Battery Level'}, # battery level if appropriate
+            {'driver': 'GV17', 'value': 0, 'uom': 70, 'name': 'Remaining API calls'},  #Nmber of api call remaining
+            {'driver': 'GV19', 'value': 0, 'uom': 151, 'name': 'Last API Update'}, #Last update
 
             ]
 
