@@ -4,7 +4,13 @@ This node server uses **Netro Public API v2** to connect your Netro smart irriga
 
 ### Obtaining Your Device API Keys (Netro API v2)
 
-Netro Public API v2 uses **per-device API keys** rather than hardware serial numbers. Generate an API key for each controller or sensor from your Netro account (via the Netro app or web portal), and enter them into the `SERIALID` parameter below separated by spaces.
+Netro Public API v2 uses **unique per-device API keys** rather than 12-character hardware serial numbers. Each controller and sensor has its own distinct API key:
+
+1. Log in to the **Netro Home Web Portal** at [https://home.netrohome.com](https://home.netrohome.com) using your Netro account credentials.
+2. Go to **Settings / Account -> API Key** (or select a device and open its **Device Settings**).
+3. Select your controller or sensor and generate/copy its **API Key** (a ~43-character token such as `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
+4. **Repeat for each device**: Switch to each of your other controllers and sensors in the Netro portal to obtain the unique API key for each one.
+5. Paste all device API keys into the `SERIALID` parameter below, separated by a single space (`key1 key2 key3`).
 
 ---
 
@@ -12,7 +18,7 @@ Netro Public API v2 uses **per-device API keys** rather than hardware serial num
 
 | Key | Default | Description |
 | :--- | :--- | :--- |
-| **`SERIALID`** | *(Required)* | Space-separated list of **Netro v2 device API keys** (one key per controller or sensor). Example: `key1 key2` |
+| **`SERIALID`** | *(Required)* | Space-separated list of **Netro v2 device API keys** (one unique key per controller or sensor). Example: `key1 key2 key3` |
 | **`TEMP`** | `F` | Temperature unit for Netro sensors: `F` (Fahrenheit) or `C` (Celsius). |
 | **`EVENT_DAYS`** | `-5` | Number of days back in time to look for watering and online/offline events (negative integer, e.g. `-5`). |
 | **`SCH_DAYS`** | `7` | Number of days into the future to look for upcoming irrigation schedules (positive integer, e.g. `7`). |

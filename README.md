@@ -23,13 +23,31 @@ This node server uses **Netro Public API v2** (`https://api.netrohome.com/npa/v2
 
 ---
 
+## How to Obtain Your Netro API v2 Keys
+
+Netro Public API v2 uses **unique per-device API keys** rather than hardware serial numbers. Each controller and each soil sensor has its own distinct API key.
+
+1. Log in to the **Netro Home Web Portal** at [https://home.netrohome.com](https://home.netrohome.com) using your Netro account credentials.
+2. Open **Settings / Account** and navigate to the **API Key** section (or open **Device Settings** for a specific device).
+3. Select the device (controller or sensor) and click **Generate / Get API Key**.
+4. Copy the generated token (a ~43-character URL-safe string, e.g. `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
+5. **Repeat for each device**: Select each additional controller or sensor in your Netro account to obtain its unique API key.
+6. In the Polyglot v3 **Configuration** page, paste all of your device API keys into the `SERIALID` parameter separated by spaces:
+   ```text
+   key_for_device_1 key_for_device_2 key_for_device_3
+   ```
+
+> **Important**: Do not paste the same API key multiple times—each API key maps to a single Netro controller or sensor.
+
+---
+
 ## Configuration Parameters
 
 Configure the following custom parameters in the Polyglot v3 UI under **Configuration**:
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `SERIALID` | *(Required)* | Space-separated list of **Netro v2 device API keys** (one key per controller or sensor, generated from the Netro app/website). |
+| `SERIALID` | *(Required)* | Space-separated list of **Netro v2 device API keys** (one unique key per controller or sensor). |
 | `EVENT_DAYS` | `-5` | Number of days back in time to query for watering and online/offline events (negative integer, e.g. `-5`). |
 | `SCH_DAYS` | `7` | Number of days ahead to query for upcoming irrigation schedules (positive integer, e.g. `7`). |
 | `MOIST_DAYS` | `-3` | Number of days back in time used to compute the linear moisture trend slope (negative integer, e.g. `-3`). |
