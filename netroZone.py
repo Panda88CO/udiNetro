@@ -28,6 +28,7 @@ class netroZone(udi_interface.Node):
         self.zone_nbr = int(match.group(1)) if match else -1
         logging.debug(f'Zone number extracted {self.zone_nbr}')
         self.nodeReady = False
+        self.system_ready = False
         #self.node = self.poly.getNode(address)
         self.n_queue = []
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
@@ -50,6 +51,7 @@ class netroZone(udi_interface.Node):
         #self.CO_setDriver('ST', 1)
         #self.nodeReady = True
         self.updateISYdrivers()
+        self.system_ready = True
         #self.update_time()
   
 
@@ -71,7 +73,7 @@ class netroZone(udi_interface.Node):
             self.CO_setDriver('GV2', self.netro_api.moisture(self.zone_nbr), 70)
             self.CO_setDriver('GV3', self.netro_api.moisture_slope(self.zone_nbr),70 )
             logging.debug(f"Zone {self.zone_nbr} smart {self.netro_api.get_zone_info(self.zone_nbr, 'smart')}" )
-            if str(self.netro_api.get_zone_info(self.zone_nbr, 'status')) in ['NO_SCHEDULE']:
+            if str(self.netro_api.get_zone_info(self.zone_nbr, 'status')) in ['NO SCHEDULE', 'NO_SCHEDULE']:
                 logging.debug(f"NO SCHEDULE FOR {self.zone_nbr}")
                 self.CO_setDriver('GV4', 98, 25)
                 self.CO_setDriver('GV5', 98, 25)

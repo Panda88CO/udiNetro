@@ -13,14 +13,14 @@ from netroAPI import netroAccess
 from netroZone import netroZone
                
 class netroController(udi_interface.Node):
-    from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
+    from  udiLib import node_queue, heartbeat, ctrl_status2ISY, command_res2ISY, wait_for_node_done, cond2ISY,  mask2key, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
 
-    def __init__(self, polyglot,  primary, address, name, temp_unit='F', eventdays=-7, moistdays=-3, schdays=7):
+    def __init__(self, polyglot,  primary, address, name, api_key, temp_unit='F', eventdays=-7, moistdays=-3, schdays=7):
         super(netroController, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Irrigation Controller node')
         self.poly = polyglot
         self.hb = 0
-        self.serial_id = address
+        self.serial_id = api_key
         self.ISYforced = False
         self.primary = primary
         self.address = address
@@ -112,6 +112,13 @@ class netroController(udi_interface.Node):
                 self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
                 time.sleep(1) #stagger node creation to avoid flooding isy
         #self.netro_api.update_controller_data()
+        # Wait for all child zone nodes to complete initialization
+        zone_wait_start = time.time()
+        while time.time() - zone_wait_start < 60:
+            if all(getattr(zn, 'nodeReady', False) and getattr(zn, 'system_ready', False) for zn in self.zone_nodes.values()):
+                break
+            time.sleep(0.5)
+
         time.sleep(2)
         self.nodeReady = True
         self.updateISYdrivers()
@@ -143,7 +150,7 @@ class netroController(udi_interface.Node):
                 self.longPoll()
                 if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
                     self.shortPoll()
-            if 'shortPoll' in pollList:
+            elif 'shortPoll' in pollList:
                 self.shortPoll()
 
 
@@ -224,7 +231,7 @@ class netroController(udi_interface.Node):
             res = self.netro_api.set_status(status)
             if res == 'ok':
                 time.sleep(1)
-                self.CO_setDriver('ST', self.netro_api.get_status(), 25)
+                self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.system_status()), 25)
 
     def stop_water_all (self, command=None):
         logging.info('stop_water called')

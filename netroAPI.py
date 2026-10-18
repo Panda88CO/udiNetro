@@ -18,10 +18,11 @@ except ImportError:
 
 
 class basicAPI(object):
-    def __init__(self, serial_nbr):
+    def __init__(self, serial_nbr, api_version='v2'):
         self.session = requests.Session()
-        self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'   
+        self.yourApiEndpoint = f'https://api.netrohome.com/npa/{api_version}'   
         self.serialID = serial_nbr
+        self.api_version = api_version
 
 
     def callNetroApi(self, method='GET',url=None, body=None):
@@ -31,12 +32,12 @@ class basicAPI(object):
             if body is None:
                 payload['key'] = self.serialID
             else:
-                payload = body
+                payload = dict(body)
                 payload['key'] = self.serialID
             status, res = self._callApi(method, url, payload)
             response = res
             if status == 'ok':
-                if 'errors' in res and len(res['errors']>0):
+                if 'errors' in res and len(res['errors']) > 0:
                     status = 'error'
                     response = res['errors']
             return(status, response)
@@ -51,7 +52,7 @@ class basicAPI(object):
                 status, res = self.callNetroApi('GET', '/info.json')
                 logging.debug(f'netroType response:{status} {res}')
                 if status == 'ok':
-                    if 'errors' in res and len(res['errors']>0):
+                    if 'errors' in res and len(res['errors']) > 0:
                         status = 'error'
                         return(status, res['errors'])
                     elif 'device' in res['data']:
@@ -89,15 +90,15 @@ class basicAPI(object):
 
         try:
             if method == 'GET':
-                response = requests.get(completeUrl, headers=headers, params=payload)
+                response = self.session.get(completeUrl, headers=headers, params=payload)
             elif method == 'DELETE':
-                response = requests.delete(completeUrl, headers=headers)
+                response = self.session.delete(completeUrl, headers=headers)
             elif method == 'PATCH':
-                response = requests.patch(completeUrl, headers=headers, json=payload)
+                response = self.session.patch(completeUrl, headers=headers, json=payload)
             elif method == 'POST':
-                response = requests.post(completeUrl, headers=headers, json=payload)
+                response = self.session.post(completeUrl, headers=headers, json=payload)
             elif method == 'PUT':
-                response = requests.put(completeUrl, headers=headers)
+                response = self.session.put(completeUrl, headers=headers)
             logging.debug(f'request response: {response}')
 
             
@@ -120,16 +121,19 @@ class basicAPI(object):
         except requests.exceptions.HTTPError as error:
             logging.error(f"Call { method } { completeUrl } failed: { error }")
             #self.apiLock.release()
-            if response.status_code == 400:
+            if response is not None and response.status_code == 400:
                 return('error', response.text)
             else:
-                return ('unknown', response.text)
+                return ('unknown', response.text if response is not None else str(error))
+        except requests.exceptions.RequestException as error:
+            logging.error(f"Request error { method } { completeUrl } failed: { error }")
+            return ('error', str(error))
     
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(basicAPI):
-    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False):
-        super().__init__(serial_nbr)
+    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False, api_version='v2'):
+        super().__init__(serial_nbr, api_version=api_version)
 
         logging.info(f'Netro API initializing')
         self.serialID = serial_nbr
@@ -347,6 +351,8 @@ class netroAccess(basicAPI):
             now_obj = datetime.now()
             if len(data)>0:
                 for indx, m_data in enumerate(data):
+                    if m_data['zone'] not in self.netro['active_zones']:
+                        continue
                     mois_date_obj = datetime.strptime(m_data['date'], '%Y-%m-%d')
                     days_ago = (now_obj - mois_date_obj).days
                     #logging.debug(f'Moisture days {days_ago}')
@@ -354,15 +360,17 @@ class netroAccess(basicAPI):
                         self.netro['active_zones'][m_data['zone']]['moisture'] = {}
                     self.netro['active_zones'][m_data['zone']]['moisture'][days_ago] = m_data['moisture']
                 for indx, zone in enumerate (self.netro['active_zones']):
-                    d_list = []
-                    m_list = []
-                    for day in self.netro['active_zones'][zone]['moisture']:
-                        d_list.append(-day)
-                        m_list.append(self.netro['active_zones'][zone]['moisture'][day])
-                    x=np.array(d_list)
-                    y=np.array(m_list)
-                    f = np.polyfit(x,y, deg=1)
-                    self.netro['active_zones'][zone]['polyfit'] = f
+                    zone_moisture = self.netro['active_zones'][zone].get('moisture', {})
+                    if len(zone_moisture) >= 2:
+                        d_list = []
+                        m_list = []
+                        for day in zone_moisture:
+                            d_list.append(-day)
+                            m_list.append(zone_moisture[day])
+                        x=np.array(d_list)
+                        y=np.array(m_list)
+                        f = np.polyfit(x,y, deg=1)
+                        self.netro['active_zones'][zone]['polyfit'] = f
                     #logging.debug(f'moisture slope {f[0]}')
             
             logging.debug(f' after processing moisture data {self.netro}')
@@ -405,7 +413,7 @@ class netroAccess(basicAPI):
                 logging.debug(f'moisture data {self.netro["active_zones"][zone_nbr]["moisture"]} , len {len(self.netro["active_zones"][zone_nbr]["moisture"])}')
                 dat  = self.netro['active_zones'][zone_nbr]['moisture']
                 min_day = 30
-                moinsture = None
+                moisture = None
                 for day in self.netro['active_zones'][zone_nbr]['moisture']:
                     if day < min_day:
                         min_day = day
@@ -633,7 +641,7 @@ class netroAccess(basicAPI):
                 if status == 'ok':
                     self.extractAPIinfo(res)
                     logging.debug(f'res = {res}')
-                    self.netro['status'] = statusEN
+                    self.netro['status'] = 'ONLINE' if statusEN == 1 else 'STANDBY'
     
                     return(status)
                 else:

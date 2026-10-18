@@ -24,15 +24,15 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 
-STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99, 'VALID':0, 'EXECUTING':1, 'EXECUTED':2,'NO SCHEDULE':98, None:99}
-ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
+STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':99,'UNKNOWN':99, 'VALID':0, 'EXECUTING':1, 'EXECUTED':2,'NO SCHEDULE':98, 'NO_SCHEDULE':98, None:99}
+ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99, None:99}
 
 def ctrl_status2ISY(self, status_str) -> int:
     logging.debug(f'ctrl_status2ISY : {status_str}')
-    return(STATUS_CODE[status_str])
+    return STATUS_CODE.get(status_str, 99)
 
 def zoneconfig2ISY(self,config_str) -> int:
-    return(ZONE_CONFIG[config_str])
+    return ZONE_CONFIG.get(config_str, 99)
 
 def node_queue(self, data):
     self.n_queue.append(data['address'])
@@ -43,7 +43,7 @@ def wait_for_node_done(self):
     self.n_queue.pop()
 
 def mask2key (self, mask):
-    logging.debug('mask2key : {mask}')
+    logging.debug(f'mask2key : {mask}')
     return(int(round(math.log2(mask),0)))
     
 def daysToMask (self, dayList):
@@ -134,7 +134,7 @@ def daylist2bin(self, daylist):
 
 
 def season2ISY(self, season):
-    logging.debug('season2ISY {season}')
+    logging.debug(f'season2ISY {season}')
     if season is not None:
         if season.upper() == 'WINTER':
             return(0)
@@ -201,7 +201,7 @@ def code2ISY(self, state):
         elif state.lower() == 'invalid':
             return(97)       
         else:
-            logging.error('Unknown state passed {state}')
+            logging.error(f'Unknown state passed {state}')
             return(99)
     else:
         return(99)
@@ -286,7 +286,7 @@ def sentry2ISY(self, state) -> int:
 
 
 def period2ISY(self, period):
-    logging.debug('period2ISY {period}')
+    logging.debug(f'period2ISY {period}')
     if period is not None:
         if period.upper() == 'OFF_PEAK':
             return(0)
@@ -322,7 +322,7 @@ def CO_setDriver(self, key, value, Unit=None):
 
 
 def send_rel_temp_to_isy(self, temperature, stateVar):
-    logging.debug('convert_temp_to_isy - {temperature}')
+    logging.debug(f'convert_temp_to_isy - {temperature}')
     if self.ISY_temp_unit == 0: # Celsius in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.node.setDriver(stateVar, round(temperature,1), True, True, 4)
@@ -341,7 +341,7 @@ def send_rel_temp_to_isy(self, temperature, stateVar):
 
 
 def send_temp_to_isy (self, temperature, stateVar):
-    logging.debug('convert_temp_to_isy - {temperature}')
+    logging.debug(f'convert_temp_to_isy - {temperature}')
     if self.ISY_temp_unit == 0: # Celsius in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.node.setDriver(stateVar, round(temperature,1), True, True, 4)
@@ -371,7 +371,7 @@ def heartbeat(self):
         self.hb = 0
 
 def handleLevelChange(self, level):
-    logging.info('New log level: {level}')
+    logging.info(f'New log level: {level}')
 
 
 def get_dynamic_profile_editors():

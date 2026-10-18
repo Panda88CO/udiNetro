@@ -24,13 +24,13 @@ class netroSensor(udi_interface.Node):
             {'driver': 'GV19', 'value': 0, 'uom': 151, 'name': 'Last Update'}, #Last update
             ]
     
-    def __init__(self, polyglot,  primary, address, name, TEMP_unit):
+    def __init__(self, polyglot,  primary, address, name, api_key, TEMP_unit):
         super(netroSensor, self).__init__(polyglot, primary, address, name)
         logging.info('_init_ Netro Sensor Node')
         self.poly = polyglot
         self.hb = 0
         self.ISYforced = False
-        self.serial_id = address
+        self.serial_id = api_key
         self.primary = primary
         self.address = address
         self.name = name
@@ -75,17 +75,14 @@ class netroSensor(udi_interface.Node):
     def stop(self):
         logging.debug('stop - Cleaning up')
 
-
-    def stop(self):
-        logging.debug('stop - Cleaning up')
-
     def retrieve_sensor_data(self):
         self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
+        return self.sensor_data
 
     def ISYupdate (self, command):
         logging.info('ISY-update called')
-        self.sensor_data = self.retrieve_sensor_data()
+        self.retrieve_sensor_data()
 
     def systemPoll(self, pollList):
         logging.debug(f'systemPoll - {pollList}')
@@ -95,12 +92,12 @@ class netroSensor(udi_interface.Node):
                 self.longpoll()
                 if 'shortPoll' in pollList: #send short polls heart beat as shortpoll is not executed
                     self.shortpoll()
-            if 'shortPoll' in pollList:
+            elif 'shortPoll' in pollList:
                 self.shortpoll()
 
     def longpoll(self):
         self.netro_api.update_info()
-        self.netro_api.update_sensor_data()
+        self.sensor_data = self.netro_api.update_sensor_data()
         self.updateISYdrivers()
 
     def shortpoll(self):
