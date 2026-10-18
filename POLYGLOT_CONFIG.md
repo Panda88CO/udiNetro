@@ -6,11 +6,10 @@ This node server uses **Netro Public API v2** to connect your Netro smart irriga
 
 Netro Public API v2 uses **unique per-device API keys** rather than 12-character hardware serial numbers. Each controller and sensor has its own distinct API key:
 
-1. Log in to the **Netro Home Web Portal** at [https://home.netrohome.com](https://home.netrohome.com) using your Netro account credentials.
-2. Go to **Settings / Account -> API Key** (or select a device and open its **Device Settings**).
-3. Select your controller or sensor and generate/copy its **API Key** (a ~43-character token such as `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
-4. **Repeat for each device**: Switch to each of your other controllers and sensors in the Netro portal to obtain the unique API key for each one.
-5. Paste all device API keys into the `SERIALID` parameter below, separated by a single space (`key1 key2 key3`).
+1. Log in to your Netro account via browser at [https://www.netrohome.com/shop](https://www.netrohome.com/shop).
+2. Click on the **Account** menu and select **API Key** in the left sidebar menu.
+3. Your registered devices will be listed—click **Generate API Key** for each controller and sensor to create its unique API key string (e.g. `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
+4. **Manually highlight and copy (`Cmd+C` / `Ctrl+C`)** the distinct API key text for each device directly from the page (do **not** use Netro's "Copy" button, which has a bug on their website that copies the first device's key for every row). Paste the keys into `SERIALID` separated by a single space (`key1 key2 key3`), then click **Save Changes**.
 
 ---
 

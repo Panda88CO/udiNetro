@@ -27,17 +27,17 @@ This node server uses **Netro Public API v2** (`https://api.netrohome.com/npa/v2
 
 Netro Public API v2 uses **unique per-device API keys** rather than hardware serial numbers. Each controller and each soil sensor has its own distinct API key.
 
-1. Log in to the **Netro Home Web Portal** at [https://home.netrohome.com](https://home.netrohome.com) using your Netro account credentials.
-2. Open **Settings / Account** and navigate to the **API Key** section (or open **Device Settings** for a specific device).
-3. Select the device (controller or sensor) and click **Generate / Get API Key**.
-4. Copy the generated token (a ~43-character URL-safe string, e.g. `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
-5. **Repeat for each device**: Select each additional controller or sensor in your Netro account to obtain its unique API key.
-6. In the Polyglot v3 **Configuration** page, paste all of your device API keys into the `SERIALID` parameter separated by spaces:
+1. Log in to your Netro account via browser at [https://www.netrohome.com/shop](https://www.netrohome.com/shop).
+2. Click on the **Account** menu.
+3. Select **API Key** in the left sidebar menu.
+4. All of your registered devices will be listed—click **Generate API Key** next to each device to create its unique encrypted API key string (e.g. `Sh6CZ1NWLj04crC_Hk7c3pBHdsvLLKurHtfjdx-Bi18`).
+5. **Manually highlight and copy (`Cmd+C` / `Ctrl+C`)** the distinct API key text for each controller and sensor directly from the table (do **not** rely on Netro's "Copy" button, which has a web portal bug that copies the first device's key for every row).
+6. In the Polyglot v3 **Configuration** page, paste all of your device API keys into the `SERIALID` parameter separated by spaces, then click **Save Changes**:
    ```text
    key_for_device_1 key_for_device_2 key_for_device_3
    ```
 
-> **Important**: Do not paste the same API key multiple times—each API key maps to a single Netro controller or sensor.
+> **Important**: Verify that each pasted key in `SERIALID` is different—Netro's "Copy" button on the Account -> API Key page often copies the first key repeatedly. Highlight each key string manually when copying.
 
 ---
 

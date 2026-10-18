@@ -97,6 +97,7 @@ class netroStart(udi_interface.Node):
         self.config_done = False
 
         self.serialID_list = []
+        self.duplicate_keys_msg = None
         self.node_dict = {}
 
         logging.info('Controller init DONE')
@@ -110,6 +111,9 @@ class netroStart(udi_interface.Node):
         #while not self.config_done and not self.portalReady :
             logging.info(f'Waiting for node to initialize {self.customParam_done} {self.config_done}')
             time.sleep(1)
+
+        if self.duplicate_keys_msg:
+            self.poly.Notices['DUPLICATE_KEYS'] = self.duplicate_keys_msg
 
         self.apply_profile_driver_names(self.id)
         
@@ -214,7 +218,15 @@ class netroStart(udi_interface.Node):
                     temp_list = [item for item in raw_serial.split() if item]
                     deduped_list = list(dict.fromkeys(temp_list))
                     if len(deduped_list) < len(temp_list):
-                        logging.warning(f'Duplicate keys found in SERIALID configuration; deduplicated {len(temp_list)} entries to {len(deduped_list)} unique key(s).')
+                        self.duplicate_keys_msg = (
+                            f'SERIALID contains {len(temp_list)} entries but only {len(deduped_list)} unique API key(s). '
+                            f'Note: Netro\'s "Copy" button on their website copies the first device\'s key for every row—highlight and copy each key manually.'
+                        )
+                        logging.warning(self.duplicate_keys_msg)
+                    else:
+                        self.duplicate_keys_msg = None
+                        if 'DUPLICATE_KEYS' in self.poly.Notices:
+                            self.poly.Notices.delete('DUPLICATE_KEYS')
                     self.serialID_list = deduped_list
                
             else:
