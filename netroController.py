@@ -37,14 +37,13 @@ class netroController(udi_interface.Node):
 
         #self.node = self.poly.getNode(address)
         self.n_queue = []
-        self.customParam_done = False
-        self.config_done= False        
-        self.nodes_in_db = None
+        self.customParam_done = True
+        self.config_done = True        
+        self.nodes_in_db = self.poly.getNodesFromDb()
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
         polyglot.subscribe(polyglot.POLL, self.systemPoll)
-        self.poly.ready()
         self.apply_profile_driver_names(self.id)
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -55,10 +54,8 @@ class netroController(udi_interface.Node):
         
     def configDoneHandler(self):
         logging.debug('configDoneHandler - config_done')
-        # We use this to discover devices, or ask to authenticate if user has not already done so
-        self.poly.Notices.clear()
         self.nodes_in_db = self.poly.getNodesFromDb()
-        self.config_done= True
+        self.config_done = True
 
     def _background_task(self):
         while not self._stop_thread.is_set():

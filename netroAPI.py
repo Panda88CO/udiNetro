@@ -18,11 +18,21 @@ except ImportError:
 
 
 class basicAPI(object):
-    def __init__(self, serial_nbr, api_version='v2'):
+    def __init__(self, serial_nbr, api_version=None):
         self.session = requests.Session()
-        self.yourApiEndpoint = f'https://api.netrohome.com/npa/{api_version}'   
         self.serialID = serial_nbr
+        if api_version is None:
+            # 12-character hex strings are v1 hardware serial numbers; longer tokens are v2 API keys
+            if isinstance(serial_nbr, str) and re.fullmatch(r'[0-9A-Fa-f]{12}', serial_nbr.strip()):
+                api_version = 'v1'
+            else:
+                api_version = 'v2'
         self.api_version = api_version
+        self.yourApiEndpoint = f'https://api.netrohome.com/npa/{self.api_version}'
+
+    def _set_api_version(self, api_version):
+        self.api_version = api_version
+        self.yourApiEndpoint = f'https://api.netrohome.com/npa/{self.api_version}'
 
 
     def callNetroApi(self, method='GET',url=None, body=None):
@@ -46,10 +56,19 @@ class basicAPI(object):
         
 
     def netroType(self):
-        #self.yourApiEndpoint = 'https://api.netrohome.com/npa/v1'
         try:
             if isinstance(self.serialID, str):         
                 status, res = self.callNetroApi('GET', '/info.json')
+                if status != 'ok':
+                    # Try fallback API version (v1 <-> v2) if the initial version failed
+                    alt_version = 'v2' if self.api_version == 'v1' else 'v1'
+                    orig_version = self.api_version
+                    self._set_api_version(alt_version)
+                    alt_status, alt_res = self.callNetroApi('GET', '/info.json')
+                    if alt_status == 'ok':
+                        status, res = alt_status, alt_res
+                    else:
+                        self._set_api_version(orig_version)
                 logging.debug(f'netroType response:{status} {res}')
                 if status == 'ok':
                     if 'errors' in res and len(res['errors']) > 0:
@@ -62,7 +81,17 @@ class basicAPI(object):
                     else:
                         return('unknown', 'unknown')
                 else:
-                    return('error', 'Check device online or if daily Tokens used') 
+                    err_msg = 'Check device online or if daily Tokens used'
+                    if isinstance(res, str):
+                        try:
+                            err_json = json.loads(res)
+                            if 'errors' in err_json and len(err_json['errors']) > 0:
+                                err_msg = err_json['errors'][0].get('message', err_msg)
+                        except Exception:
+                            pass
+                    elif isinstance(res, list) and len(res) > 0 and isinstance(res[0], dict):
+                        err_msg = res[0].get('message', err_msg)
+                    return('error', err_msg) 
             else:
                 logging.error(f'netroType - serial number {self.serialID} is not a string but {type(self.serialID)}')
                 return('unknown', 'unknown')
@@ -132,7 +161,7 @@ class basicAPI(object):
 #STATUS_CODE = {'STANDBY':0, 'SETUP':1, 'ONLINE':2, 'WATERING':3, 'OFFLINE':4, 'SLEEPING':5, 'POWEROFF':6,'ERROR':7,'UNKNOWN':99}
 #ZONE_CONFIG = {'SMART':0, 'ASSISTANT':1,'TIMER':2,'ERROR':99,'UNKNOWN':99}
 class netroAccess(basicAPI):
-    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False, api_version='v2'):
+    def __init__(self,  serial_nbr, event_days=-7, moist_days=-3, sch_days=7, dev_noly = False, api_version=None):
         super().__init__(serial_nbr, api_version=api_version)
 
         logging.info(f'Netro API initializing')

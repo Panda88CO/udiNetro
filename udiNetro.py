@@ -139,9 +139,9 @@ class netroStart(udi_interface.Node):
                 self.node_dict[serial_nbr] = netroSensor(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit )
                 assigned_primary_addresses.append(node_address)
             elif dev_type == 'error':
-                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated ERROR {name}'
+                self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR: {name}'
             else:
-                self.poly.Notices['ERROR'] = f'SerialID {serial_nbr} generated  ERROR'
+                self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR'
             time.sleep(1)
 
         # Wait for all instantiated nodes (and their child zone nodes) to finish initializing before loading profiles
@@ -159,12 +159,13 @@ class netroStart(udi_interface.Node):
         time.sleep(2)
         logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
 
-        for indx, node  in enumerate(self.nodes_in_db):
-            #node = self.nodes_in_db[nde]
-            logging.debug(f'Scanning db for unused primary nodes  : {node}')
-            if node['primaryNode'] not in assigned_primary_addresses:
-                logging.debug('Removing node : {} {}'.format(node['name'], node))
-                self.poly.delNode(node['address'])
+        if len(self.node_dict) > 0:
+            for indx, node  in enumerate(self.nodes_in_db):
+                #node = self.nodes_in_db[nde]
+                logging.debug(f'Scanning db for unused primary nodes  : {node}')
+                if node['primaryNode'] not in assigned_primary_addresses:
+                    logging.debug('Removing node : {} {}'.format(node['name'], node))
+                    self.poly.delNode(node['address'])
             
     
         self.update_all_drivers()
@@ -174,7 +175,7 @@ class netroStart(udi_interface.Node):
 
         self.poly.Notices['done'] = 'Initialization process completed'
         time.sleep(2)
-        self.poly.Notices.clear()
+        self.poly.Notices.delete('done')
 
 
 
@@ -187,7 +188,8 @@ class netroStart(udi_interface.Node):
     def configDoneHandler(self):
         logging.debug('configDoneHandler - config_done')
         # We use this to discover devices, or ask to authenticate if user has not already done so
-        self.poly.Notices.clear()
+        if not self.initialized:
+            self.poly.Notices.clear()
         self.nodes_in_db = self.poly.getNodesFromDb()
         self.config_done= True
  
@@ -210,7 +212,10 @@ class netroStart(udi_interface.Node):
                 }
                 if raw_serial not in placeholders:
                     temp_list = [item for item in raw_serial.split() if item]
-                    self.serialID_list = temp_list
+                    deduped_list = list(dict.fromkeys(temp_list))
+                    if len(deduped_list) < len(temp_list):
+                        logging.warning(f'Duplicate keys found in SERIALID configuration; deduplicated {len(temp_list)} entries to {len(deduped_list)} unique key(s).')
+                    self.serialID_list = deduped_list
                
             else:
                 logging.warning('No serialID found')
@@ -371,7 +376,6 @@ if __name__ == "__main__":
         #polyglot.setCustomParamsDoc()
         Netro =netroStart(polyglot, 'controller', 'controller', 'Netro Irrigation')
 
-        polyglot.ready()
         polyglot.runForever()
 
     except (KeyboardInterrupt, SystemExit):
