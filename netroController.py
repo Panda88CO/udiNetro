@@ -193,6 +193,9 @@ class netroController(udi_interface.Node):
                 self.CO_setDriver('GV16', bat_lvl , 52)
             self.CO_setDriver('GV17', self.netro_api.get_controller_info('calls_remaining'),70)
             self.CO_setDriver('GV19', self.netro_api.get_controller_info('last_api_time'),151)
+            last_poll = self.netro_api.get_controller_info('last_poll_time')
+            if last_poll is not None:
+                self.CO_setDriver('TIME', last_poll, 151)
         except Exception as e:
             logging.error(f'updateISYdrivers Controller node  failed: Nodes may not be 100% ready {e}')
 
@@ -231,6 +234,9 @@ class netroController(udi_interface.Node):
             if res == 'ok':
                 time.sleep(1)
                 self.CO_setDriver('ST', self.ctrl_status2ISY(self.netro_api.system_status()), 25)
+                last_poll = self.netro_api.get_controller_info('last_poll_time')
+                if last_poll is not None:
+                    self.CO_setDriver('TIME', last_poll, 151)
 
     def stop_water_all (self, command=None):
         logging.info('stop_water called')
@@ -261,7 +267,7 @@ class netroController(udi_interface.Node):
             {'driver': 'GV16', 'value': 99, 'uom': 25, 'name': 'Battery Level'}, # battery level if appropriate
             {'driver': 'GV17', 'value': 0, 'uom': 70, 'name': 'Remaining API calls'},  #Nmber of api call remaining
             {'driver': 'GV19', 'value': 0, 'uom': 151, 'name': 'Last API Update'}, #Last update
-
+            {'driver': 'TIME', 'value': 99, 'uom': 25, 'name': 'Last Poll Time'}, #Last successful poll time
             ]
 
 

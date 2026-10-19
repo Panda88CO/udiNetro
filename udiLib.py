@@ -361,14 +361,10 @@ def send_temp_to_isy (self, temperature, stateVar):
 
 
 def heartbeat(self):
-    logging.debug('heartbeat: ' + str(self.hb))
-    
-    if self.hb == 0:
-        self.reportCmd('DON',2)
-        self.hb = 1
-    else:
-        self.reportCmd('DOF',2)
-        self.hb = 0
+    logging.debug('heartbeat: sending DON, waiting 5s, sending DOF')
+    self.reportCmd('DON', 2)
+    time.sleep(5)
+    self.reportCmd('DOF', 2)
 
 def handleLevelChange(self, level):
     logging.info(f'New log level: {level}')
@@ -759,7 +755,10 @@ def get_dynamic_profile_nodedefs():
     Used for updateJsonProfile and as the primary source of driver names.
     """
     sensor_cmds = {
-        "sends": [],
+        "sends": [
+            {"id": "DON"},
+            {"id": "DOF"},
+        ],
         "accepts": [
             {"id": "UPDATE", "name": "Update Data"},
         ],
@@ -795,6 +794,7 @@ def get_dynamic_profile_nodedefs():
                 {"id": "GV16", "editor": "BATLEVEL", "name": "Battery Level"},
                 {"id": "GV17", "editor": "APICOUNT", "name": "Remaining API calls"},
                 {"id": "GV19", "editor": "UNIXTIME", "name": "Last API Update"},
+                {"id": "TIME", "editor": "UNIXTIME", "name": "Last Poll Time"},
             ],
             "cmds": {
                 "sends": [

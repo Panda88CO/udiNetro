@@ -175,6 +175,7 @@ class netroAccess(basicAPI):
         self.DEV_TYPE = None
         self.netro = {}
         self.netro['active_zones'] = {}
+        self.netro['last_poll_time'] = None
         self.update_info() #Get latest API data
         logging.debug(f'self.nero: {self.netro}')
         if 'device_type' in self.netro:
@@ -249,11 +250,15 @@ class netroAccess(basicAPI):
 
     def extractAPIinfo(self, res) -> int:
         try:
-            
+            if not isinstance(res, dict) or 'meta' not in res or 'data' not in res:
+                return(None)
+            if 'errors' in res and len(res['errors']) > 0:
+                return(None)
             date_time_str = res['meta']['last_active']
             logging.debug('extractAPIinfo {}'.format(json.dumps(res['meta'], indent=4)))
             unix_time = self.daytimestr2epocTime(date_time_str)
-            self.netro['last_api_time'] = unix_time     
+            self.netro['last_api_time'] = unix_time
+            self.netro['last_poll_time'] = int(time.time())
             self.netro['calls_remaining'] = res['meta']['token_remaining']   
             
             return('ok')
@@ -268,10 +273,11 @@ class netroAccess(basicAPI):
     
     def update_controller_data(self):
         logging.debug('update_controller')
-        self.update_info()
-        self.update_moisture_info()
-        self.update_schedules()
-        self.update_events()
+        s1 = self.update_info()
+        s2 = self.update_moisture_info()
+        s3 = self.update_schedules()
+        s4 = self.update_events()
+        return any(s is not None and s != 'error' for s in (s1, s2, s3, s4))
 
 
     def get_controller_info(self, key):
@@ -725,6 +731,7 @@ class netroAccess(basicAPI):
                 params = {'days':skip_days}
                 status, res = self.callNetroApi('POST', '/no_water.json', params)
                 if status == 'ok':
+                    self.extractAPIinfo(res)
                     logging.debug(f'res = {res}')
                     return(status)
             else:
@@ -749,9 +756,9 @@ class netroAccess(basicAPI):
                 params['end_date']=stop_str
                 status, tmp_res = self.callNetroApi('GET', '/sensor_data.json', params)
                 logging.debug(f'status {status}  tmp_res{tmp_res}')
-                self.extractAPIinfo(tmp_res)
 
                 if status == 'ok':
+                    self.extractAPIinfo(tmp_res)
                     
                     logging.debug('status {} '.format(tmp_res['data']['sensor_data']))
                     if len(tmp_res['data']['sensor_data']) > 0:

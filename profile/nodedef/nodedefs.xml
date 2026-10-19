@@ -26,6 +26,7 @@
          <st id="GV16" editor="BATLEVEL" />
          <st id="GV17" editor="APICOUNT" />
          <st id="GV19" editor="UNIXTIME" />
+         <st id="TIME" editor="UNIXTIME" />
       </sts>
       <cmds>
          <sends>
@@ -87,6 +88,8 @@
       </sts>
       <cmds>
          <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
          </sends>
          <accepts>
             <cmd id="UPDATE" />
@@ -107,6 +110,8 @@
       </sts>
       <cmds>
          <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
          </sends>
          <accepts>
             <cmd id="UPDATE" />

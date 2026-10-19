@@ -36,7 +36,7 @@ Netro Public API v2 uses **unique per-device API keys** rather than 12-character
 
 ### Polling & Rate Limits
 
-- **shortPoll**: Sends a heartbeat (`DON`/`DOF`) to ISY for each controller and sensor node.
+- **shortPoll**: Sends a heartbeat pulse (`DON`, waits 5 seconds, then sends `DOF`) to ISY for each controller and sensor node.
 - **longPoll**: Polls the Netro Public API v2 for the latest device status, schedules, events, moisture estimates, and sensor data.
 - **Rate Limit**: Netro enforces a limit of **2,000 API calls per day** per device (a controller `longPoll` uses 4 calls; a sensor `longPoll` uses 2 calls). Avoid setting `longPoll` too short.
 

@@ -11,7 +11,7 @@ This node server uses **Netro Public API v2** (`https://api.netrohome.com/npa/v2
 - **Service Node (`CONTROLLER`)**:
   - Primary service node managing configuration, device discovery, and dynamic profile synchronization.
 - **Irrigation Controllers (`IRRCTRL`)**:
-  - Monitors controller status (`Standby`, `Setup`, `Online`, `Watering`, `Offline`, `Sleeping`, `Power Off`, `Valve Error`), active zone count, next scheduled start time, previous end time, last online/offline events, battery level (for battery-powered controllers like Pixie), remaining daily API calls, and last API update time.
+  - Monitors controller status (`Standby`, `Setup`, `Online`, `Watering`, `Offline`, `Sleeping`, `Power Off`, `Valve Error`), active zone count, next scheduled start time, previous end time, last online/offline events, battery level (for battery-powered controllers like Pixie), remaining daily API calls, last API update time (`GV19`), and last successful poll time (`TIME`).
   - **Commands**:
     - `UPDATE` (*Update Data*): Refreshes controller and child zone data from Netro API v2.
     - `ENABLE` (*Controller*): Enables (`Enabled`) or disables (`Disabled`) the controller.
@@ -67,7 +67,7 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Polling & API Rate Limits
 
-- **ShortPoll**: Sends a heartbeat (`DON`/`DOF`) to ISY for each controller and sensor node.
+- **ShortPoll**: Sends a heartbeat pulse (`DON`, waits 5 seconds, then sends `DOF`) to ISY for each controller and sensor node.
 - **LongPoll**: Queries the Netro Public API v2 for the latest device status, events, schedules, moisture estimates, and sensor readings (note: battery-powered sensors may sleep between reports, so the most recent reading before sleep is reported).
 
 > **Note on Rate Limits**: Netro enforces a limit of **2,000 API calls per day** per device. A controller `longPoll` typically uses 4 API calls (`info`, `moistures`, `schedules`, and `events`), while a sensor `longPoll` uses 2 API calls (`info` and `sensor_data`). Avoid setting `longPoll` too aggressively.
@@ -76,6 +76,9 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Changelog
 
+- **0.2.5**
+  - Added `TIME` (*Last Poll Time*) driver to `IRRCTRL` (`netroController`), updated only when a Netro API call succeeds with valid data.
+  - Updated `heartbeat` on `shortPoll` to send `DON`, wait 5 seconds, and send `DOF` on every poll instead of toggling between polls.
 - **0.2.4**
   - Standardized all `nodeDef` IDs (`CONTROLLER`, `IRRCTRL`, `IRRZONE`, `SENSORC`, `SENSORF`), `editor` IDs, `nls` prefixes, command IDs (`UPDATE`, `STOPWATER`, `SKIPDAYS`, `ENABLE`, `WATER`), and command parameter IDs (`DURATION`, `DELAY`) to uppercase alphanumeric without special characters or reserved words.
   - Added full `"nls"` dictionary to dynamic JSON profile payload (`updateJsonProfile`).
