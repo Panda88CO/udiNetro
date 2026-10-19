@@ -20,7 +20,7 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.2.3'
+VERSION = '0.2.4'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY, apply_profile_driver_names
@@ -352,6 +352,10 @@ class netroStart(udi_interface.Node):
         from udiLib import get_dynamic_profile_nodedefs
         return get_dynamic_profile_nodedefs()
 
+    def _profile_nls(self):
+        from udiLib import get_dynamic_profile_nls
+        return get_dynamic_profile_nls()
+
     def _dynamic_profile_payload(self):
         return {
             "delete": {
@@ -362,9 +366,10 @@ class netroStart(udi_interface.Node):
             "editors": self._profile_editors(),
             "nodedefs": self._profile_nodedefs(),
             "linkdefs": [],
+            "nls": self._profile_nls(),
         }
 
-    id = 'controller'
+    id = 'CONTROLLER'
 
 
     commands = {  }

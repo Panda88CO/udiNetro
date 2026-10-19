@@ -380,11 +380,12 @@ def get_dynamic_profile_editors():
     """
     return [
         {
-            "id": "IrrState",
+            "id": "IRRSTATE",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1,2,3,4,5,6,7,99",
+                    "nls": "IRRSTATE",
                     "names": {
                         "0": "Standby",
                         "1": "Setup",
@@ -400,11 +401,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "Enabled",
+            "id": "CTRLEN",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1,99",
+                    "nls": "CTRLEN",
                     "names": {
                         "0": "Disabled",
                         "1": "Enabled",
@@ -414,11 +416,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "Status",
+            "id": "SENSORSTAT",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1,98,99",
+                    "nls": "SENSORSTAT",
                     "names": {
                         "0": "Offline",
                         "1": "Online",
@@ -429,22 +432,24 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "constatus",
+            "id": "CONSTATUS",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0-3,99",
+                    "nls": "CONSTATUS",
                     "names": {
                         "0": "Offline",
                         "1": "Online",
                         "2": "Sleeping",
+                        "3": "Unknown",
                         "99": "Unknown",
                     },
                 }
             ],
         },
         {
-            "id": "NbrZones",
+            "id": "NBRZONES",
             "ranges": [
                 {
                     "uom": "70",
@@ -454,7 +459,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "count",
+            "id": "APICOUNT",
             "ranges": [
                 {
                     "uom": "70",
@@ -464,7 +469,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "tempC",
+            "id": "TEMPC",
             "ranges": [
                 {
                     "uom": "4",
@@ -475,6 +480,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "98,99",
+                    "nls": "TEMPNLS",
                     "names": {
                         "98": "No Temperature Data",
                         "99": "Unknown",
@@ -483,7 +489,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "tempF",
+            "id": "TEMPF",
             "ranges": [
                 {
                     "uom": "17",
@@ -494,6 +500,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "98,99",
+                    "nls": "TEMPNLS",
                     "names": {
                         "98": "No Temperature Data",
                         "99": "Unknown",
@@ -502,11 +509,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "setEnable",
+            "id": "SETENABLE",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1",
+                    "nls": "CTRLEN",
                     "names": {
                         "0": "Disabled",
                         "1": "Enabled",
@@ -515,11 +523,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "SchSource",
+            "id": "SCHSOURCE",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1,2,99",
+                    "nls": "SCHSOURCE",
                     "names": {
                         "0": "Netro Smart Schedule",
                         "1": "Netro Fixed Schedule",
@@ -530,11 +539,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "SchStatus",
+            "id": "SCHSTATUS",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1,2,98,99",
+                    "nls": "SCHSTATUS",
                     "names": {
                         "0": "Awaiting Schedule start",
                         "1": "Schedule Executing",
@@ -546,11 +556,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "StartStop",
+            "id": "STARTSTOP",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1",
+                    "nls": "CTRLEN",
                     "names": {
                         "0": "Disabled",
                         "1": "Enabled",
@@ -559,7 +570,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "Minutes",
+            "id": "MINDUR",
             "ranges": [
                 {
                     "uom": "44",
@@ -570,6 +581,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "99",
+                    "nls": "UNKNLS",
                     "names": {
                         "99": "Unknown",
                     },
@@ -577,7 +589,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "setMinutes",
+            "id": "SETMINUTES",
             "ranges": [
                 {
                     "uom": "44",
@@ -588,7 +600,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "setDays",
+            "id": "SETDAYS",
             "ranges": [
                 {
                     "uom": "10",
@@ -598,11 +610,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "OnOff",
+            "id": "ONOFFSTATE",
             "ranges": [
                 {
                     "uom": "25",
                     "subset": "0,1",
+                    "nls": "ONOFFSTATE",
                     "names": {
                         "0": "Off",
                         "1": "On",
@@ -611,11 +624,12 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "ZoneType",
+            "id": "ZONETYPE",
             "ranges": [
                 {
                     "uom": "25",
-                    "subset": "0,1,2",
+                    "subset": "0,1,2,99",
+                    "nls": "ZONETYPE",
                     "names": {
                         "0": "Smart",
                         "1": "Smart Basic",
@@ -626,7 +640,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "Moisture",
+            "id": "MOISTURE",
             "ranges": [
                 {
                     "uom": "70",
@@ -636,6 +650,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "99",
+                    "nls": "UNKNLS",
                     "names": {
                         "99": "Unknown",
                     },
@@ -643,7 +658,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "slope",
+            "id": "MOISTSLOPE",
             "ranges": [
                 {
                     "uom": "70",
@@ -654,6 +669,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "99",
+                    "nls": "UNKNLS",
                     "names": {
                         "99": "Unknown",
                     },
@@ -661,7 +677,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "Sunlight",
+            "id": "SUNLIGHT",
             "ranges": [
                 {
                     "uom": "36",
@@ -671,7 +687,8 @@ def get_dynamic_profile_editors():
                 },
                 {
                     "uom": "25",
-                    "subset": "99",
+                    "subset": "98,99",
+                    "nls": "NOLIGHT",
                     "names": {
                         "98": "No light Data",
                         "99": "Unknown",
@@ -680,7 +697,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "battery",
+            "id": "BATLEVEL",
             "ranges": [
                 {
                     "uom": "51",
@@ -690,6 +707,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "98,99",
+                    "nls": "BATNLS",
                     "names": {
                         "98": "No battery",
                         "99": "Unknown",
@@ -703,6 +721,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "0,1,98,99",
+                    "nls": "BOOLSTATE",
                     "names": {
                         "0": "False",
                         "1": "True",
@@ -713,7 +732,7 @@ def get_dynamic_profile_editors():
             ],
         },
         {
-            "id": "unixtime",
+            "id": "UNIXTIME",
             "ranges": [
                 {
                     "uom": "151",
@@ -723,6 +742,7 @@ def get_dynamic_profile_editors():
                 {
                     "uom": "25",
                     "subset": "98,99",
+                    "nls": "SCHNLS",
                     "names": {
                         "98": "No Schedule Defined",
                         "99": "No Data",
@@ -747,11 +767,12 @@ def get_dynamic_profile_nodedefs():
 
     return [
         {
-            "id": "controller",
-            "name": "Netro Irrigation Controller",
+            "id": "CONTROLLER",
+            "nls": "NLSCTRL",
+            "name": "Netro Irrigation Service",
             "icon": "Irrigation",
             "properties": [
-                {"id": "ST", "editor": "Enabled", "name": "Controller Enabled"},
+                {"id": "ST", "editor": "CTRLEN", "name": "Controller Enabled"},
             ],
             "cmds": {
                 "sends": [],
@@ -760,40 +781,41 @@ def get_dynamic_profile_nodedefs():
             "links": {"ctl": [], "rsp": []},
         },
         {
-            "id": "irrctrl",
+            "id": "IRRCTRL",
+            "nls": "NLSIRRCTRL",
             "name": "Netro Irrigation Controller",
             "icon": "Irrigation",
             "properties": [
-                {"id": "ST", "editor": "IrrState", "name": "Controller State"},
-                {"id": "GV1", "editor": "NbrZones", "name": "Number Active Zones"},
-                {"id": "GV3", "editor": "unixtime", "name": "Next Start Time"},
-                {"id": "GV4", "editor": "unixtime", "name": "Previous End Time"},
-                {"id": "GV5", "editor": "unixtime", "name": "Last Offline Event"},
-                {"id": "GV6", "editor": "unixtime", "name": "Last Online Event"},
-                {"id": "GV16", "editor": "battery", "name": "Battery Level"},
-                {"id": "GV17", "editor": "count", "name": "Remaining API calls"},
-                {"id": "GV19", "editor": "unixtime", "name": "Last API Update"},
+                {"id": "ST", "editor": "IRRSTATE", "name": "Controller State"},
+                {"id": "GV1", "editor": "NBRZONES", "name": "Number Active Zones"},
+                {"id": "GV3", "editor": "UNIXTIME", "name": "Next Start Time"},
+                {"id": "GV4", "editor": "UNIXTIME", "name": "Previous End Time"},
+                {"id": "GV5", "editor": "UNIXTIME", "name": "Last Offline Event"},
+                {"id": "GV6", "editor": "UNIXTIME", "name": "Last Online Event"},
+                {"id": "GV16", "editor": "BATLEVEL", "name": "Battery Level"},
+                {"id": "GV17", "editor": "APICOUNT", "name": "Remaining API calls"},
+                {"id": "GV19", "editor": "UNIXTIME", "name": "Last API Update"},
             ],
             "cmds": {
                 "sends": [
-                    {"id": "DON", "name": "On"},
-                    {"id": "DOF", "name": "Off"},
+                    {"id": "DON"},
+                    {"id": "DOF"},
                 ],
                 "accepts": [
-                    {"id": "Update", "name": "Update Data"},
-                    {"id": "StopWater", "name": "Stop All Watering"},
+                    {"id": "UPDATE", "name": "Update Data"},
+                    {"id": "STOPWATER", "name": "Stop All Watering"},
                     {
-                        "id": "SkipDays",
+                        "id": "SKIPDAYS",
                         "name": "Days to Skip Watering",
                         "parameters": [
-                            {"id": "", "editor": "setDays"},
+                            {"id": "", "editor": "SETDAYS"},
                         ],
                     },
                     {
-                        "id": "Enable",
+                        "id": "ENABLE",
                         "name": "Controller",
                         "parameters": [
-                            {"id": "", "editor": "setEnable"},
+                            {"id": "", "editor": "SETENABLE"},
                         ],
                     },
                 ],
@@ -801,34 +823,35 @@ def get_dynamic_profile_nodedefs():
             "links": {"ctl": [], "rsp": []},
         },
         {
-            "id": "zone",
+            "id": "IRRZONE",
+            "nls": "NLSZONE",
             "name": "Irrigation Zone",
             "icon": "Irrigation",
             "properties": [
-                {"id": "ST", "editor": "SchStatus", "name": "Zone Status"},
-                {"id": "GV0", "editor": "NbrZones", "name": "Zone Number"},
-                {"id": "GV1", "editor": "ZoneType", "name": "Zone Type"},
-                {"id": "GV2", "editor": "Moisture", "name": "Moisture Level (0-100)"},
-                {"id": "GV3", "editor": "slope", "name": "Moisture Slope"},
-                {"id": "GV4", "editor": "unixtime", "name": "Previous Start Time"},
-                {"id": "GV5", "editor": "unixtime", "name": "Previous End Time"},
-                {"id": "GV6", "editor": "unixtime", "name": "Next Start Time"},
-                {"id": "GV7", "editor": "unixtime", "name": "Next End Time"},
-                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+                {"id": "ST", "editor": "SCHSTATUS", "name": "Zone Status"},
+                {"id": "GV0", "editor": "NBRZONES", "name": "Zone Number"},
+                {"id": "GV1", "editor": "ZONETYPE", "name": "Zone Type"},
+                {"id": "GV2", "editor": "MOISTURE", "name": "Moisture Level (0-100)"},
+                {"id": "GV3", "editor": "MOISTSLOPE", "name": "Moisture Slope"},
+                {"id": "GV4", "editor": "UNIXTIME", "name": "Previous Start Time"},
+                {"id": "GV5", "editor": "UNIXTIME", "name": "Previous End Time"},
+                {"id": "GV6", "editor": "UNIXTIME", "name": "Next Start Time"},
+                {"id": "GV7", "editor": "UNIXTIME", "name": "Next End Time"},
+                {"id": "GV19", "editor": "UNIXTIME", "name": "Last Update"},
             ],
             "cmds": {
                 "sends": [
-                    {"id": "DON", "name": "On"},
-                    {"id": "DOF", "name": "Off"},
+                    {"id": "DON"},
+                    {"id": "DOF"},
                 ],
                 "accepts": [
-                    {"id": "StopWater", "name": "Stop Watering"},
+                    {"id": "STOPWATER", "name": "Stop Watering"},
                     {
-                        "id": "Water",
+                        "id": "WATER",
                         "name": "Water Zone",
                         "parameters": [
-                            {"id": "Duration", "editor": "setMinutes", "name": "Water Run Time"},
-                            {"id": "Delay", "editor": "setMinutes", "name": "Start Delay"},
+                            {"id": "DURATION", "editor": "SETMINUTES", "name": "Water Run Time"},
+                            {"id": "DELAY", "editor": "SETMINUTES", "name": "Start Delay"},
                         ],
                     },
                 ],
@@ -836,38 +859,73 @@ def get_dynamic_profile_nodedefs():
             "links": {"ctl": [], "rsp": []},
         },
         {
-            "id": "sensor",
+            "id": "SENSORC",
+            "nls": "NLSSENSOR",
             "name": "Irrigation Sensor",
             "icon": "Irrigation",
             "properties": [
-                {"id": "ST", "editor": "Moisture", "name": "Moisture Level (0-100)(Estimated)"},
-                {"id": "CLITEMP", "editor": "tempC", "name": "Temperature"},
-                {"id": "GV2", "editor": "Sunlight", "name": "Sun Light (LUX)"},
-                {"id": "GV18", "editor": "unixtime", "name": "Data Report Time"},
-                {"id": "GV14", "editor": "battery", "name": "Battery Level"},
-                {"id": "GV15", "editor": "constatus", "name": "Connection Status"},
-                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+                {"id": "ST", "editor": "MOISTURE", "name": "Moisture Level (0-100)(Estimated)"},
+                {"id": "CLITEMP", "editor": "TEMPC", "name": "Temperature"},
+                {"id": "GV2", "editor": "SUNLIGHT", "name": "Sun Light (LUX)"},
+                {"id": "GV18", "editor": "UNIXTIME", "name": "Data Report Time"},
+                {"id": "GV14", "editor": "BATLEVEL", "name": "Battery Level"},
+                {"id": "GV15", "editor": "CONSTATUS", "name": "Connection Status"},
+                {"id": "GV19", "editor": "UNIXTIME", "name": "Last Update"},
             ],
             "cmds": sensor_cmds,
             "links": {"ctl": [], "rsp": []},
         },
         {
-            "id": "sensorF",
+            "id": "SENSORF",
+            "nls": "NLSSENSOR",
             "name": "Irrigation Sensor",
             "icon": "Irrigation",
             "properties": [
-                {"id": "ST", "editor": "Moisture", "name": "Moisture Level (0-100)(Estimated)"},
-                {"id": "CLITEMP", "editor": "tempF", "name": "Temperature"},
-                {"id": "GV2", "editor": "Sunlight", "name": "Sun Light (LUX)"},
-                {"id": "GV18", "editor": "unixtime", "name": "Data Report Time"},
-                {"id": "GV14", "editor": "battery", "name": "Battery Level"},
-                {"id": "GV15", "editor": "constatus", "name": "Connection Status"},
-                {"id": "GV19", "editor": "unixtime", "name": "Last Update"},
+                {"id": "ST", "editor": "MOISTURE", "name": "Moisture Level (0-100)(Estimated)"},
+                {"id": "CLITEMP", "editor": "TEMPF", "name": "Temperature"},
+                {"id": "GV2", "editor": "SUNLIGHT", "name": "Sun Light (LUX)"},
+                {"id": "GV18", "editor": "UNIXTIME", "name": "Data Report Time"},
+                {"id": "GV14", "editor": "BATLEVEL", "name": "Battery Level"},
+                {"id": "GV15", "editor": "CONSTATUS", "name": "Connection Status"},
+                {"id": "GV19", "editor": "UNIXTIME", "name": "Last Update"},
             ],
             "cmds": sensor_cmds,
             "links": {"ctl": [], "rsp": []},
         },
     ]
+
+
+def get_dynamic_profile_nls():
+    """
+    Build the NLS key-value dictionary from the dynamic profile editors and nodedefs.
+    """
+    nls = {}
+    for editor in get_dynamic_profile_editors():
+        for rng in editor.get("ranges", []):
+            nls_prefix = rng.get("nls")
+            names = rng.get("names", {})
+            if nls_prefix and names:
+                for k, v in names.items():
+                    nls[f"{nls_prefix}-{k}"] = v
+
+    for nd in get_dynamic_profile_nodedefs():
+        nd_id = nd["id"]
+        nd_nls = nd.get("nls", nd_id)
+        if "name" in nd:
+            nls[f"ND-{nd_id}-NAME"] = nd["name"]
+        if "icon" in nd:
+            nls[f"ND-{nd_id}-ICON"] = nd["icon"]
+        for prop in nd.get("properties", []):
+            if "name" in prop:
+                nls[f"ST-{nd_nls}-{prop['id']}-NAME"] = prop["name"]
+        for cmd in nd.get("cmds", {}).get("accepts", []):
+            if "name" in cmd:
+                nls[f"CMD-{nd_nls}-{cmd['id']}-NAME"] = cmd["name"]
+            for param in cmd.get("parameters", []):
+                if param.get("id") and "name" in param:
+                    nls[f"CMDP-{param['id']}-NAME"] = param["name"]
+
+    return nls
 
 
 _profile_driver_names = None

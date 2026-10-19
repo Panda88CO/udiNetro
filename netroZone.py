@@ -22,7 +22,7 @@ class netroZone(udi_interface.Node):
         self.primary = primary
         self.address = address
         self.name = name
-        match = re.search(r"_z(\d+)", self.address )
+        match = re.search(r"_?z(\d+)$", self.address )
         #logging.debug(f'Zone number match {match}')
 
         self.zone_nbr = int(match.group(1)) if match else -1
@@ -119,13 +119,15 @@ class netroZone(udi_interface.Node):
     def water_control (self, command):
         logging.info('water_control called') 
         duration = 0
-        delay=0
+        delay = 0
 
-        query = command.get("query")
-        if 'Duration.uom44' in query:
-            duration = int(query.get('Duration.uom44'))
-        if 'Delay.uom44' in query:
-            delay = int(query.get('Delay.uom44'))  
+        query = command.get("query", {})
+        dur_val = query.get('DURATION.uom44') or query.get('Duration.uom44')
+        if dur_val is not None:
+            duration = int(dur_val)
+        del_val = query.get('DELAY.uom44') or query.get('Delay.uom44')
+        if del_val is not None:
+            delay = int(del_val)
      
         status = self.netro_api.set_watering(duration, delay, self.zone_nbr)    
         logging.debug(f'set_watering {status}')
@@ -143,12 +145,12 @@ class netroZone(udi_interface.Node):
 
 
 
-    id = 'zone'
+    id = 'IRRZONE'
     commands = { 
-                 #'Update' : update,
-                 'Water' : water_control,
-                 'StopWater' : stop_water_all,
-                 #'Enable' : enable,
+                 #'UPDATE' : update,
+                 'WATER' : water_control,
+                 'STOPWATER' : stop_water_all,
+                 #'ENABLE' : enable,
                 }
 
     drivers = [

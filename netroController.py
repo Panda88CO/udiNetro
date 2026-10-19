@@ -94,7 +94,7 @@ class netroController(udi_interface.Node):
         zone_addresses = [self.primary]
         if self.netro_api.get_controller_info('total_zones') == 1:
             name = 'Hose Zone'
-            address = self.poly.getValidAddress(self.address[-10:]+'_z1')
+            address = self.poly.getValidAddress(self.address[-10:]+'z1')
             zone_addresses.append(address)
             self.zone_nodes[1] = netroZone(self.poly, self.address, address, name , self.netro_api )
         else:
@@ -104,7 +104,7 @@ class netroController(udi_interface.Node):
                 logging.debug(f'Key {key} Selected Zone {tmp_zone}')
                 name = self.poly.getValidName(tmp_zone['name'])
 
-                address = self.poly.getValidAddress(self.address[-10:]+'_z'+str(key))
+                address = self.poly.getValidAddress(self.address[-10:]+'z'+str(key))
                 zone_addresses.append(address)
                 self.zone_nodes[tmp_zone['ith']] = netroZone(self.poly, self.address, address, name , self.netro_api )
                 time.sleep(1) #stagger node creation to avoid flooding isy
@@ -211,9 +211,10 @@ class netroController(udi_interface.Node):
 
     def skip_days (self, command):
         logging.info('skip_days called')
-        query = command.get("query")
-        if 'SkipDays.uom10' in query:
-            skip_days = int(query.get('SkipDays.uom10'))
+        query = command.get("query", {})
+        val = query.get('SKIPDAYS.uom10') or query.get('SkipDays.uom10') or command.get('value')
+        if val is not None:
+            skip_days = int(val)
             res = self.netro_api.set_skip_water_days(skip_days)
             if res == 'ok':
                 time.sleep(2)
@@ -222,9 +223,10 @@ class netroController(udi_interface.Node):
 
     def enable (self, command):
         logging.info('enable called')
-        query = command.get("query")
-        if 'enable.uom25' in query:
-            status = int(query.get('enable.uom25'))
+        query = command.get("query", {})
+        val = query.get('ENABLE.uom25') or query.get('Enable.uom25') or query.get('enable.uom25') or command.get('value')
+        if val is not None:
+            status = int(val)
             res = self.netro_api.set_status(status)
             if res == 'ok':
                 time.sleep(1)
@@ -241,12 +243,12 @@ class netroController(udi_interface.Node):
             self.updateISYdrivers()
 
 
-    id = 'irrctrl'
+    id = 'IRRCTRL'
     commands = { 
-                 'Update' : update,
-                 'SkipDays' : skip_days,
-                 'Enable' : enable,
-                 'StopWater' : stop_water_all,
+                 'UPDATE' : update,
+                 'SKIPDAYS' : skip_days,
+                 'ENABLE' : enable,
+                 'STOPWATER' : stop_water_all,
                 }
 
     drivers = [

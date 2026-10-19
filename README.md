@@ -1,25 +1,35 @@
 # udiNetro
 
-Universal Devices ISY / eisy Polyglot v3 (PG3) Node Server for **Netro Home** smart irrigation controllers (Sprite, Spark, Pixie) and soil moisture sensors (Whisperer).
+Universal Devices ISY / eisy Polyglot v3 (PG3x) Node Server for **Netro Home** smart irrigation controllers (Sprite, Spark, Pixie) and soil moisture sensors (Whisperer).
 
 This node server uses **Netro Public API v2** (`https://api.netrohome.com/npa/v2`) to provide status monitoring, schedule insights, moisture trending, and irrigation control directly inside ISY/IoX.
 
 ---
 
-## Features
+## Features & Node Types
 
-- **Netro API v2 Support**: Uses per-device API keys generated from the Netro Home portal/app.
-- **Irrigation Controllers (`irrctrl`)**:
-  - Monitors controller status (`Standby`, `Setup`, `Online`, `Watering`, `Offline`, `Sleeping`, `Power Off`), active zone count, next scheduled start time, previous end time, last online/offline events, battery level (for battery-powered controllers like Pixie), remaining daily API calls, and last API update time.
-  - Supports enabling/disabling the controller, skipping watering for `N` days, stopping all watering, and manual data refresh.
-- **Irrigation Zones (`zone`)**:
-  - Automatically creates a child node for each enabled zone (or a single hose zone for 1-zone controllers).
-  - Reports zone status, zone number, zone configuration (`Smart`, `Assistant`, `Timer`), estimated moisture level (`0–100%`), multi-day moisture trend slope (`%/day`), previous start/end times, and next scheduled start/end times.
-  - Supports manual watering with configurable duration and start delay, as well as stopping active watering.
-- **Moisture Sensors (`sensor` / `sensorF`)**:
-  - Reports soil moisture (`%`), ambient temperature (`°C` or `°F`), sunlight (`lux`), battery level (`%`), connection status, sensor report timestamp, and last API update timestamp.
+- **Service Node (`CONTROLLER`)**:
+  - Primary service node managing configuration, device discovery, and dynamic profile synchronization.
+- **Irrigation Controllers (`IRRCTRL`)**:
+  - Monitors controller status (`Standby`, `Setup`, `Online`, `Watering`, `Offline`, `Sleeping`, `Power Off`, `Valve Error`), active zone count, next scheduled start time, previous end time, last online/offline events, battery level (for battery-powered controllers like Pixie), remaining daily API calls, and last API update time.
+  - **Commands**:
+    - `UPDATE` (*Update Data*): Refreshes controller and child zone data from Netro API v2.
+    - `ENABLE` (*Controller*): Enables (`Enabled`) or disables (`Disabled`) the controller.
+    - `SKIPDAYS` (*Days to Skip Watering*): Skips scheduled watering for `0–365` days.
+    - `STOPWATER` (*Stop All Watering*): Immediately stops watering across all zones.
+- **Irrigation Zones (`IRRZONE`)**:
+  - Automatically creates a child node for each enabled zone (or a single hose zone for 1-zone controllers like Pixie).
+  - Reports zone status (`Awaiting Schedule start`, `Schedule Executing`, `Schedule Executed`, `No Schedule Defined`), zone number, zone configuration (`Smart`, `Smart Basic`, `Timer`), estimated moisture level (`0–100%`), multi-day moisture trend slope (`%/day`), previous start/end times, and next scheduled start/end times.
+  - **Commands**:
+    - `WATER` (*Water Zone*): Starts manual watering with configurable `DURATION` (*Water Run Time*, `0–120` minutes) and `DELAY` (*Start Delay*, `0–120` minutes).
+    - `STOPWATER` (*Stop Watering*): Immediately stops active watering.
+- **Moisture Sensors (`SENSORC` / `SENSORF`)**:
+  - Uses `SENSORF` when `TEMP` is set to `F` (Fahrenheit) or `SENSORC` when `TEMP` is set to `C` (Celsius).
+  - Reports soil moisture (`0–100%`), ambient temperature (`°F` or `°C`), sunlight (`LUX`), battery level (`0–100%`), connection status (`Offline`, `Online`, `Sleeping`), sensor data report timestamp, and last API update timestamp.
+  - **Commands**:
+    - `UPDATE` (*Update Data*): Polls the latest sensor readings from Netro API v2.
 - **Dynamic Profile Generation**:
-  - Automatically populates driver names from dynamic/static profile definitions and pushes dynamic JSON profiles (`updateJsonProfile`) once all nodes have finished initializing.
+  - Automatically populates driver display names from dynamic/static profile definitions and pushes dynamic JSON profiles (`updateJsonProfile`, with static `profile/` fallback) after initial configuration and node creation complete. Pressing **Discover** in PG3x also refreshes the profile.
 
 ---
 
@@ -37,7 +47,7 @@ Netro Public API v2 uses **unique per-device API keys** rather than hardware ser
    key_for_device_1 key_for_device_2 key_for_device_3
    ```
 
-> **Important**: Verify that each pasted key in `SERIALID` is different—Netro's "Copy" button on the Account -> API Key page often copies the first key repeatedly. Highlight each key string manually when copying.
+> **Important**: Verify that each pasted key in `SERIALID` is different—Netro's "Copy" button on the Account -> API Key page often copies the first key repeatedly. If duplicate keys are detected in `SERIALID`, the node server will display a warning notice in Polyglot and deduplicate the list.
 
 ---
 
@@ -48,10 +58,10 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
 | `SERIALID` | *(Required)* | Space-separated list of **Netro v2 device API keys** (one unique key per controller or sensor). |
+| `TEMP` | `F` | Temperature unit for Netro sensors: `F` (Fahrenheit, `SENSORF`) or `C` (Celsius, `SENSORC`). |
 | `EVENT_DAYS` | `-5` | Number of days back in time to query for watering and online/offline events (negative integer, e.g. `-5`). |
 | `SCH_DAYS` | `7` | Number of days ahead to query for upcoming irrigation schedules (positive integer, e.g. `7`). |
 | `MOIST_DAYS` | `-3` | Number of days back in time used to compute the linear moisture trend slope (negative integer, e.g. `-3`). |
-| `TEMP` | `F` | Temperature unit for Netro sensors: `F` (Fahrenheit) or `C` (Celsius). |
 
 ---
 
@@ -66,6 +76,11 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Changelog
 
+- **0.2.4**
+  - Standardized all `nodeDef` IDs (`CONTROLLER`, `IRRCTRL`, `IRRZONE`, `SENSORC`, `SENSORF`), `editor` IDs, `nls` prefixes, command IDs (`UPDATE`, `STOPWATER`, `SKIPDAYS`, `ENABLE`, `WATER`), and command parameter IDs (`DURATION`, `DELAY`) to uppercase alphanumeric without special characters or reserved words.
+  - Added full `"nls"` dictionary to dynamic JSON profile payload (`updateJsonProfile`).
+  - Added duplicate API key detection and warning notice in `SERIALID` parsing.
+  - Removed redundant `self.poly.ready()` calls in child device nodes.
 - **0.2.3**
   - Ported Netro Public API v2 support (`https://api.netrohome.com/npa/v2`) and base36 ISY node addressing for device API keys.
   - Added driver `'name'` definitions and dynamic JSON profile generation (`updateJsonProfile` with static `profile/` fallback) deferred until node initialization completes.

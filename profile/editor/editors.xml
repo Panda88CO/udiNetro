@@ -1,88 +1,79 @@
-<editors> 
-  <editor id="IrrState" > 
-     <range  uom="25" subset="0,1,2,3,4,5,6,7,99"  nls='IrrState'/>
+<editors>
+  <editor id="IRRSTATE">
+    <range uom="25" subset="0,1,2,3,4,5,6,7,99" nls="IRRSTATE" />
   </editor>
-    <editor id="Enabled" > 
-     <range  uom="25" subset="0,1,99"  nls='Enabled'/>
+  <editor id="CTRLEN">
+    <range uom="25" subset="0,1,99" nls="CTRLEN" />
   </editor>
-      <editor id="Status" > 
-     <range  uom="25" subset="0,1,98,99"  nls='Status'/>
+  <editor id="SENSORSTAT">
+    <range uom="25" subset="0,1,98,99" nls="SENSORSTAT" />
   </editor>
-  <editor id="constatus" > 
-     <range  uom="25" subset="0-3,99"  nls='constatus'/>
+  <editor id="CONSTATUS">
+    <range uom="25" subset="0-3,99" nls="CONSTATUS" />
   </editor>
-  <editor id="NbrZones" > 
-     <range  uom="70" min="0" max="16" />
+  <editor id="NBRZONES">
+    <range uom="70" min="0" max="16" />
   </editor>
-  <editor id="count" > 
-     <range  uom="70" min="0" max="2000" />
+  <editor id="APICOUNT">
+    <range uom="70" min="0" max="2000" />
   </editor>
-   <editor id="tempC"> 
-        <range uom="4" min="-40" max="105" prec="1" />
-        <range uom="25" subset="98,99" nls="temp" />
+  <editor id="TEMPC">
+    <range uom="4" min="-40" max="105" prec="1" />
+    <range uom="25" subset="98,99" nls="TEMPNLS" />
   </editor>
-  <editor id="tempF"> 
-        <range uom="17" min="-40" max="221" prec="1" />        
-        <range uom="25" subset="98,99" nls="temp" />
+  <editor id="TEMPF">
+    <range uom="17" min="-40" max="221" prec="1" />
+    <range uom="25" subset="98,99" nls="TEMPNLS" />
   </editor>
-    <editor id="setEnable" > 
-     <range  uom="25" subset="0,1"  nls='Enabled'/>
+  <editor id="SETENABLE">
+    <range uom="25" subset="0,1" nls="CTRLEN" />
   </editor>
-  <editor id="SchSource" > 
-     <range  uom="25" subset="0,1,2,99" nls="SchSource" />
+  <editor id="SCHSOURCE">
+    <range uom="25" subset="0,1,2,99" nls="SCHSOURCE" />
   </editor>
-  <editor id="SchStatus" > 
-     <range  uom="25" subset="0,1,2,98,99" nls="SchStatus" />
+  <editor id="SCHSTATUS">
+    <range uom="25" subset="0,1,2,98,99" nls="SCHSTATUS" />
   </editor>
-
-   <editor id="StartStop" > 
-     <range  uom="25" subset="0,1"  nls='Enabled'/>
+  <editor id="STARTSTOP">
+    <range uom="25" subset="0,1" nls="CTRLEN" />
   </editor>
-
-  <editor id="Minutes" > 
-     <range  uom="44"  min="0" max="1440" prec="0" />
-      <range  uom="25" subset="99" nls="UNKNOWN"  />
-  </editor> 
-
-  <editor id="setMinutes" > 
-     <range  uom="44"  min="0" max="120" prec="0" />
-  </editor> 
-  <editor id="setDays" > 
-     <range  uom="10" min="0" max="365" />
+  <editor id="MINDUR">
+    <range uom="44" min="0" max="1440" prec="0" />
+    <range uom="25" subset="99" nls="UNKNLS" />
   </editor>
-
-  <editor id="OnOff" > 
-     <range  uom="25" subset="0,1" nls="OnOff" />
+  <editor id="SETMINUTES">
+    <range uom="44" min="0" max="120" prec="0" />
   </editor>
-  
-  <editor id="ZoneType" > 
-     <range  uom="25" subset="0,1,2" nls="ZoneType" />
+  <editor id="SETDAYS">
+    <range uom="10" min="0" max="365" />
   </editor>
-
-    <editor id="Moisture" > 
-     <range  uom="70" min="0" max="100" />
-     <range  uom="25" subset="99" nls="unknown" />
+  <editor id="ONOFFSTATE">
+    <range uom="25" subset="0,1" nls="ONOFFSTATE" />
   </editor>
-
-    <editor id="slope" > 
-      <range  uom="70" min="-100" max="100" prec="1" />
-      <range  uom="25" subset="99" nls="unknown" />
+  <editor id="ZONETYPE">
+    <range uom="25" subset="0,1,2,99" nls="ZONETYPE" />
   </editor>
-
-    <editor id="Sunlight" > 
-     <range  uom="36" min="0" max="10000" prec="1" />
-      <range  uom="25" subset="99" nls="nolight" />     
+  <editor id="MOISTURE">
+    <range uom="70" min="0" max="100" />
+    <range uom="25" subset="99" nls="UNKNLS" />
   </editor>
-    <editor id="battery" > 
-     <range  uom="51" min="0" max="100" />
-      <range  uom="25" subset="98,99" nls="battery" />
+  <editor id="MOISTSLOPE">
+    <range uom="70" min="-100" max="100" prec="1" />
+    <range uom="25" subset="99" nls="UNKNLS" />
   </editor>
-  <editor id="BOOLSTATE" > 
-     <range  uom="25" subset="0,1,98,99" nls="BOOLSTATE"/>
-  </editor> 
-    <editor id="unixtime" > 
-      <range  uom="151" min="1748387733" max="102063945730" />
-      <range  uom="25" subset="98,99" nls="schedule" />
+  <editor id="SUNLIGHT">
+    <range uom="36" min="0" max="10000" prec="1" />
+    <range uom="25" subset="98,99" nls="NOLIGHT" />
   </editor>
-
-</editors> 
+  <editor id="BATLEVEL">
+    <range uom="51" min="0" max="100" />
+    <range uom="25" subset="98,99" nls="BATNLS" />
+  </editor>
+  <editor id="BOOLSTATE">
+    <range uom="25" subset="0,1,98,99" nls="BOOLSTATE" />
+  </editor>
+  <editor id="UNIXTIME">
+    <range uom="151" min="1748387733" max="102063945730" />
+    <range uom="25" subset="98,99" nls="SCHNLS" />
+  </editor>
+</editors>

@@ -12,7 +12,7 @@ from netroAPI import netroAccess
                
 class netroSensor(udi_interface.Node):
     from  udiLib import node_queue, command_res2ISY, ctrl_status2ISY, wait_for_node_done,cond2ISY,  mask2key, heartbeat, code2ISY, state2ISY, bool2ISY, online2ISY, CO_setDriver, apply_profile_driver_names
-    id = 'sensor'
+    id = 'SENSORC'
 
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25, 'name': 'Moisture Level (0-100)(Estimated)'},  #Moisture 0-100
@@ -37,7 +37,7 @@ class netroSensor(udi_interface.Node):
         self.TEMP_unit = TEMP_unit
         if self.TEMP_unit == 'F':
             logging.info('Temperature Unit set to Fahrenheit')
-            self.id = 'sensorF'
+            self.id = 'SENSORF'
         self.nodeReady = False
         self.system_ready = False
         #self.node = self.poly.getNode(address)

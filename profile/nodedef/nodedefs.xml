@@ -1,117 +1,117 @@
 <?xml version="1.0"?>
-<nodeDefs> 
+<nodeDefs>
 
-   <nodeDef id="controller" nls="nlsctrl">
+   <nodeDef id="CONTROLLER" nls="NLSCTRL">
       <editors />
       <sts>
-         <st id="ST" editor="Enabled" />
-      </sts>
-      <cmds>
-         <sends>    
-         </sends>
-         <accepts>
-         </accepts>
-      </cmds>
-   </nodeDef> 
-
-   <nodeDef id="irrctrl" nls="nlsirrctrl">
-      <editors />
-      <sts>
-         <st id="ST" editor="IrrState" />
-         <st id="GV1" editor="NbrZones" />
-         <st id="GV3" editor="unixtime" />  
-         <st id="GV4" editor="unixtime" />
-         <st id="GV5" editor="unixtime" />  
-         <st id="GV6" editor="unixtime" />      
-         <st id="GV16" editor="battery" />
-         <st id="GV17" editor="count" /> 
-         <st id="GV19" editor="unixtime" />
-      </sts>
-      <cmds>
-         <sends>
-            <cmd id="DON" /> 
-            <cmd id="DOF" />          
-         </sends>
-         <accepts>
-            <cmd id="Update" />
-            <cmd id="StopWater" />
-            <cmd id="SkipDays" >   
-               <p id="" editor="setDays" /> 
-            </cmd >              
-            <cmd id="Enable" >   
-               <p id="" editor="setEnable" /> 
-            </cmd >
-         </accepts>
-      </cmds>
-   </nodeDef> 
-
-   <nodeDef id="zone" nls="nlszone">
-      <editors />
-      <sts>
-         <st id="ST" editor="SchStatus" /> 
-         <st id="GV0" editor="NbrZones" /> 
-         <st id="GV1" editor="ZoneType" /> 
-         <st id="GV2" editor="Moisture" />
-         <st id="GV3" editor="slope" />         
-         <st id="GV4" editor="unixtime" />
-         <st id="GV5" editor="unixtime" />
-         <st id="GV6" editor="unixtime" />
-         <st id="GV7" editor="unixtime" />
-         <st id="GV19" editor="unixtime" />
-      </sts>
-      <cmds>
-         <sends>
-            <cmd id="DON" /> 
-            <cmd id="DOF" />          
-         </sends>
-         <accepts>
-            <cmd id="StopWater"/>
-            <cmd id="Water" >   
-               <p id="Duration" editor="setMinutes" />
-               <p id="Delay" editor="setMinutes" />                
-            </cmd >
-         </accepts>
-      </cmds>
-   </nodeDef> 
-   
-   <nodeDef id="sensor" nls="nlssensor">
-      <editors />
-      <sts>
-         <st id="ST" editor="Moisture" /> 
-         <st id="CLITEMP" editor="tempC" />
-         <st id="GV2" editor="Sunlight" />
-         <st id="GV18" editor="unixtime" />
-         <st id="GV14" editor="battery" />
-         <st id="GV15" editor="constatus" />   
-         <st id="GV19" editor="unixtime" />
+         <st id="ST" editor="CTRLEN" />
       </sts>
       <cmds>
          <sends>
          </sends>
          <accepts>
-            <cmd id="UPDATE" /> 
          </accepts>
       </cmds>
-   </nodeDef> 
+   </nodeDef>
 
-   <nodeDef id="sensorF" nls="nlssensor">
+   <nodeDef id="IRRCTRL" nls="NLSIRRCTRL">
       <editors />
       <sts>
-         <st id="ST" editor="Moisture" /> 
-         <st id="CLITEMP" editor="tempF" />
-         <st id="GV2" editor="Sunlight" />
-         <st id="GV18" editor="unixtime" />
-         <st id="GV14" editor="battery" />
-         <st id="GV15" editor="constatus" />   
-         <st id="GV19" editor="unixtime" />
+         <st id="ST" editor="IRRSTATE" />
+         <st id="GV1" editor="NBRZONES" />
+         <st id="GV3" editor="UNIXTIME" />
+         <st id="GV4" editor="UNIXTIME" />
+         <st id="GV5" editor="UNIXTIME" />
+         <st id="GV6" editor="UNIXTIME" />
+         <st id="GV16" editor="BATLEVEL" />
+         <st id="GV17" editor="APICOUNT" />
+         <st id="GV19" editor="UNIXTIME" />
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
+            <cmd id="STOPWATER" />
+            <cmd id="SKIPDAYS">
+               <p id="" editor="SETDAYS" />
+            </cmd>
+            <cmd id="ENABLE">
+               <p id="" editor="SETENABLE" />
+            </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="IRRZONE" nls="NLSZONE">
+      <editors />
+      <sts>
+         <st id="ST" editor="SCHSTATUS" />
+         <st id="GV0" editor="NBRZONES" />
+         <st id="GV1" editor="ZONETYPE" />
+         <st id="GV2" editor="MOISTURE" />
+         <st id="GV3" editor="MOISTSLOPE" />
+         <st id="GV4" editor="UNIXTIME" />
+         <st id="GV5" editor="UNIXTIME" />
+         <st id="GV6" editor="UNIXTIME" />
+         <st id="GV7" editor="UNIXTIME" />
+         <st id="GV19" editor="UNIXTIME" />
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
+         </sends>
+         <accepts>
+            <cmd id="STOPWATER" />
+            <cmd id="WATER">
+               <p id="DURATION" editor="SETMINUTES" />
+               <p id="DELAY" editor="SETMINUTES" />
+            </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="SENSORC" nls="NLSSENSOR">
+      <editors />
+      <sts>
+         <st id="ST" editor="MOISTURE" />
+         <st id="CLITEMP" editor="TEMPC" />
+         <st id="GV2" editor="SUNLIGHT" />
+         <st id="GV18" editor="UNIXTIME" />
+         <st id="GV14" editor="BATLEVEL" />
+         <st id="GV15" editor="CONSTATUS" />
+         <st id="GV19" editor="UNIXTIME" />
       </sts>
       <cmds>
          <sends>
          </sends>
          <accepts>
-            <cmd id="UPDATE" /> 
+            <cmd id="UPDATE" />
          </accepts>
       </cmds>
-   </nodeDef> 
+   </nodeDef>
+
+   <nodeDef id="SENSORF" nls="NLSSENSOR">
+      <editors />
+      <sts>
+         <st id="ST" editor="MOISTURE" />
+         <st id="CLITEMP" editor="TEMPF" />
+         <st id="GV2" editor="SUNLIGHT" />
+         <st id="GV18" editor="UNIXTIME" />
+         <st id="GV14" editor="BATLEVEL" />
+         <st id="GV15" editor="CONSTATUS" />
+         <st id="GV19" editor="UNIXTIME" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
+         </accepts>
+      </cmds>
+   </nodeDef>
 
 </nodeDefs>
