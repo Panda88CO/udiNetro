@@ -76,6 +76,8 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Changelog
 
+- **0.2.6**
+  - Added comprehensive unused node detection and removal during startup in `udiNetro.py` and `netroController.py` to automatically remove obsolete controllers, child zones (e.g. legacy `_z` addresses), and sensors from ISY.
 - **0.2.5**
   - Added `TIME` (*Last Poll Time*) driver to `IRRCTRL` (`netroController`), updated only when a Netro API call succeeds with valid data.
   - Updated `heartbeat` on `shortPoll` to send `DON`, wait 5 seconds, and send `DOF` on every poll instead of toggling between polls.

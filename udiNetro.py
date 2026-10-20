@@ -20,7 +20,7 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.2.5'
+VERSION = '0.2.6'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY, apply_profile_driver_names
@@ -36,18 +36,21 @@ class netroStart(udi_interface.Node):
             base36 = digits[remainder] + base36
         return base36
 
-    def _find_existing_primary_address(self, name):
+    def _find_existing_primary_address(self, name, assigned_addresses=None):
         for node in self.nodes_in_db:
-            if node.get('address') == 'controller':
+            addr = node.get('address')
+            if addr == 'controller':
                 continue
-            if node.get('primaryNode') != node.get('address'):
+            if node.get('primaryNode') != addr:
+                continue
+            if assigned_addresses and addr in assigned_addresses:
                 continue
             if node.get('name') == name:
-                return node.get('address')
+                return addr
         return None
 
-    def _build_primary_address(self, name, prefix, offset=0):
-        existing_address = self._find_existing_primary_address(name)
+    def _build_primary_address(self, name, prefix, offset=0, assigned_addresses=None):
+        existing_address = self._find_existing_primary_address(name, assigned_addresses)
         if existing_address is not None:
             return existing_address
 
@@ -134,12 +137,12 @@ class netroStart(udi_interface.Node):
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                node_address = self._build_primary_address(name, 'c', indx)
+                node_address = self._build_primary_address(name, 'c', indx, assigned_primary_addresses)
                 self.node_dict[serial_nbr] = netroController(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
                 assigned_primary_addresses.append(node_address)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
-                node_address = self._build_primary_address(name, 's', indx)
+                node_address = self._build_primary_address(name, 's', indx, assigned_primary_addresses)
                 self.node_dict[serial_nbr] = netroSensor(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit )
                 assigned_primary_addresses.append(node_address)
             elif dev_type == 'error':
@@ -161,15 +164,33 @@ class netroStart(udi_interface.Node):
             time.sleep(1)
 
         time.sleep(2)
-        logging.debug(f'Scanning db for extra nodes : {assigned_primary_addresses}')
+        # Collect all active node addresses (controller service node, controllers, child zones, sensors)
+        active_addresses = {self.address}
+        for dev_node in self.node_dict.values():
+            active_addresses.add(dev_node.address)
+            if hasattr(dev_node, 'zone_nodes') and isinstance(dev_node.zone_nodes, dict):
+                for zone_node in dev_node.zone_nodes.values():
+                    active_addresses.add(zone_node.address)
 
-        if len(self.node_dict) > 0:
-            for indx, node  in enumerate(self.nodes_in_db):
-                #node = self.nodes_in_db[nde]
-                logging.debug(f'Scanning db for unused primary nodes  : {node}')
-                if node['primaryNode'] not in assigned_primary_addresses:
-                    logging.debug('Removing node : {} {}'.format(node['name'], node))
-                    self.poly.delNode(node['address'])
+        logging.info(f'Scanning database for unused nodes. Active addresses: {active_addresses}')
+        raw_db_nodes = self.poly.getNodesFromDb()
+        db_node_list = list(raw_db_nodes.values()) if isinstance(raw_db_nodes, dict) else (raw_db_nodes or [])
+
+        removed_count = 0
+        for node in db_node_list:
+            node_addr = node.get('address')
+            if node_addr and node_addr not in active_addresses:
+                logging.warning(f"Removing unused node from ISY: {node.get('name')} (address: {node_addr}, primary: {node.get('primaryNode')})")
+                try:
+                    self.poly.delNode(node_addr)
+                    removed_count += 1
+                except Exception as e:
+                    logging.error(f"Error removing node {node_addr}: {e}")
+
+        if removed_count > 0:
+            logging.info(f"Removed {removed_count} unused node(s) from ISY database.")
+        else:
+            logging.info("No unused nodes found in ISY database.")
             
     
         self.update_all_drivers()
@@ -185,7 +206,8 @@ class netroStart(udi_interface.Node):
 
 
     def check_config(self):
-        self.nodes_in_db = self.poly.getNodesFromDb()
+        nodes = self.poly.getNodesFromDb()
+        self.nodes_in_db = list(nodes.values()) if isinstance(nodes, dict) else (nodes or [])
         #self.config_done= True
 
 
@@ -194,7 +216,8 @@ class netroStart(udi_interface.Node):
         # We use this to discover devices, or ask to authenticate if user has not already done so
         if not self.initialized:
             self.poly.Notices.clear()
-        self.nodes_in_db = self.poly.getNodesFromDb()
+        nodes = self.poly.getNodesFromDb()
+        self.nodes_in_db = list(nodes.values()) if isinstance(nodes, dict) else (nodes or [])
         self.config_done= True
  
 

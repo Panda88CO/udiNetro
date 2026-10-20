@@ -120,14 +120,16 @@ class netroController(udi_interface.Node):
         self.nodeReady = True
         self.updateISYdrivers()
 
-        logging.debug(f'Scanning db for extra nodes : {self.nodes_in_db}')
-        
-
-        #for indx, node  in enumerate(self.nodes_in_db):
-        #    logging.debug(f'Scanning db for node : {node}')
-        #    if node['primaryNode']  in self.serial_id and node['address'] not in zone_addresses:
-        #       logging.debug('Removing node : {} {}'.format(node['name'], node))
-        #       self.poly.delNode(node['address'])
+        raw_db_nodes = self.poly.getNodesFromDb()
+        db_node_list = list(raw_db_nodes.values()) if isinstance(raw_db_nodes, dict) else (raw_db_nodes or [])
+        logging.debug(f'Scanning db for extra zone nodes under controller {self.address}: {db_node_list}')
+        for node in db_node_list:
+            if node.get('primaryNode') == self.address and node.get('address') not in zone_addresses:
+                logging.warning(f"Removing unused zone node from ISY: {node.get('name')} (address: {node.get('address')})")
+                try:
+                    self.poly.delNode(node.get('address'))
+                except Exception as e:
+                    logging.error(f"Error removing zone node {node.get('address')}: {e}")
         self.system_ready = True
             
     def stop(self):
