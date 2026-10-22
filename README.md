@@ -76,6 +76,10 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Changelog
 
+- **0.2.7**
+  - Fixed rapid API polling in `check_for_planned_schedules()` by adding state tracking for schedule start and end, preventing exhaustion of Netro's daily 2,000 API token limit.
+  - Added safety guard to unused node cleanup on startup: skips node deletion if any configured device fails to initialize (e.g. rate limit reached or network drop).
+  - Enhanced API error handling and logging for HTTP 400/429 token limit errors.
 - **0.2.6**
   - Added comprehensive unused node detection and removal during startup in `udiNetro.py` and `netroController.py` to automatically remove obsolete controllers, child zones (e.g. legacy `_z` addresses), and sensors from ISY.
 - **0.2.5**

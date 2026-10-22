@@ -20,7 +20,7 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.2.6'
+VERSION = '0.2.7'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY, apply_profile_driver_names
@@ -127,6 +127,7 @@ class netroStart(udi_interface.Node):
             time.sleep(10)
             sys.exit()
    
+        has_startup_errors = False
         logging.debug(f'Instanciating nodes for {self.serialID_list}')
         for indx, serial_nbr in enumerate(self.serialID_list):
             logging.debug(f'Instanciating nodes for {serial_nbr}')
@@ -146,8 +147,10 @@ class netroStart(udi_interface.Node):
                 self.node_dict[serial_nbr] = netroSensor(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit )
                 assigned_primary_addresses.append(node_address)
             elif dev_type == 'error':
+                has_startup_errors = True
                 self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR: {name}'
             else:
+                has_startup_errors = True
                 self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR'
             time.sleep(1)
 
@@ -172,25 +175,28 @@ class netroStart(udi_interface.Node):
                 for zone_node in dev_node.zone_nodes.values():
                     active_addresses.add(zone_node.address)
 
-        logging.info(f'Scanning database for unused nodes. Active addresses: {active_addresses}')
-        raw_db_nodes = self.poly.getNodesFromDb()
-        db_node_list = list(raw_db_nodes.values()) if isinstance(raw_db_nodes, dict) else (raw_db_nodes or [])
-
-        removed_count = 0
-        for node in db_node_list:
-            node_addr = node.get('address')
-            if node_addr and node_addr not in active_addresses:
-                logging.warning(f"Removing unused node from ISY: {node.get('name')} (address: {node_addr}, primary: {node.get('primaryNode')})")
-                try:
-                    self.poly.delNode(node_addr)
-                    removed_count += 1
-                except Exception as e:
-                    logging.error(f"Error removing node {node_addr}: {e}")
-
-        if removed_count > 0:
-            logging.info(f"Removed {removed_count} unused node(s) from ISY database.")
+        if has_startup_errors:
+            logging.warning("Skipping removal of database nodes because one or more devices failed to initialize (e.g. rate limit exceeded or offline). Existing nodes are preserved.")
         else:
-            logging.info("No unused nodes found in ISY database.")
+            logging.info(f'Scanning database for unused nodes. Active addresses: {active_addresses}')
+            raw_db_nodes = self.poly.getNodesFromDb()
+            db_node_list = list(raw_db_nodes.values()) if isinstance(raw_db_nodes, dict) else (raw_db_nodes or [])
+
+            removed_count = 0
+            for node in db_node_list:
+                node_addr = node.get('address')
+                if node_addr and node_addr not in active_addresses:
+                    logging.warning(f"Removing unused node from ISY: {node.get('name')} (address: {node_addr}, primary: {node.get('primaryNode')})")
+                    try:
+                        self.poly.delNode(node_addr)
+                        removed_count += 1
+                    except Exception as e:
+                        logging.error(f"Error removing node {node_addr}: {e}")
+
+            if removed_count > 0:
+                logging.info(f"Removed {removed_count} unused node(s) from ISY database.")
+            else:
+                logging.info("No unused nodes found in ISY database.")
             
     
         self.update_all_drivers()

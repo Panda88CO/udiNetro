@@ -148,12 +148,16 @@ class basicAPI(object):
                 return 'unknown', response.text
 
         except requests.exceptions.HTTPError as error:
-            logging.error(f"Call { method } { completeUrl } failed: { error }")
-            #self.apiLock.release()
+            resp_text = response.text if response is not None else ""
+            logging.error(f"Call { method } { completeUrl } failed: { error } - Response: { resp_text }")
+            if "limit" in resp_text.lower() or "token" in resp_text.lower():
+                logging.warning(f"Netro API rate limit / token limit reached (resets daily at midnight): {resp_text}")
             if response is not None and response.status_code == 400:
-                return('error', response.text)
+                return('error', resp_text)
+            elif response is not None and response.status_code == 429:
+                return('overload', resp_text)
             else:
-                return ('unknown', response.text if response is not None else str(error))
+                return ('unknown', resp_text if response is not None else str(error))
         except requests.exceptions.RequestException as error:
             logging.error(f"Request error { method } { completeUrl } failed: { error }")
             return ('error', str(error))

@@ -31,6 +31,8 @@ class netroController(udi_interface.Node):
         self.SCH_DAYS = schdays
         self.nodeReady = False
         self.system_ready = False
+        self._last_triggered_start = None
+        self._last_triggered_end = None
         self._stop_thread = threading.Event()
         self._thread = threading.Thread(target=self._background_task, daemon=True)
         self._thread.start()
@@ -67,18 +69,25 @@ class netroController(udi_interface.Node):
             self._stop_thread.wait(30)  # Wait 30 seconds or until stopped
 
     def check_for_planned_schedules(self):
-        # Place the code you want to run every 30 seconds here
         logging.debug("check_for_planned_schedules executed.")
         time_now = int(time.time())
-        if isinstance(self.netro_api.get_controller_info('next_start'), int) and isinstance(self.netro_api.get_controller_info('last_end'), int):
-            logging.debug(f"schedule dataAG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
-            # Need statemachine 
-            if time_now >= self.netro_api.get_controller_info('next_start')or (self.netro_api.system_status() == 'WATERING' and  time_now >= self.netro_api.get_controller_info('last_end')): #:                
-                logging.debug("check_for_planned_schedules - next start time reached, updating ISY drivers")
-                logging.debug(f"schedule dataBG {time_now} {self.netro_api.get_controller_info('next_start')} {self.netro_api.system_status()} {self.netro_api.get_controller_info('last_end')}")
-                self.netro_api.update_controller_data()
-                # Update ISY drivers with the latest data
-                self.updateISYdrivers()
+        next_start = self.netro_api.get_controller_info('next_start')
+        last_end = self.netro_api.get_controller_info('last_end')
+        status = self.netro_api.system_status()
+
+        # Trigger update once when next scheduled start time is reached
+        if isinstance(next_start, int) and time_now >= next_start and next_start != self._last_triggered_start:
+            logging.info(f"Planned schedule start reached ({next_start}), updating controller data")
+            self._last_triggered_start = next_start
+            self.netro_api.update_controller_data()
+            self.updateISYdrivers()
+
+        # Trigger update once when watering schedule ends
+        elif status == 'WATERING' and isinstance(last_end, int) and time_now >= last_end and last_end != self._last_triggered_end:
+            logging.info(f"Planned schedule end reached ({last_end}), updating controller data")
+            self._last_triggered_end = last_end
+            self.netro_api.update_controller_data()
+            self.updateISYdrivers()
 
         
 
