@@ -20,7 +20,7 @@ from datetime import timedelta, datetime
 from netroController import netroController
 from netroSensor import netroSensor
 
-VERSION = '0.2.7'
+VERSION = '0.2.9'
 
 class netroStart(udi_interface.Node):
     from  udiLib import handleLevelChange, node_queue, command_res2ISY, code2ISY, wait_for_node_done ,  cond2ISY,  mask2key, heartbeat, state2ISY, sync_state2ISY, bool2ISY, online2ISY, CO_setDriver, openClose2ISY, apply_profile_driver_names
@@ -84,7 +84,7 @@ class netroStart(udi_interface.Node):
         polyglot.subscribe(polyglot.LOGLEVEL, self.handleLevelChange)
         polyglot.subscribe(polyglot.NOTICES, self.handleNotices)
         polyglot.subscribe(polyglot.DISCOVER, self.discover)
-        #polyglot.subscribe(polyglot.POLL, self.systemPoll)        
+        polyglot.subscribe(polyglot.POLL, self.systemPoll)        
         #polyglot.subscribe(polyglot.WEBHOOK, self.webhook)
         #logging.debug('Calling start')
         #olyglot.subscribe(polyglot.START, self.start, 'controller')
@@ -107,7 +107,8 @@ class netroStart(udi_interface.Node):
         logging.debug(f'drivers ; {self.drivers}')
 
         self.poly.Notices.clear()
-        assigned_primary_addresses = ['controller']
+        self.assigned_primary_addresses = ['controller']
+        self.uninitialized_keys = []
         self.poly.setCustomParamsDoc()
 
         while not self.customParam_done  or not self.config_done :
@@ -131,26 +132,38 @@ class netroStart(udi_interface.Node):
         logging.debug(f'Instanciating nodes for {self.serialID_list}')
         for indx, serial_nbr in enumerate(self.serialID_list):
             logging.debug(f'Instanciating nodes for {serial_nbr}')
-            api_access = basicAPI(serial_nbr)
-            dev_type, name = api_access.netroType()
-            del api_access
+            dev_type, name = None, None
+            for attempt in range(3):
+                api_access = basicAPI(serial_nbr)
+                dev_type, name = api_access.netroType()
+                del api_access
+                if dev_type in ('controller', 'sensor'):
+                    break
+                if attempt < 2 and dev_type == 'error' and any(kw in str(name).lower() for kw in ('resolve', 'connection', 'network', 'errno', 'timed out')):
+                    logging.warning(f'Network/DNS not ready for {serial_nbr} (attempt {attempt+1}/3): {name}. Retrying in 5 seconds...')
+                    time.sleep(5)
+                else:
+                    break
+
             time.sleep(1)   
             logging.debug(f'Name : {name}, {dev_type }')
             if dev_type == 'controller':
                 name = self.poly.getValidName(name)
-                node_address = self._build_primary_address(name, 'c', indx, assigned_primary_addresses)
+                node_address = self._build_primary_address(name, 'c', indx, self.assigned_primary_addresses)
                 self.node_dict[serial_nbr] = netroController(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
-                assigned_primary_addresses.append(node_address)
+                self.assigned_primary_addresses.append(node_address)
             elif dev_type == 'sensor':
                 name = self.poly.getValidName(name)
-                node_address = self._build_primary_address(name, 's', indx, assigned_primary_addresses)
+                node_address = self._build_primary_address(name, 's', indx, self.assigned_primary_addresses)
                 self.node_dict[serial_nbr] = netroSensor(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit )
-                assigned_primary_addresses.append(node_address)
+                self.assigned_primary_addresses.append(node_address)
             elif dev_type == 'error':
                 has_startup_errors = True
+                self.uninitialized_keys.append((indx, serial_nbr))
                 self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR: {name}'
             else:
                 has_startup_errors = True
+                self.uninitialized_keys.append((indx, serial_nbr))
                 self.poly.Notices[f'ERROR_{indx}'] = f'Key {serial_nbr} generated ERROR'
             time.sleep(1)
 
@@ -338,6 +351,44 @@ class netroStart(udi_interface.Node):
 
     def ISYupdate (self, command=None):
         logging.info(f'ISY-update status node  called')
+
+    def systemPoll(self, pollList):
+        if pollList == 'longPoll' and getattr(self, 'uninitialized_keys', None):
+            self.retry_uninitialized_devices()
+
+    def retry_uninitialized_devices(self):
+        if not self.uninitialized_keys:
+            return
+        logging.info(f"Retrying initialization for uninitialized keys: {self.uninitialized_keys}")
+        still_failed = []
+        newly_added = False
+        for indx, serial_nbr in self.uninitialized_keys:
+            api_access = basicAPI(serial_nbr)
+            dev_type, name = api_access.netroType()
+            del api_access
+            if dev_type == 'controller':
+                name = self.poly.getValidName(name)
+                node_address = self._build_primary_address(name, 'c', indx, self.assigned_primary_addresses)
+                self.node_dict[serial_nbr] = netroController(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit, self.EVENT_DAYS, self.MOIST_DAYS, self.SCH_DAYS)
+                self.assigned_primary_addresses.append(node_address)
+                if f'ERROR_{indx}' in self.poly.Notices:
+                    self.poly.Notices.delete(f'ERROR_{indx}')
+                newly_added = True
+                logging.info(f"Successfully recovered and instantiated controller node {name} ({node_address}) for key {serial_nbr}")
+            elif dev_type == 'sensor':
+                name = self.poly.getValidName(name)
+                node_address = self._build_primary_address(name, 's', indx, self.assigned_primary_addresses)
+                self.node_dict[serial_nbr] = netroSensor(self.poly, node_address, node_address, name, serial_nbr, self.Temp_unit)
+                self.assigned_primary_addresses.append(node_address)
+                if f'ERROR_{indx}' in self.poly.Notices:
+                    self.poly.Notices.delete(f'ERROR_{indx}')
+                newly_added = True
+                logging.info(f"Successfully recovered and instantiated sensor node {name} ({node_address}) for key {serial_nbr}")
+            else:
+                still_failed.append((indx, serial_nbr))
+        self.uninitialized_keys = still_failed
+        if newly_added:
+            self._update_dynamic_profile()
 
     def discover(self, *args, **kwargs):
         if not (self.customParam_done and self.config_done and self.nodeDefineDone and self.initialized):

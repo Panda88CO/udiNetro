@@ -76,6 +76,8 @@ Configure the following custom parameters in the Polyglot v3 UI under **Configur
 
 ## Changelog
 
+- **0.2.9 / 0.2.8**
+  - Added startup retry backoff (3 attempts with 5-second delays) and automatic background recovery on `longPoll` for uninitialized device keys if DNS resolution or network routing fails during system boot.
 - **0.2.7**
   - Fixed rapid API polling in `check_for_planned_schedules()` by adding state tracking for schedule start and end, preventing exhaustion of Netro's daily 2,000 API token limit.
   - Added safety guard to unused node cleanup on startup: skips node deletion if any configured device fails to initialize (e.g. rate limit reached or network drop).
